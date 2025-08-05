@@ -235,21 +235,6 @@ try {
 }
 ```
 
-## 📚 Additional Resources
-
-- [Appstack Dashboard](https://dashboard.appstack.com/)
-- [iOS SDK Documentation](https://github.com/appstack/ios-appstack-sdk)
-- [SKAdNetwork Guide](https://developer.apple.com/documentation/storekit/skadnetwork)
-
-## 🤝 Contributing
-
-Contributions are welcome. Please:
-
-1. Fork the repository
-2. Create a branch for your feature (`git checkout -b feature/new-feature`)
-3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature/new-feature`)
-5. Create a Pull Request
 
 ## 📄 License
 
