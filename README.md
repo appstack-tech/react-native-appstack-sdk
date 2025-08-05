@@ -234,19 +234,3 @@ try {
   }
 }
 ```
-
-
-## 📄 License
-
-This project is under the MIT license. See the [LICENSE](LICENSE) file for more details.
-
-## 📞 Support
-
-For questions or issues:
-
-- **GitHub Issues**: [Create an issue](https://github.com/your-org/react-native-appstack-sdk/issues)
-- **Email**: support@appstack.com
-
----
-
-**Note**: This is an unofficial bridge for the Appstack iOS SDK. For the official SDK, visit [appstack.com](https://appstack.com).
