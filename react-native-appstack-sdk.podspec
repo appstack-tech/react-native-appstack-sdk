@@ -16,8 +16,8 @@ Pod::Spec.new do |s|
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
   
-  # Include Appstack XCFramework
-  s.vendored_frameworks = "ios/AppstackSDK.xcframework"
+  # Include Appstack frameworks for both simulator and device
+  s.ios.vendored_frameworks = "ios/ios-arm64/AppstackSDK.framework", "ios/ios-arm64_x86_64-simulator/AppstackSDK.framework"
   
   # React Native configuration
   s.dependency "React-Core"

@@ -47,8 +47,6 @@ export interface AppstackSDKInterface {
    * @returns Promise that resolves when configuration is successful
    */
   enableASAAttribution(): Promise<boolean>;
-
-
 }
 
 /**
@@ -62,11 +60,18 @@ export interface AppstackSDKInterface {
  * await AppstackSDK.configure('your-api-key');
  * 
  * // Send events
- * await AppstackSDK.sendEvent('user_registered');
- * await AppstackSDK.sendEventWithRevenue('purchase', 29.99);
+ * await AppstackSDK.sendEvent('PURCHASE');
+ * await AppstackSDK.sendEventWithRevenue('PURCHASE', 29.99);
  * 
- * // Enable Apple Search Ads Attribution
- * await AppstackSDK.enableASAAttribution();
+ * // Additional SDK methods
+ * await AppstackSDK.flush(); // Manually flush events
+ * await AppstackSDK.clearData(); // Clear stored data
+ * const enabled = await AppstackSDK.isEnabled(); // Check SDK status
+ * 
+ * // Enable Apple Search Ads Attribution (iOS only)
+ * if (Platform.OS === 'ios') {
+ *   await AppstackSDK.enableASAAttribution();
+ * }
  * ```
  */
 class AppstackSDK implements AppstackSDKInterface {
@@ -92,11 +97,6 @@ class AppstackSDK implements AppstackSDKInterface {
       throw new Error('API key must be a non-empty string');
     }
 
-    if (Platform.OS !== 'ios') {
-      console.warn('Appstack SDK is currently only supported on iOS');
-      return false;
-    }
-
     try {
       const result = await AppstackReactNative.configure(apiKey.trim());
       return result;
@@ -112,11 +112,6 @@ class AppstackSDK implements AppstackSDKInterface {
   async sendEvent(eventName: string): Promise<boolean> {
     if (!eventName || typeof eventName !== 'string' || eventName.trim() === '') {
       throw new Error('Event name must be a non-empty string');
-    }
-
-    if (Platform.OS !== 'ios') {
-      console.warn('Appstack SDK is currently only supported on iOS');
-      return false;
     }
 
     try {
@@ -145,11 +140,6 @@ class AppstackSDK implements AppstackSDKInterface {
       throw new Error('Revenue must be a valid number or numeric string');
     }
 
-    if (Platform.OS !== 'ios') {
-      console.warn('Appstack SDK is currently only supported on iOS');
-      return false;
-    }
-
     try {
       return await AppstackReactNative.sendEventWithRevenue(eventName.trim(), revenue);
     } catch (error) {
@@ -174,8 +164,6 @@ class AppstackSDK implements AppstackSDKInterface {
       throw error;
     }
   }
-
-
 }
 
 // Export the singleton instance
