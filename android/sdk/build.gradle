@@ -13,12 +13,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -40,12 +40,13 @@ dependencies {
     implementation "androidx.annotation:annotation:1.7.1"
     implementation "androidx.lifecycle:lifecycle-process:2.7.0"
 
-    // Network dependencies (simplified)
+    // Network dependencies - use Moshi to match the Kotlin code
     implementation "com.squareup.retrofit2:retrofit:2.11.0"
-    implementation "com.squareup.retrofit2:converter-gson:2.11.0"
+    implementation "com.squareup.retrofit2:converter-moshi:2.11.0"
     implementation "com.squareup.okhttp3:okhttp:4.12.0"
     implementation "com.squareup.okhttp3:logging-interceptor:4.12.0"
     
-    // JSON
-    implementation "com.google.code.gson:gson:2.10.1"
+    // Moshi JSON library
+    implementation "com.squareup.moshi:moshi:1.15.0"
+    implementation "com.squareup.moshi:moshi-kotlin:1.15.0"
 }

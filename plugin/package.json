@@ -1,0 +1,33 @@
+{
+  "name": "react-native-appstack-sdk-plugin",
+  "version": "1.0.0",
+  "description": "Expo config plugin for react-native-appstack-sdk",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf build"
+  },
+  "keywords": [
+    "expo",
+    "expo-plugin",
+    "react-native",
+    "appstack",
+    "attribution"
+  ],
+  "peerDependencies": {
+    "expo": "*"
+  },
+  "dependencies": {
+    "@expo/config-plugins": "~10.1.1"
+  },
+  "devDependencies": {
+    "@expo/config-types": "^52.0.0",
+    "typescript": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/react-native-appstack-sdk.git",
+    "directory": "plugin"
+  }
+}

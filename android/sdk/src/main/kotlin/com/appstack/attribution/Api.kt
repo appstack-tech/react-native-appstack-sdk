@@ -35,7 +35,7 @@ object AppStackAttributionSdk {
         context: Context,
         apiKey: String,
         isDebug: Boolean,
-        endpointBaseUrl: String = "http://10.0.2.2:8000",
+        endpointBaseUrl: String = "https://api.event.dev.appstack.tech/android/",
         logLevel: LogLevel = LogLevel.INFO,
         listener: InitListener? = null
     ) {

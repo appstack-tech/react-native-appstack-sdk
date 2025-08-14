@@ -1,8 +1,6 @@
 plugins {
     id("com.android.library")
     kotlin("android")
-    id("com.google.devtools.ksp")
-    id("com.vanniktech.maven.publish") version "0.33.0"
 }
 
 android {
@@ -12,6 +10,7 @@ android {
 
     defaultConfig {
         minSdk = 21
+        targetSdk = 34
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Bundle the keep-rules defined in `consumer-rules.pro` inside the AAR so that
         // every application consuming the SDK automatically inherits the necessary
@@ -47,9 +46,9 @@ android {
 }
 
 dependencies {
-    // Note: React Native dependencies will be provided by the host app at runtime
-    compileOnly("com.facebook.react:react-native:+") // React Native bridge dependencies
-
+    // React Native dependencies - use compileOnly for library modules
+    compileOnly("com.facebook.react:react-native:+")
+    
     // Kotlin Coroutines – keep versions aligned via BOM
     implementation(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.7.3"))
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core")

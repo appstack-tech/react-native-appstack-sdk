@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "homepageapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tomrlas.homepageapp"
@@ -35,7 +35,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+"../plugin/build"
     ],
     "experiments": {
       "typedRoutes": true

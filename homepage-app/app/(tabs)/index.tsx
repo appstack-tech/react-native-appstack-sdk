@@ -6,32 +6,11 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-
-// Import your SDK with error handling for development
-let AppstackSDK: any = null;
-try {
-  AppstackSDK = require('react-native-appstack-sdk').default;
-} catch (error) {
-  console.warn('AppstackSDK not available in this environment:', error);
-  // Create a mock SDK for development/web environments
-  AppstackSDK = {
-    configure: async (apiKey: string) => {
-      console.log('Mock SDK: configure called with', apiKey);
-      return true;
-    },
-    sendEvent: async (eventName: string) => {
-      console.log('Mock SDK: sendEvent called with', eventName);
-      return true;
-    },
-    sendEventWithRevenue: async (eventName: string, revenue: number) => {
-      console.log('Mock SDK: sendEventWithRevenue called with', eventName, revenue);
-      return true;
-    }
-  };
-}
+import AppstackSDK from 'react-native-appstack-sdk';
 
 export default function HomeScreen() {
   const [isSDKInitialized, setIsSDKInitialized] = useState(false);
+  const [sdkError, setSdkError] = useState<string | null>(null);
 
   // Initialize SDK when component mounts
   useEffect(() => {
@@ -40,16 +19,27 @@ export default function HomeScreen() {
 
   const initializeAppstackSDK = async () => {
     try {
-      // Replace with your actual API key from Appstack dashboard
-      await AppstackSDK.configure('your-api-key-here');
+      console.log('Initializing Appstack SDK...');
+      
+      // Configure the SDK
+      await AppstackSDK.configure('sample-api-key');
       setIsSDKInitialized(true);
-      console.log('Appstack SDK initialized successfully!');
+      setSdkError(null);
+      
+      console.log('Appstack SDK configured successfully');
       
       // Send a basic event to test
       await AppstackSDK.sendEvent('APP_OPENED');
+      console.log('APP_OPENED event sent successfully');
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Failed to initialize Appstack SDK:', error);
-      Alert.alert('SDK Error', 'Failed to initialize Appstack SDK');
+      setSdkError(errorMessage);
+      
+      // Only show alert if it's not the common linking error
+      if (!errorMessage.includes("doesn't seem to be linked")) {
+        Alert.alert('SDK Error', `Failed to initialize Appstack SDK: ${errorMessage}`);
+      }
     }
   };
 
@@ -62,6 +52,7 @@ export default function HomeScreen() {
     try {
       await AppstackSDK.sendEvent('TEST_BUTTON_PRESSED');
       Alert.alert('Success!', 'Test event sent successfully');
+      console.log('TEST_BUTTON_PRESSED event sent successfully');
     } catch (error) {
       console.error('Failed to send event:', error);
       Alert.alert('Error', 'Failed to send test event');
@@ -77,6 +68,7 @@ export default function HomeScreen() {
     try {
       await AppstackSDK.sendEventWithRevenue('PURCHASE', 29.99);
       Alert.alert('Success!', 'Revenue event sent successfully');
+      console.log('PURCHASE event with revenue sent successfully');
     } catch (error) {
       console.error('Failed to send revenue event:', error);
       Alert.alert('Error', 'Failed to send revenue event');
@@ -103,6 +95,9 @@ export default function HomeScreen() {
         <ThemedText style={{ color: isSDKInitialized ? 'green' : 'red' }}>
           {isSDKInitialized ? '✅ SDK Initialized' : '⏳ Initializing SDK...'}
         </ThemedText>
+        {sdkError && (
+          <ThemedText style={{ color: 'red', marginTop: 4 }}>{sdkError}</ThemedText>
+        )}
       </ThemedView>
 
       {/* Test Buttons */}
