@@ -13,6 +13,7 @@
     "android",
     "ios",
     "cpp",
+    "react-native.config.js",
     "*.podspec",
     "!lib/typescript/example",
     "!ios/build",

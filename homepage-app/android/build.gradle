@@ -27,6 +27,7 @@ allprojects {
       url(reactNativeAndroidDir)
     }
 
+    mavenLocal()  // Add this line to find locally published dependencies
     google()
     mavenCentral()
     maven { url 'https://www.jitpack.io' }

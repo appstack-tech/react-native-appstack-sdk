@@ -14,8 +14,8 @@ pluginManagement {
 
     plugins {
         // Android Gradle Plugin (application & library variants)
-        id("com.android.application") version "8.12.0"
-        id("com.android.library") version "8.12.0"
+        id("com.android.application") version "8.8.2"
+        id("com.android.library") version "8.8.2"
 
         // Kotlin plugins (jvm/android/kapt etc.)
         kotlin("android") version "1.9.24"
@@ -26,7 +26,21 @@ pluginManagement {
     }
 }
 
+// Add repositories for all projects
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        // Local Maven repository for development builds
+        mavenLocal()
+        maven {
+            url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+            mavenContent { snapshotsOnly() }
+        }
+    }
+}
+
 include(
-    ":sdk",
     ":sample-app",
 )

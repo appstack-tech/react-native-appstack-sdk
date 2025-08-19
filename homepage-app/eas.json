@@ -8,7 +8,8 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "NODE_ENV": "development"
+        "NODE_ENV": "development",
+        "ANDROID_HOME": "/Users/tomrl/Library/Android/sdk"
       }
     },
     "preview": {

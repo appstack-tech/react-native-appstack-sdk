@@ -20,14 +20,27 @@ export default function HomeScreen() {
   const initializeAppstackSDK = async () => {
     try {
       console.log('Initializing Appstack SDK...');
-      
-      // Configure the SDK
-      await AppstackSDK.configure('sample-api-key');
+
+      // Read API key from environment
+      // const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY;
+      const apiKey = 'sample-api-key';
+      if (!apiKey || apiKey.trim() === '') {
+        const msg = 'Missing EXPO_PUBLIC_APPSTACK_API_KEY. Set it in your env (e.g. eas.json env or .env) to initialize the SDK.';
+        console.warn(msg);
+        setSdkError(msg);
+        setIsSDKInitialized(false);
+        return;
+      }
+
+      // Configure the SDK with the provided key and explicit endpoint
+      await AppstackSDK.configure(
+        apiKey.trim()
+      );
       setIsSDKInitialized(true);
       setSdkError(null);
-      
+
       console.log('Appstack SDK configured successfully');
-      
+
       // Send a basic event to test
       await AppstackSDK.sendEvent('APP_OPENED');
       console.log('APP_OPENED event sent successfully');
@@ -35,7 +48,7 @@ export default function HomeScreen() {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Failed to initialize Appstack SDK:', error);
       setSdkError(errorMessage);
-      
+
       // Only show alert if it's not the common linking error
       if (!errorMessage.includes("doesn't seem to be linked")) {
         Alert.alert('SDK Error', `Failed to initialize Appstack SDK: ${errorMessage}`);
