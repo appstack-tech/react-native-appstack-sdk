@@ -63,3 +63,6 @@ android/app/build/
 # Temporary files
 *.tmp
 *.temp
+
+# Android build
+android/sdk/build/

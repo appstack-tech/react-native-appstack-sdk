@@ -2,8 +2,8 @@
   "name": "react-native-appstack-sdk",
   "version": "1.0.0",
   "description": "React Native bridge for Appstack iOS SDK - Track events and revenue with SKAdNetwork integration",
-  "main": "lib/commonjs/index",
-  "module": "lib/module/index",
+  "main": "lib/commonjs/index.js",
+  "module": "lib/module/index.js",
   "types": "lib/typescript/index.d.ts",
   "react-native": "src/index",
   "source": "src/index",
@@ -13,6 +13,7 @@
     "android",
     "ios",
     "cpp",
+    "react-native.config.js",
     "*.podspec",
     "!lib/typescript/example",
     "!ios/build",
@@ -31,9 +32,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "prepack": "bob build",
-    "release": "release-it",
-    "example": "yarn --cwd example",
-    "bootstrap": "yarn example && yarn install"
+    "build": "./build.sh",
+    "build:clean": "./build.sh --clean",
+    "release": "release-it"
   },
   "keywords": [
     "react-native",
@@ -56,27 +57,26 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
+    "@react-native-community/cli": "latest",
     "@react-native-community/eslint-config": "^3.0.0",
     "@types/jest": "^28.1.2",
     "@types/react": "~17.0.21",
-    "@types/react-native": "0.70.0",
+    "@types/react-native": "0.73.0",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^28.1.1",
     "prettier": "^2.0.5",
     "react": "18.2.0",
-    "react-native": "0.72.0",
     "react-native-builder-bob": "^0.20.0",
-    "release-it": "^15.0.0",
-    "typescript": "^4.5.2"
+    "release-it": "^15.0.0"
   },
   "resolutions": {
     "@types/react": "17.0.21"
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": ">=0.72.0"
   },
   "engines": {
     "node": ">= 16.0.0"
@@ -102,5 +102,10 @@
         }
       ]
     ]
+  },
+  "codegenConfig": {
+    "name": "AppstackReactNativeSpec",
+    "type": "modules",
+    "jsSrcsDir": "src"
   }
 }
