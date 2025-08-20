@@ -1,9 +1,8 @@
 declare module 'react-native-appstack-sdk' {
   export interface AppstackSDKInterface {
     configure(apiKey: string): Promise<boolean>;
-    sendEvent(eventName: string): Promise<boolean>;
-    sendEventWithRevenue(eventName: string, revenue: number | string): Promise<boolean>;
-    enableASAAttribution(): Promise<boolean>;
+    sendEvent(eventName: string, revenue: number | string): Promise<boolean>;
+    enableAppleAdsAttribution(): Promise<boolean>;
   }
 
   export interface AppstackEventParams {
@@ -35,9 +34,8 @@ declare module 'react-native-appstack-sdk' {
   export class AppstackSDK implements AppstackSDKInterface {
     static getInstance(): AppstackSDK;
     configure(apiKey: string): Promise<boolean>;
-    sendEvent(eventName: string): Promise<boolean>;
-    sendEventWithRevenue(eventName: string, revenue: number | string): Promise<boolean>;
-    enableASAAttribution(): Promise<boolean>;
+    sendEvent(eventName: string, revenue?: number | string): Promise<boolean>;
+    enableAppleAdsAttribution(): Promise<boolean>;
   }
 
   const appstackSDK: AppstackSDK;

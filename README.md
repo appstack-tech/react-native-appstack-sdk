@@ -67,10 +67,10 @@ useEffect(() => {
 await AppstackSDK.sendEvent('user_registered');
 
 // Event with revenue
-await AppstackSDK.sendEventWithRevenue('purchase', 29.99);
+await AppstackSDK.sendEvent('purchase', 29.99);
 
 // Event with revenue as string
-await AppstackSDK.sendEventWithRevenue('subscription', '9.99');
+await AppstackSDK.sendEvent('subscription', '9.99');
 ```
 
 ### Enable Apple Search Ads Attribution
@@ -78,10 +78,10 @@ await AppstackSDK.sendEventWithRevenue('subscription', '9.99');
 ```typescript
 // Enable ASA Attribution (requires iOS 14.3+)
 try {
-  await AppstackSDK.enableASAAttribution();
-  console.log('ASA Attribution enabled');
+  await AppstackSDK.enableAppleAdsAttribution();
+  console.log('Apple Ads Attribution enabled');
 } catch (error) {
-  console.error('Error enabling ASA Attribution:', error);
+  console.error('Error enabling Apple Ads Attribution:', error);
 }
 ```
 
@@ -103,20 +103,20 @@ Send a basic event without parameters.
 await AppstackSDK.sendEvent('custom_event');
 ```
 
-### `sendEventWithRevenue(eventName: string, revenue: number | string): Promise<boolean>`
+### `sendEvent(eventName: string, revenue: number | string): Promise<boolean>`
 
 Send an event with revenue parameter.
 
 ```typescript
-await AppstackSDK.sendEventWithRevenue('purchase', 29.99);
+await AppstackSDK.sendEvent('purchase', 29.99);
 ```
 
-### `enableASAAttribution(): Promise<boolean>`
+### `enableAppleAdsttribution(): Promise<boolean>`
 
-Enable Apple Search Ads Attribution tracking (iOS 14.3+).
+Enable Apple Ads Attribution tracking (iOS 14.3+).
 
 ```typescript
-await AppstackSDK.enableASAAttribution();
+await AppstackSDK.enableAppleAdsAttribution();
 ```
 
 ## 🎯 Complete Example
@@ -139,7 +139,7 @@ const App = () => {
       await AppstackSDK.configure('your-api-key');
       
       // Enable ASA Attribution
-      await AppstackSDK.enableASAAttribution();
+      await AppstackSDK.enableAppleAdsAttribution();
       
       setIsInitialized(true);
       console.log('Appstack SDK initialized successfully');
@@ -160,7 +160,7 @@ const App = () => {
 
   const handlePurchase = async () => {
     try {
-      await AppstackSDK.sendEventWithRevenue('purchase', 99.99);
+      await AppstackSDK.sendEvent('purchase', 99.99);
       Alert.alert('Success', 'Purchase event sent');
     } catch (error) {
       console.error('Error sending event:', error);

@@ -1,4 +1,3 @@
-// @ts-ignore
 import { NativeModules, Platform } from 'react-native';
 
 const LINKING_ERROR =
@@ -10,13 +9,13 @@ const LINKING_ERROR =
 const AppstackReactNative = NativeModules.AppstackReactNative
   ? NativeModules.AppstackReactNative
   : new Proxy(
-      {},
+      {} as any,
       {
         get() {
           throw new Error(LINKING_ERROR);
         },
       }
-    );
+    ) as any;
 
 export interface AppstackSDKInterface {
   /**
@@ -27,26 +26,20 @@ export interface AppstackSDKInterface {
   configure(apiKey: string): Promise<boolean>;
 
   /**
-   * Send a basic event without parameters
+   * Send an event with optional revenue parameter
    * @param eventName - Event name (must match those configured in Appstack dashboard)
+   * @param revenue - Optional revenue value (can be number or string)
    * @returns Promise that resolves when the event is sent successfully
    */
-  sendEvent(eventName: string): Promise<boolean>;
-
-  /**
-   * Send an event with revenue parameter
-   * @param eventName - Event name
-   * @param revenue - Revenue value (can be number or string)
-   * @returns Promise that resolves when the event is sent successfully
-   */
-  sendEventWithRevenue(eventName: string, revenue: number | string): Promise<boolean>;
+  sendEvent(eventName: string, revenue?: number | string): Promise<boolean>;
 
   /**
    * Enable Apple Search Ads Attribution tracking
-   * Requires iOS 14.3+
+   * Requires iOS 15.0+
    * @returns Promise that resolves when configuration is successful
+   * @deprecated Use enableAppleAdsAttribution() instead
    */
-  enableASAAttribution(): Promise<boolean>;
+  enableAppleAdsAttribution(): Promise<boolean>;
 }
 
 /**
@@ -60,17 +53,12 @@ export interface AppstackSDKInterface {
  * await AppstackSDK.configure('your-api-key');
  * 
  * // Send events
- * await AppstackSDK.sendEvent('PURCHASE');
- * await AppstackSDK.sendEventWithRevenue('PURCHASE', 29.99);
+ * await AppstackSDK.sendEvent('PURCHASE'); // Without revenue
+ * await AppstackSDK.sendEvent('PURCHASE', 29.99); // With revenue
  * 
- * // Additional SDK methods
- * await AppstackSDK.flush(); // Manually flush events
- * await AppstackSDK.clearData(); // Clear stored data
- * const enabled = await AppstackSDK.isEnabled(); // Check SDK status
- * 
- * // Enable Apple Search Ads Attribution (iOS only)
+ * // Enable Apple Ads Attribution (iOS only)
  * if (Platform.OS === 'ios') {
- *   await AppstackSDK.enableASAAttribution();
+ *   await AppstackSDK.enableAppleAdsAttribution();
  * }
  * ```
  */
@@ -107,60 +95,42 @@ class AppstackSDK implements AppstackSDKInterface {
   }
 
   /**
-   * Send a basic event without parameters
+   * Send an event with optional revenue parameter
    */
-  async sendEvent(eventName: string): Promise<boolean> {
+  async sendEvent(eventName: string, revenue?: number | string): Promise<boolean> {
     if (!eventName || typeof eventName !== 'string' || eventName.trim() === '') {
       throw new Error('Event name must be a non-empty string');
     }
 
     try {
-      return await AppstackReactNative.sendEvent(eventName.trim());
+      if (revenue !== undefined && revenue !== null) {
+              // Convert and validate revenue
+      const numericRevenue = typeof revenue === 'string' ? parseFloat(revenue) : revenue;
+      if (isNaN(numericRevenue)) {
+        throw new Error('Revenue must be a valid number or numeric string');
+      }
+      return await AppstackReactNative.sendEvent(eventName.trim(), numericRevenue);
+    } else {
+      return await AppstackReactNative.sendEvent(eventName.trim(), 0);
+    }
     } catch (error) {
       console.error(`Failed to send event '${eventName}':`, error);
       throw error;
     }
   }
-
   /**
-   * Send an event with revenue parameter
+   * Enable Apple Ads Attribution tracking
    */
-  async sendEventWithRevenue(eventName: string, revenue: number | string): Promise<boolean> {
-    if (!eventName || typeof eventName !== 'string' || eventName.trim() === '') {
-      throw new Error('Event name must be a non-empty string');
-    }
-
-    if (revenue === null || revenue === undefined) {
-      throw new Error('Revenue must be provided');
-    }
-
-    // Validate that revenue is a valid number or string convertible to number
-    const numericRevenue = typeof revenue === 'string' ? parseFloat(revenue) : revenue;
-    if (isNaN(numericRevenue)) {
-      throw new Error('Revenue must be a valid number or numeric string');
-    }
-
-    try {
-      return await AppstackReactNative.sendEventWithRevenue(eventName.trim(), revenue);
-    } catch (error) {
-      console.error(`Failed to send event '${eventName}' with revenue '${revenue}':`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * Enable Apple Search Ads Attribution tracking
-   */
-  async enableASAAttribution(): Promise<boolean> {
+  async enableAppleAdsAttribution(): Promise<boolean> {
     if (Platform.OS !== 'ios') {
-      console.warn('Apple Search Ads Attribution is only available on iOS');
+      console.warn('Apple Ads Attribution is only available on iOS');
       return false;
     }
 
     try {
-      return await AppstackReactNative.enableASAAttribution();
+      return await AppstackReactNative.enableAppleAdsAttribution();
     } catch (error) {
-      console.error('Failed to enable ASA Attribution:', error);
+      console.error('Failed to enable Apple Ads Attribution:', error);
       throw error;
     }
   }

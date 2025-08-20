@@ -99,7 +99,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
     }
 
     @ReactMethod
-    fun sendEvent(eventName: String, promise: Promise) {
+    fun sendEvent(eventName: String, revenue: Double, promise: Promise) {
         try {
             if (eventName.isBlank()) {
                 promise.reject("INVALID_EVENT_NAME", "Event name cannot be null or empty")
@@ -116,7 +116,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             AppStackAttributionSdk.sendEvent(
                 eventType,
                 if (eventType == EventType.CUSTOM) eventName.trim() else null,
-                null
+                if (revenue == 0.0) null else revenue
             )
             
             promise.resolve(true)
@@ -126,57 +126,8 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
     }
 
     @ReactMethod
-    fun sendEventWithRevenue(eventName: String, revenue: Dynamic, promise: Promise) {
-        try {
-            if (eventName.isBlank()) {
-                promise.reject("INVALID_EVENT_NAME", "Event name cannot be null or empty")
-                return
-            }
-
-            if (revenue.isNull) {
-                promise.reject("INVALID_REVENUE", "Revenue cannot be null")
-                return
-            }
-
-            // Convert revenue to Double
-            val revenueValue = when (revenue.type) {
-                ReadableType.Number -> revenue.asDouble()
-                ReadableType.String -> {
-                    try {
-                        revenue.asString().toDouble()
-                    } catch (e: NumberFormatException) {
-                        promise.reject("INVALID_REVENUE", "Revenue must be a valid number or numeric string")
-                        return
-                    }
-                }
-                else -> {
-                    promise.reject("INVALID_REVENUE", "Revenue must be a number or numeric string")
-                    return
-                }
-            }
-
-            // Try to find a matching EventType enum, fallback to CUSTOM
-            val eventType = try {
-                EventType.valueOf(eventName.trim().uppercase())
-            } catch (e: IllegalArgumentException) {
-                EventType.CUSTOM
-            }
-
-            AppStackAttributionSdk.sendEvent(
-                eventType,
-                if (eventType == EventType.CUSTOM) eventName.trim() else null,
-                revenueValue
-            )
-            
-            promise.resolve(true)
-        } catch (exception: Exception) {
-            promise.reject("EVENT_SEND_ERROR", "Failed to send event '$eventName' with revenue '$revenue': ${exception.message}", exception)
-        }
-    }
-
-    @ReactMethod
-    fun enableASAAttribution(promise: Promise) {
-        // ASA Attribution is iOS-only, so we return false on Android
+    fun enableAppleAdsAttribution(promise: Promise) {
+        // Apple Ads Attribution is iOS-only, so we return false on Android
         promise.resolve(false)
     }
 

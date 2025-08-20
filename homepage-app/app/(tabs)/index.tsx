@@ -20,6 +20,12 @@ export default function HomeScreen() {
   const initializeAppstackSDK = async () => {
     try {
       console.log('Initializing Appstack SDK...');
+      
+      // Debug: Check what's available in NativeModules
+      const { NativeModules } = require('react-native');
+      console.log('Available native modules:', Object.keys(NativeModules));
+      console.log('AppstackReactNative module:', NativeModules.AppstackReactNative);
+      console.log('Is AppstackReactNative available:', !!NativeModules.AppstackReactNative);
 
       // Read API key from environment
       // const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY;
@@ -79,7 +85,7 @@ export default function HomeScreen() {
     }
 
     try {
-      await AppstackSDK.sendEventWithRevenue('PURCHASE', 29.99);
+      await AppstackSDK.sendEvent('PURCHASE', 29.99);
       Alert.alert('Success!', 'Revenue event sent successfully');
       console.log('PURCHASE event with revenue sent successfully');
     } catch (error) {

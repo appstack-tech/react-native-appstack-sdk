@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "homepageapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tomrlas.homepageapp"
