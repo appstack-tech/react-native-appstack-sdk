@@ -71,12 +71,7 @@ RCT_EXPORT_METHOD(sendEventWithRevenue:(NSString *)eventName
     }
     
     @try {
-        // Create parameters dictionary with revenue
-        NSDictionary<AppstackEventParam, id> *params = @{
-            AppstackEventParamRevenue: revenue
-        };
-        
-        [Appstack.shared sendEventWithEvent:eventName params:params];
+        [Appstack.shared sendEventWithEvent:eventName revenue:revenue];
         resolve(@(YES));
     } @catch (NSException *exception) {
         reject(@"EVENT_SEND_ERROR", exception.reason, nil);
