@@ -29,7 +29,10 @@ export default function HomeScreen() {
 
       // Read API key from environment
       // const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY;
-      const apiKey = 'sample-api-key';
+      let apiKey = 'sample-api-key';
+      if (Platform.OS === 'ios') {
+        apiKey = 'your-appstack-api-key'; // 'o37...' if you want to use the real key;
+      }
       if (!apiKey || apiKey.trim() === '') {
         const msg = 'Missing EXPO_PUBLIC_APPSTACK_API_KEY. Set it in your env (e.g. eas.json env or .env) to initialize the SDK.';
         console.warn(msg);

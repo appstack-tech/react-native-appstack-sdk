@@ -15,9 +15,10 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/your-org/react-native-appstack-sdk.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
+  s.swift_version = '5.0'
   
-  # Include Appstack frameworks for both simulator and device
-  s.ios.vendored_frameworks = "ios/ios-arm64/AppstackSDK.framework", "ios/ios-arm64_x86_64-simulator/AppstackSDK.framework"
+  # Include Appstack framework for simulator (for development)
+  s.ios.vendored_frameworks = "ios/ios-arm64_x86_64-simulator/AppstackSDK.framework"
   
   # React Native configuration
   s.dependency "React-Core"
