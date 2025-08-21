@@ -22,12 +22,18 @@ def reactNativeAndroidDir = new File(
 
 allprojects {
   repositories {
+    // Prioritize mavenLocal for appstack-android-sdk
+    mavenLocal() {
+      content {
+        includeGroup "tech.app-stack.sdk"
+      }
+    }
+    
     maven {
       // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
       url(reactNativeAndroidDir)
     }
 
-    mavenLocal()  // Add this line to find locally published dependencies
     google()
     mavenCentral()
     maven { url 'https://www.jitpack.io' }
