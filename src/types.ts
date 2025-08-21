@@ -6,7 +6,7 @@ export interface AppstackEventParams {
    * Revenue value associated with the event
    * Can be number or string convertible to number
    */
-  revenue?: number | string;
+  revenue?: number;
 }
 
 /**
