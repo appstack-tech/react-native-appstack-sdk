@@ -36,11 +36,6 @@ android {
 
 repositories {
     // Put mavenLocal() first to prioritize local dependencies
-    mavenLocal() {
-        content {
-            includeGroup "tech.app-stack.sdk"
-        }
-    }
     google()
     mavenCentral()
     maven {
@@ -52,8 +47,7 @@ repositories {
 dependencies {
     compileOnly 'com.facebook.react:react-native:+'
 
-    implementation 'tech.app-stack.sdk:appstack-android-sdk:0.0.2-SNAPSHOT'
-    // implementation 'tech.app-stack.sdk:appstack-android-sdk:0.0.1'
+    implementation 'tech.appstack.android-sdk:appstack-android-sdk:0.0.2'
 
     implementation 'androidx.annotation:annotation:1.7.1'
 

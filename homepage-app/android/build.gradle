@@ -22,12 +22,6 @@ def reactNativeAndroidDir = new File(
 
 allprojects {
   repositories {
-    // Prioritize mavenLocal for appstack-android-sdk
-    mavenLocal() {
-      content {
-        includeGroup "tech.app-stack.sdk"
-      }
-    }
     
     maven {
       // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
