@@ -1,0 +1,31 @@
+name: Build and Publish
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Run linting
+      run: npm run lint
+    - name: Run type checking
+      run: npm run typecheck
+    - name: Run tests
+      run: npm test
+    - name: Test build
+      run: npm run prepack
+    - name: Verify build output
+      run: |
+        test -f lib/commonjs/index.js || exit 1
+        test -f lib/module/index.js || exit 1
+        test -f lib/typescript/index.d.ts || exit 1
+        echo "✅ All build artifacts verified"

@@ -1,6 +1,6 @@
 {
   "name": "react-native-appstack-sdk",
-  "version": "1.0.0",
+  "version": "0.0.0-placeholder",
   "description": "React Native bridge for Appstack iOS SDK - Track events and revenue with SKAdNetwork integration",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -46,13 +46,16 @@
     "tracking",
     "analytics"
   ],
-  "repository": "https://github.com/your-org/react-native-appstack-sdk",
-  "author": "Your Name <your.email@example.com> (https://github.com/your-org)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/appstack-tech/react-native-appstack-sdk.git"
+  },
+  "author": "Tom Darmon <tom@appstack.tech>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/your-org/react-native-appstack-sdk/issues"
+    "url": "https://github.com/appstack-tech/react-native-appstack-sdk/issues"
   },
-  "homepage": "https://github.com/your-org/react-native-appstack-sdk#readme",
+  "homepage": "https://github.com/appstack-tech/react-native-appstack-sdk#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
