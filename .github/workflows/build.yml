@@ -21,7 +21,7 @@ jobs:
         echo "✅ Updated package.json version to ${{ github.ref_name }}"
     
     - name: Build and test
-      run: ./build.sh --clean --ci
+      run: ./build.sh --clean
     
     - name: Create npm package
       run: npm pack
