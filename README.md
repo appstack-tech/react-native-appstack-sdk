@@ -123,14 +123,61 @@ if (Platform.OS === 'ios') {
 ## Advanced
 
 <details>
-<summary>Requirements</summary>
+<summary>Security Considerations</summary>
 
-- **React Native** 0.72.0+
-- **iOS** 13.0+ 
-- **Android** 5.0+ (API level 21)
-- **Xcode** 14.0+
-- **Java** 17+
+**API Key Protection:**
+- **Never commit API keys** to version control or public repositories
+- Store API keys in environment variables or secure configuration files
+
+**Best Practices:**
+```typescript
+// ✅ Good - Use environment variables
+const apiKey = Platform.OS === 'ios' 
+  ? process.env.APPSTACK_IOS_API_KEY 
+  : process.env.APPSTACK_ANDROID_API_KEY;
+
+// ❌ Avoid - Hardcoded keys in source code
+const apiKey = 'ak_live_1234567890abcdef'; // DON'T DO THIS
+```
+
+**Data Privacy:**
+- Event names and revenue data are transmitted securely over HTTPS
+- No personally identifiable information (PII) should be included in event names
+- The SDK does not collect device identifiers beyond what's required for attribution
+
+**Network Security:**
+- All API communications use TLS 1.2+ encryption
+- Certificate pinning is implemented for additional security
+- Requests are authenticated using your API key
+</details>
+
+<details>
+<summary>Limitations</summary>
+
+**Attribution Timing:**
+- Apple Search Ads attribution data appears within 24-48 hours after install
+- Attribution is only available for apps installed from App Store or TestFlight
+- Attribution requires user consent on iOS 14.5+ (handled automatically)
+
+**Platform Constraints:**
+- **iOS:** Requires iOS 13.0+, Apple Search Ads attribution needs iOS 14.3+
+- **Android:** Minimum API level 21 (Android 5.0)
+- **React Native:** 0.72.0+
+- **Xcode:** 14.0+
+- **Java:** 17.0+
 - **Node.js** 16.0+
+- Some Apple Search Ads features may not work in some development/simulator environments
+
+**Event Tracking:**
+- Event names are case-sensitive and must match be standardized (already done for Android but not for iOS)
+- Revenue values needs to be converted to USD
+- For now, we can't configure the endpoint to send the events for iOS, this will be patched in a future release.
+
+**Technical Limitations:**
+- SDK must be initialized before any tracking calls
+- enableAppleAdsAttribution only works on iOS and will do nothing on Android.
+- Network connectivity required for event transmission (events are queued offline)
+- Some attribution features require app to be distributed through official stores
 </details>
 
 <details>
