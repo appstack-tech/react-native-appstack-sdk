@@ -42,8 +42,8 @@ const App = () => {
   useEffect(() => {
     const init = async () => {
       const apiKey = Platform.OS === 'ios' 
-        ? 'your-ios-api-key' 
-        : 'your-android-api-key';
+        ? process.env.APPSTACK_IOS_API_KEY 
+        : process.env.APPSTACK_ANDROID_API_KEY;
       
       await AppstackSDK.configure(apiKey);
       
@@ -125,21 +125,6 @@ if (Platform.OS === 'ios') {
 <details>
 <summary>Security Considerations</summary>
 
-**API Key Protection:**
-- **Never commit API keys** to version control or public repositories
-- Store API keys in environment variables or secure configuration files
-
-**Best Practices:**
-```typescript
-// ✅ Good - Use environment variables
-const apiKey = Platform.OS === 'ios' 
-  ? process.env.APPSTACK_IOS_API_KEY 
-  : process.env.APPSTACK_ANDROID_API_KEY;
-
-// ❌ Avoid - Hardcoded keys in source code
-const apiKey = 'ak_live_1234567890abcdef'; // DON'T DO THIS
-```
-
 **Data Privacy:**
 - Event names and revenue data are transmitted securely over HTTPS
 - No personally identifiable information (PII) should be included in event names
@@ -178,30 +163,6 @@ const apiKey = 'ak_live_1234567890abcdef'; // DON'T DO THIS
 - enableAppleAdsAttribution only works on iOS and will do nothing on Android.
 - Network connectivity required for event transmission (events are queued offline)
 - Some attribution features require app to be distributed through official stores
-</details>
-
-<details>
-<summary>Important Notes</summary>
-
-**Initialization:**
-- Always configure SDK before sending events
-- Do it in your root component
-
-**Event Names:**
-- Should always match on both platform usage
-- Case-sensitive
-
-**Revenue:**
-- Accepts `number` or `string`
-- Strings automatically converted to numbers
-
-**Apple Search Ads:**
-- iOS 14.3+ required
-- Attribution data appears within 24-48 hours
-
-**Platform Support:**
-- iOS: Full support
-- Android: Full support
 </details>
 
 ## Documentation
