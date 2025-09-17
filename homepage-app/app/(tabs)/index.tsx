@@ -22,6 +22,7 @@ export default function HomeScreen() {
       console.log('Initializing Appstack SDK...');
       
       // Debug: Check what's available in NativeModules
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { NativeModules } = require('react-native');
       console.log('Available native modules:', Object.keys(NativeModules));
       console.log('AppstackReactNative module:', NativeModules.AppstackReactNative);
@@ -29,7 +30,7 @@ export default function HomeScreen() {
 
       // Read API key from environment
       // const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY;
-      let apiKey = 'sample-api-key';
+      let apiKey = 'your-appstack-api-key'; // 'o37...' if you want to use the real key;
       if (Platform.OS === 'ios') {
         apiKey = 'your-appstack-api-key'; // 'o37...' if you want to use the real key;
       }
