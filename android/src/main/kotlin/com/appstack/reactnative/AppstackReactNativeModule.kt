@@ -5,7 +5,7 @@ import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.module.annotations.ReactModule
 // Import the SDK from the Maven dependency
-import com.appstack.attribution.AppStackAttributionSdk
+import com.appstack.attribution.AppstackAttributionSdk
 import com.appstack.attribution.EventType
 import com.appstack.attribution.InitListener
 
@@ -40,7 +40,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             // Validate that SDK classes are available
             try {
                 Log.d(TAG, "Checking SDK class availability...")
-                val sdkClass = AppStackAttributionSdk::class.java
+                val sdkClass = AppstackAttributionSdk::class.java
                 Log.d(TAG, "All SDK classes are available")
             } catch (e: Exception) {
                 Log.e(TAG, "SDK classes not available", e)
@@ -67,15 +67,15 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             
             // Check if SDK is already initialized
             try {
-                val isAlreadyEnabled = AppStackAttributionSdk.isEnabled()
+                val isAlreadyEnabled = AppstackAttributionSdk.isEnabled()
                 Log.d(TAG, "SDK current status before init: isEnabled=$isAlreadyEnabled")
             } catch (e: Exception) {
                 Log.d(TAG, "Could not check SDK status before init: ${e.message}")
             }
             
-            Log.d(TAG, "Calling AppStackAttributionSdk.configure...")
+            Log.d(TAG, "Calling AppstackAttributionSdk.configure...")
             
-            AppStackAttributionSdk.configure(
+            AppstackAttributionSdk.configure(
                 context,
                 apiKey.trim(),
             )
@@ -113,7 +113,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
                 EventType.CUSTOM
             }
 
-            AppStackAttributionSdk.sendEvent(
+            AppstackAttributionSdk.sendEvent(
                 eventType,
                 if (eventType == EventType.CUSTOM) eventName.trim() else null,
                 if (revenue == 0.0) null else revenue
@@ -134,7 +134,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
     @ReactMethod
     fun flush(promise: Promise) {
         try {
-            AppStackAttributionSdk.flush()
+            AppstackAttributionSdk.flush()
             promise.resolve(true)
         } catch (exception: Exception) {
             promise.reject("FLUSH_ERROR", "Failed to flush events: ${exception.message}", exception)
@@ -144,7 +144,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
     @ReactMethod
     fun clearData(promise: Promise) {
         try {
-            AppStackAttributionSdk.clearData()
+            AppstackAttributionSdk.clearData()
             promise.resolve(true)
         } catch (exception: Exception) {
             promise.reject("CLEAR_DATA_ERROR", "Failed to clear data: ${exception.message}", exception)
@@ -154,7 +154,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
     @ReactMethod
     fun isEnabled(promise: Promise) {
         try {
-            val enabled = AppStackAttributionSdk.isEnabled()
+            val enabled = AppstackAttributionSdk.isEnabled()
             promise.resolve(enabled)
         } catch (exception: Exception) {
             promise.reject("STATUS_ERROR", "Failed to get SDK status: ${exception.message}", exception)
