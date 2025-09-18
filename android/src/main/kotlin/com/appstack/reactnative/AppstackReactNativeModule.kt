@@ -22,7 +22,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
     }
 
     @ReactMethod
-    fun configure(apiKey: String, promise: Promise) {
+    fun configure(apiKey: String, isDebug: Boolean, endpointBaseUrl: String?, logLevel: Int, promise: Promise) {
         try {
             Log.d(TAG, "Configuring Appstack SDK with API key: ${apiKey.take(8)}...")
             
@@ -35,6 +35,15 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             if (context == null) {
                 promise.reject("CONTEXT_ERROR", "React application context is null")
                 return
+            }
+
+            // Convert Int logLevel to LogLevel enum
+            val logLevelEnum = when (logLevel) {
+                0 -> com.appstack.attribution.LogLevel.DEBUG
+                1 -> com.appstack.attribution.LogLevel.INFO
+                2 -> com.appstack.attribution.LogLevel.WARN
+                3 -> com.appstack.attribution.LogLevel.ERROR
+                else -> com.appstack.attribution.LogLevel.INFO
             }
 
             // Validate that SDK classes are available
@@ -76,8 +85,12 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             Log.d(TAG, "Calling AppstackAttributionSdk.configure...")
             
             AppstackAttributionSdk.configure(
-                context,
-                apiKey.trim(),
+                context = context,
+                apiKey = apiKey.trim(),
+                isDebug = isDebug,
+                endpointBaseUrl = endpointBaseUrl ?: "https://api.event.dev.appstack.tech/android/",
+                logLevel = logLevelEnum,
+                listener = initListener
             )
             
             Log.d(TAG, "SDK configure method called successfully")
@@ -99,29 +112,49 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
     }
 
     @ReactMethod
-    fun sendEvent(eventName: String, revenue: Double, promise: Promise) {
+    fun sendEvent(eventName: String?, eventType: String?, revenue: Double?, promise: Promise) {
         try {
-            if (eventName.isBlank()) {
-                promise.reject("INVALID_EVENT_NAME", "Event name cannot be null or empty")
+            // At least one of eventName or eventType should be provided
+            if ((eventName.isNullOrBlank()) && (eventType.isNullOrBlank())) {
+                promise.reject("INVALID_EVENT_NAME", "Either eventName or eventType must be provided")
                 return
             }
 
-            // Try to find a matching EventType enum, fallback to CUSTOM
-            val eventType = try {
-                EventType.valueOf(eventName.trim().uppercase())
-            } catch (e: IllegalArgumentException) {
-                EventType.CUSTOM
+            // Determine the EventType enum to use
+            val finalEventType: EventType
+            val finalEventName: String?
+            
+            if (!eventType.isNullOrBlank()) {
+                // Use provided event_type parameter
+                finalEventType = try {
+                    EventType.valueOf(eventType.trim().uppercase())
+                } catch (e: IllegalArgumentException) {
+                    EventType.CUSTOM
+                }
+                finalEventName = if (finalEventType == EventType.CUSTOM) eventName?.trim() else null
+            } else if (!eventName.isNullOrBlank()) {
+                // Fallback to legacy behavior - try to parse eventName as EventType
+                finalEventType = try {
+                    EventType.valueOf(eventName.trim().uppercase())
+                } catch (e: IllegalArgumentException) {
+                    EventType.CUSTOM
+                }
+                finalEventName = if (finalEventType == EventType.CUSTOM) eventName.trim() else null
+            } else {
+                // This shouldn't happen due to validation above, but just in case
+                finalEventType = EventType.CUSTOM
+                finalEventName = "UNKNOWN_EVENT"
             }
 
             AppstackAttributionSdk.sendEvent(
-                eventType,
-                if (eventType == EventType.CUSTOM) eventName.trim() else null,
-                if (revenue == 0.0) null else revenue
+                event = finalEventType,
+                name = finalEventName,
+                revenue = revenue
             )
             
             promise.resolve(true)
         } catch (exception: Exception) {
-            promise.reject("EVENT_SEND_ERROR", "Failed to send event '$eventName': ${exception.message}", exception)
+            promise.reject("EVENT_SEND_ERROR", "Failed to send event (eventName: '$eventName', eventType: '$eventType'): ${exception.message}", exception)
         }
     }
 

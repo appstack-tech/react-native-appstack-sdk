@@ -42,9 +42,12 @@ export default function HomeScreen() {
         return;
       }
 
-      // Configure the SDK with the provided key and explicit endpoint
+      // Configure the SDK with the provided key and all available parameters
       await AppstackSDK.configure(
-        apiKey.trim()
+        apiKey.trim(),
+        true, // isDebug - enable debug mode for development
+        'https://api.event.dev.appstack.tech/android/', // endpointBaseUrl - custom endpoint
+        0 // logLevel - 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
       );
       setIsSDKInitialized(true);
       setSdkError(null);
@@ -98,6 +101,62 @@ export default function HomeScreen() {
     }
   };
 
+  const handleEventWithoutRevenue = async () => {
+    if (!isSDKInitialized) {
+      Alert.alert('SDK not initialized', 'Please wait for SDK to initialize');
+      return;
+    }
+
+    try {
+      await AppstackSDK.sendEvent('SIGN_UP'); // No revenue parameter
+      Alert.alert('Success!', 'Sign up event sent successfully');
+      console.log('SIGN_UP event sent successfully');
+    } catch (error) {
+      console.error('Failed to send sign up event:', error);
+      Alert.alert('Error', 'Failed to send sign up event');
+    }
+  };
+
+  const handleCustomEvent = async () => {
+    if (!isSDKInitialized) {
+      Alert.alert('SDK not initialized', 'Please wait for SDK to initialize');
+      return;
+    }
+
+    try {
+      await AppstackSDK.sendEvent('CUSTOM_EVENT_NAME', 15.50);
+      Alert.alert('Success!', 'Custom event sent successfully');
+      console.log('CUSTOM_EVENT_NAME event sent successfully');
+    } catch (error) {
+      console.error('Failed to send custom event:', error);
+      Alert.alert('Error', 'Failed to send custom event');
+    }
+  };
+
+  const reinitializeWithBasicConfig = async () => {
+    try {
+      console.log('Reinitializing with basic configuration...');
+      
+      let apiKey = 'your-appstack-api-key';
+      if (Platform.OS === 'ios') {
+        apiKey = 'your-appstack-api-key';
+      }
+
+      // Basic configuration (backward compatible)
+      await AppstackSDK.configure(apiKey.trim());
+      
+      setIsSDKInitialized(true);
+      setSdkError(null);
+      Alert.alert('Success!', 'SDK reinitialized with basic configuration');
+      console.log('Appstack SDK reinitialized with basic configuration');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Failed to reinitialize Appstack SDK:', error);
+      setSdkError(errorMessage);
+      Alert.alert('Error', `Failed to reinitialize SDK: ${errorMessage}`);
+    }
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -123,14 +182,31 @@ export default function HomeScreen() {
         )}
       </ThemedView>
 
-      {/* Test Buttons */}
+      {/* Configuration Tests */}
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Test Your SDK</ThemedText>
+        <ThemedText type="subtitle">Configuration Options</ThemedText>
+        <ThemedText style={styles.infoText}>
+          Current: Full configuration with debug mode, custom endpoint, and DEBUG log level
+        </ThemedText>
+        <TouchableOpacity style={styles.secondaryButton} onPress={reinitializeWithBasicConfig}>
+          <ThemedText style={styles.buttonText}>Test Basic Configuration</ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+
+      {/* Event Tests */}
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Event Testing</ThemedText>
         <TouchableOpacity style={styles.button} onPress={handleTestEvent}>
           <ThemedText style={styles.buttonText}>Send Test Event</ThemedText>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleEventWithoutRevenue}>
+          <ThemedText style={styles.buttonText}>Send Event (No Revenue)</ThemedText>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleRevenueEvent}>
           <ThemedText style={styles.buttonText}>Send Revenue Event ($29.99)</ThemedText>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleCustomEvent}>
+          <ThemedText style={styles.buttonText}>Send Custom Event ($15.50)</ThemedText>
         </TouchableOpacity>
       </ThemedView>
 
@@ -193,8 +269,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 4,
   },
+  secondaryButton: {
+    backgroundColor: '#34C759',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 4,
+  },
   buttonText: {
     color: 'white',
     fontWeight: '600',
+  },
+  infoText: {
+    fontSize: 12,
+    opacity: 0.7,
+    marginBottom: 8,
   },
 });

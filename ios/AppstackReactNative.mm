@@ -78,15 +78,17 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
 #pragma mark - Event Tracking
 
 RCT_EXPORT_METHOD(sendEvent:(NSString *)eventName
+                 eventType:(NSString *)eventType
                  revenue:(id _Nullable)revenue
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    NSLog(@"[AppstackReactNative] sendEvent called with eventName: %@, revenue: %@", eventName, revenue);
+    NSLog(@"[AppstackReactNative] sendEvent called with eventName: %@, eventType: %@, revenue: %@", eventName, eventType, revenue);
     
-    if (!eventName || [eventName length] == 0) {
-        NSLog(@"[AppstackReactNative] sendEvent failed: Invalid event name");
-        reject(@"INVALID_EVENT_NAME", @"Event name cannot be null or empty", nil);
+    // At least one of eventName or eventType should be provided
+    if ((!eventName || [eventName length] == 0) && (!eventType || [eventType length] == 0)) {
+        NSLog(@"[AppstackReactNative] sendEvent failed: Both eventName and eventType are empty");
+        reject(@"INVALID_EVENT_NAME", @"Either eventName or eventType must be provided", nil);
         return;
     }
     
@@ -133,12 +135,12 @@ RCT_EXPORT_METHOD(sendEvent:(NSString *)eventName
         if (BridgeClass) {
             NSLog(@"[AppstackReactNative] AppstackBridge class found for sendEvent!");
             
-            if ([BridgeClass respondsToSelector:@selector(sendEvent:revenue:)]) {
-                NSLog(@"[AppstackReactNative] 'sendEvent:revenue:' method found, calling with eventName: %@, revenue: %@", eventName, revenueDecimal);
-                [BridgeClass performSelector:@selector(sendEvent:revenue:) withObject:eventName withObject:revenueDecimal];
+            if ([BridgeClass respondsToSelector:@selector(sendEvent:eventName:revenue:)]) {
+                NSLog(@"[AppstackReactNative] 'sendEvent:eventName:revenue:' method found, calling with eventType: %@, eventName: %@, revenue: %@", eventType, eventName, revenueDecimal);
+                [BridgeClass performSelector:@selector(sendEvent:eventName:revenue:) withObject:eventType withObject:eventName withObject:revenueDecimal];
                 NSLog(@"[AppstackReactNative] sendEvent method called successfully via bridge");
             } else {
-                NSLog(@"[AppstackReactNative] ERROR: 'sendEvent:revenue:' method not found on AppstackBridge");
+                NSLog(@"[AppstackReactNative] ERROR: 'sendEvent:eventName:revenue:' method not found on AppstackBridge");
             }
         } else {
             NSLog(@"[AppstackReactNative] ERROR: AppstackBridge class not found for sendEvent. Trying alternative class name...");
@@ -147,12 +149,12 @@ RCT_EXPORT_METHOD(sendEvent:(NSString *)eventName
             Class AltBridgeClass = NSClassFromString(@"AppstackBridge");
             if (AltBridgeClass) {
                 NSLog(@"[AppstackReactNative] Alternative AppstackBridge class found for sendEvent!");
-                if ([AltBridgeClass respondsToSelector:@selector(sendEvent:revenue:)]) {
+                if ([AltBridgeClass respondsToSelector:@selector(sendEvent:eventName:revenue:)]) {
                     NSLog(@"[AppstackReactNative] Calling sendEvent via alternative bridge class");
-                    [AltBridgeClass performSelector:@selector(sendEvent:revenue:) withObject:eventName withObject:revenueDecimal];
+                    [AltBridgeClass performSelector:@selector(sendEvent:eventName:revenue:) withObject:eventType withObject:eventName withObject:revenueDecimal];
                     NSLog(@"[AppstackReactNative] sendEvent method called successfully via alternative bridge");
                 } else {
-                    NSLog(@"[AppstackReactNative] ERROR: 'sendEvent:revenue:' method not found on alternative AppstackBridge");
+                    NSLog(@"[AppstackReactNative] ERROR: 'sendEvent:eventName:revenue:' method not found on alternative AppstackBridge");
                 }
             } else {
                 NSLog(@"[AppstackReactNative] ERROR: Neither AppstackBridge class variant found for sendEvent");

@@ -1,8 +1,29 @@
 declare module 'react-native-appstack-sdk' {
   export interface AppstackSDKInterface {
-    configure(apiKey: string): Promise<boolean>;
-    sendEvent(eventName: string, revenue: number | string): Promise<boolean>;
+    configure(apiKey: string, isDebug?: boolean, endpointBaseUrl?: string, logLevel?: number): Promise<boolean>;
+    sendEvent(eventName?: string, eventType?: EventType | string, revenue?: number | string): Promise<boolean>;
     enableAppleAdsAttribution(): Promise<boolean>;
+  }
+
+  export enum EventType {
+    INSTALL = 'INSTALL',
+    LOGIN = 'LOGIN',
+    SIGN_UP = 'SIGN_UP',
+    REGISTER = 'REGISTER',
+    PURCHASE = 'PURCHASE',
+    ADD_TO_CART = 'ADD_TO_CART',
+    ADD_TO_WISHLIST = 'ADD_TO_WISHLIST',
+    INITIATE_CHECKOUT = 'INITIATE_CHECKOUT',
+    START_TRIAL = 'START_TRIAL',
+    SUBSCRIBE = 'SUBSCRIBE',
+    LEVEL_START = 'LEVEL_START',
+    LEVEL_COMPLETE = 'LEVEL_COMPLETE',
+    TUTORIAL_COMPLETE = 'TUTORIAL_COMPLETE',
+    SEARCH = 'SEARCH',
+    VIEW_ITEM = 'VIEW_ITEM',
+    VIEW_CONTENT = 'VIEW_CONTENT',
+    SHARE = 'SHARE',
+    CUSTOM = 'CUSTOM',
   }
 
   export interface AppstackEventParams {
@@ -11,7 +32,9 @@ declare module 'react-native-appstack-sdk' {
 
   export interface AppstackConfig {
     apiKey: string;
-    enableDebugMode?: boolean;
+    isDebug?: boolean;
+    endpointBaseUrl?: string;
+    logLevel?: number;
   }
   
   export class AppstackError extends Error {
@@ -33,8 +56,8 @@ declare module 'react-native-appstack-sdk' {
 
   export class AppstackSDK implements AppstackSDKInterface {
     static getInstance(): AppstackSDK;
-    configure(apiKey: string): Promise<boolean>;
-    sendEvent(eventName: string, revenue?: number | string): Promise<boolean>;
+    configure(apiKey: string, isDebug?: boolean, endpointBaseUrl?: string, logLevel?: number): Promise<boolean>;
+    sendEvent(eventName?: string, eventType?: EventType | string, revenue?: number | string): Promise<boolean>;
     enableAppleAdsAttribution(): Promise<boolean>;
   }
 

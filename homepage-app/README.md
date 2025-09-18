@@ -1,6 +1,15 @@
-# Welcome to your Expo app 👋
+# Appstack SDK Demo App 📱
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a demo React Native app showcasing the Appstack Attribution SDK integration. Built with [Expo](https://expo.dev) and [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+
+## Features
+
+This demo app demonstrates:
+- ✅ **Full SDK Configuration** - All available parameters including debug mode, custom endpoints, and log levels
+- ✅ **Basic Configuration** - Backward-compatible simple setup
+- ✅ **Event Tracking** - Standard events, custom events, and revenue tracking
+- ✅ **Error Handling** - Comprehensive error handling and user feedback
+- ✅ **Cross-Platform** - Works on both iOS and Android
 
 ## Get started
 
@@ -24,6 +33,107 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Appstack SDK Usage
+
+### Configuration Options
+
+The SDK supports multiple configuration approaches:
+
+#### Full Configuration (Recommended for Development)
+```typescript
+import AppstackSDK from 'react-native-appstack-sdk';
+
+await AppstackSDK.configure(
+  'your-api-key',
+  true, // isDebug - enable debug mode
+  'https://api.event.dev.appstack.tech/android/', // endpointBaseUrl - custom endpoint
+  0 // logLevel - 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
+);
+```
+
+#### Basic Configuration (Production)
+```typescript
+// Backward compatible - uses default values
+await AppstackSDK.configure('your-api-key');
+```
+
+#### Parameter Details
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `apiKey` | `string` | **Required** | Your Appstack API key from the dashboard |
+| `isDebug` | `boolean` | `false` | Enable debug mode for detailed logging |
+| `endpointBaseUrl` | `string?` | Platform default | Custom API endpoint URL |
+| `logLevel` | `number` | `1` (INFO) | Log level: 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR |
+
+### Event Tracking
+
+#### Standard Events
+```typescript
+// Event without revenue
+await AppstackSDK.sendEvent(null, 'SIGN_UP');
+
+// Event with revenue
+await AppstackSDK.sendEvent(null, 'PURCHASE', 29.99);
+
+// Revenue as string
+await AppstackSDK.sendEvent(null, 'PURCHASE', '29.99');
+```
+
+#### Custom Events
+```typescript
+// Custom event names are automatically handled
+await AppstackSDK.sendEvent('CUSTOM_EVENT_NAME', 'CUSTOM', 15.50);
+```
+
+#### Supported Event Types
+- `INSTALL` (automatic)
+- `SIGN_UP`
+- `PURCHASE`
+- `SUBSCRIPTION`
+- `AD_CLICK`
+- `LEVEL_COMPLETE`
+- Custom event names (any string)
+
+### Error Handling
+
+```typescript
+try {
+  await AppstackSDK.configure('your-api-key');
+  await AppstackSDK.sendEvent('PURCHASE', 29.99);
+} catch (error) {
+  console.error('SDK Error:', error.message);
+  // Handle error appropriately
+}
+```
+
+### Platform-Specific Features
+
+#### iOS Only
+```typescript
+import { Platform } from 'react-native';
+
+if (Platform.OS === 'ios') {
+  await AppstackSDK.enableAppleAdsAttribution();
+}
+```
+
+## Demo App Features
+
+This app demonstrates all SDK capabilities:
+
+1. **Configuration Testing** - Switch between full and basic configuration
+2. **Event Tracking** - Test different event types with and without revenue
+3. **Error Handling** - See how errors are handled and displayed
+4. **Real-time Feedback** - Visual confirmation of successful operations
+
+## Development Tips
+
+1. **Use Debug Mode** - Enable `isDebug: true` during development for detailed logs
+2. **Test Both Platforms** - Verify functionality on both iOS and Android
+3. **Handle Errors** - Always wrap SDK calls in try-catch blocks
+4. **Validate Revenue** - Ensure revenue values are valid numbers
 
 ## Get a fresh project
 

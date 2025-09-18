@@ -27,22 +27,43 @@ import AppstackSDK
         )
     }
     
-    @objc public static func sendEvent(_ eventName: String, revenue: NSDecimalNumber?) {
-        // Convert string event name to EventType enum
-        let eventType: EventType
-        if let enumEvent = EventType(rawValue: eventName.uppercased()) {
-            eventType = enumEvent
+    @objc public static func sendEvent(_ eventType: String?, eventName: String?, revenue: NSDecimalNumber?) {
+        // Determine the EventType enum to use
+        let finalEventType: EventType
+        let finalEventName: String?
+        
+        if let eventTypeString = eventType, !eventTypeString.isEmpty {
+            // Use provided event_type parameter
+            if let enumEvent = EventType(rawValue: eventTypeString.uppercased()) {
+                finalEventType = enumEvent
+                finalEventName = enumEvent == .CUSTOM ? eventName : nil
+            } else {
+                // Invalid event type, fallback to CUSTOM
+                finalEventType = .CUSTOM
+                finalEventName = eventName ?? eventTypeString
+            }
+        } else if let eventNameString = eventName, !eventNameString.isEmpty {
+            // Fallback to legacy behavior - try to parse eventName as EventType
+            if let enumEvent = EventType(rawValue: eventNameString.uppercased()) {
+                finalEventType = enumEvent
+                finalEventName = enumEvent == .CUSTOM ? eventNameString : nil
+            } else {
+                // For custom events, use CUSTOM type
+                finalEventType = .CUSTOM
+                finalEventName = eventNameString
+            }
         } else {
-            // For custom events, use CUSTOM type
-            eventType = .CUSTOM
+            // Neither event_type nor eventName provided, default to CUSTOM
+            finalEventType = .CUSTOM
+            finalEventName = "UNKNOWN_EVENT"
         }
         
         // Convert NSDecimalNumber to Double
         let revenueDouble = revenue?.doubleValue
         
         AppstackAttributionSdk.shared.sendEvent(
-            event: eventType,
-            name: eventType == .CUSTOM ? eventName : nil,
+            event: finalEventType,
+            name: finalEventName,
             revenue: revenueDouble
         )
     }

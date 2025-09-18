@@ -36,7 +36,7 @@ No additional configuration needed for Android - the SDK will work automatically
 ```typescript
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
-import AppstackSDK from 'react-native-appstack-sdk';
+import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 
 const App = () => {
   useEffect(() => {
@@ -56,7 +56,7 @@ const App = () => {
   }, []);
 
   const trackPurchase = () => {
-    AppstackSDK.sendEvent('purchase', 29.99);
+    AppstackSDK.sendEvent(null, EventType.PURCHASE, 29.99);
   };
 
   // ... your app
@@ -81,25 +81,43 @@ if (!success) {
 }
 ```
 
-### `sendEvent(name: string, revenue?: number): Promise<boolean>`
+### `sendEvent(eventName?: string, eventType?: EventType | string, revenue?: number | string): Promise<boolean>`
 Tracks custom events with optional revenue data. Use this for all user actions you want to measure.
 
 **Parameters:**
-- `name` - Event name (must match your Appstack dashboard configuration)
+- `eventName` - Event name (for backward compatibility or custom event names)
+- `eventType` - Event type from the EventType enum (preferred method for standard events)
 - `revenue` - Optional revenue amount in dollars (e.g., 29.99 for $29.99)
 
 **Returns:** Promise that resolves to `true` if event was sent successfully
 
 **Examples:**
 ```typescript
-// Track events without revenue
-await AppstackSDK.sendEvent('user_registration');
-await AppstackSDK.sendEvent('level_completed');
+import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 
-// Track events with revenue
-await AppstackSDK.sendEvent('purchase', 29.99);
-await AppstackSDK.sendEvent('subscription', 9.99);
+// Using EventType enum (recommended)
+await AppstackSDK.sendEvent(null, EventType.PURCHASE, 29.99);
+await AppstackSDK.sendEvent(null, EventType.SIGN_UP);
+await AppstackSDK.sendEvent(null, EventType.ADD_TO_CART);
+
+// Using string event types
+await AppstackSDK.sendEvent(null, 'PURCHASE', 29.99);
+await AppstackSDK.sendEvent(null, 'SIGN_UP');
+
+// Backward compatibility - using eventName only
+await AppstackSDK.sendEvent('user_registration');
+await AppstackSDK.sendEvent('purchase', null, 29.99);
+
+// Custom events with custom names
+await AppstackSDK.sendEvent('my_custom_event', EventType.CUSTOM, 15.50);
 ```
+
+**Available EventType values:**
+- `INSTALL`, `LOGIN`, `SIGN_UP`, `REGISTER`
+- `PURCHASE`, `ADD_TO_CART`, `ADD_TO_WISHLIST`, `INITIATE_CHECKOUT`, `START_TRIAL`, `SUBSCRIBE`
+- `LEVEL_START`, `LEVEL_COMPLETE`
+- `TUTORIAL_COMPLETE`, `SEARCH`, `VIEW_ITEM`, `VIEW_CONTENT`, `SHARE`
+- `CUSTOM` (for application-specific events)
 
 ### `enableAppleAdsAttribution(): Promise<boolean>` (iOS only)
 Enables Apple Search Ads attribution tracking. Call this after `configure()` on iOS to track App Store install sources.
