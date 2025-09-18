@@ -149,7 +149,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             AppstackAttributionSdk.sendEvent(
                 event = finalEventType,
                 name = finalEventName,
-                revenue = revenue
+                revenue = revenueValue
             )
             
             promise.resolve(true)

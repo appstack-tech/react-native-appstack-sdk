@@ -150,7 +150,7 @@ class AppstackSDK implements AppstackSDKInterface {
       return await AppstackReactNative.sendEvent(
         eventName?.trim() || null, 
         eventTypeString?.trim() || null, 
-        numericRevenue
+        numericRevenue ?? 0.0
       );
     } catch (error) {
       console.error(`Failed to send event (eventName: '${eventName}', eventType: '${eventType}'):`, error);
