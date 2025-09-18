@@ -17,10 +17,13 @@ RCT_EXPORT_MODULE()
 #pragma mark - SDK Configuration
 
 RCT_EXPORT_METHOD(configure:(NSString *)apiKey
+                 isDebug:(BOOL)isDebug
+                 endpointBaseUrl:(NSString * _Nullable)endpointBaseUrl
+                 logLevel:(NSInteger)logLevel
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    NSLog(@"[AppstackReactNative] configure called with apiKey: %@", apiKey);
+    NSLog(@"[AppstackReactNative] configure called with apiKey: %@, isDebug: %@, endpointBaseUrl: %@, logLevel: %ld", apiKey, isDebug ? @"YES" : @"NO", endpointBaseUrl ?: @"nil", (long)logLevel);
     
     if (!apiKey || [apiKey length] == 0) {
         NSLog(@"[AppstackReactNative] configure failed: Invalid API key");
@@ -37,12 +40,12 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
             if (BridgeClass) {
                 NSLog(@"[AppstackReactNative] AppstackBridge class found!");
                 
-                if ([BridgeClass respondsToSelector:@selector(configureWithApiKey:isDebug:)]) {
-                    NSLog(@"[AppstackReactNative] 'configureWithApiKey:isDebug:' method found, calling with apiKey: %@", apiKey);
-                    [BridgeClass performSelector:@selector(configureWithApiKey:isDebug:) withObject:apiKey withObject:@(NO)];
+                if ([BridgeClass respondsToSelector:@selector(configureWithApiKey:isDebug:endpointBaseUrl:logLevel:)]) {
+                    NSLog(@"[AppstackReactNative] 'configureWithApiKey:isDebug:endpointBaseUrl:logLevel:' method found, calling with apiKey: %@, isDebug: %@, endpointBaseUrl: %@, logLevel: %ld", apiKey, isDebug ? @"YES" : @"NO", endpointBaseUrl ?: @"nil", (long)logLevel);
+                    [BridgeClass performSelector:@selector(configureWithApiKey:isDebug:endpointBaseUrl:logLevel:) withObject:apiKey withObject:@(isDebug) withObject:endpointBaseUrl withObject:@(logLevel)];
                     NSLog(@"[AppstackReactNative] configure method called successfully via bridge");
                 } else {
-                    NSLog(@"[AppstackReactNative] ERROR: 'configureWithApiKey:isDebug:' method not found on AppstackBridge");
+                    NSLog(@"[AppstackReactNative] ERROR: 'configureWithApiKey:isDebug:endpointBaseUrl:logLevel:' method not found on AppstackBridge");
                 }
             } else {
                 NSLog(@"[AppstackReactNative] ERROR: AppstackBridge class not found. Trying alternative class name...");
@@ -51,12 +54,12 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
                 Class AltBridgeClass = NSClassFromString(@"AppstackBridge");
                 if (AltBridgeClass) {
                     NSLog(@"[AppstackReactNative] Alternative AppstackBridge class found!");
-                    if ([AltBridgeClass respondsToSelector:@selector(configureWithApiKey:isDebug:)]) {
+                    if ([AltBridgeClass respondsToSelector:@selector(configureWithApiKey:isDebug:endpointBaseUrl:logLevel:)]) {
                         NSLog(@"[AppstackReactNative] Calling configure via alternative bridge class");
-                        [AltBridgeClass performSelector:@selector(configureWithApiKey:isDebug:) withObject:apiKey withObject:@(NO)];
+                        [AltBridgeClass performSelector:@selector(configureWithApiKey:isDebug:endpointBaseUrl:logLevel:) withObject:apiKey withObject:@(isDebug) withObject:endpointBaseUrl withObject:@(logLevel)];
                         NSLog(@"[AppstackReactNative] configure method called successfully via alternative bridge");
                     } else {
-                        NSLog(@"[AppstackReactNative] ERROR: 'configureWithApiKey:isDebug:' method not found on alternative AppstackBridge");
+                        NSLog(@"[AppstackReactNative] ERROR: 'configureWithApiKey:isDebug:endpointBaseUrl:logLevel:' method not found on alternative AppstackBridge");
                     }
                 } else {
                     NSLog(@"[AppstackReactNative] ERROR: Neither AppstackBridge class variant found");
@@ -212,6 +215,61 @@ RCT_EXPORT_METHOD(enableAppleAdsAttribution:(RCTPromiseResolveBlock)resolve
         } @catch (NSException *exception) {
             NSLog(@"[AppstackReactNative] enableAppleAdsAttribution failed with exception: %@", exception.reason);
             reject(@"ASA_ATTRIBUTION_ERROR", exception.reason, nil);
+        }
+    } else {
+        NSLog(@"[AppstackReactNative] ERROR: iOS version < 15.0, Apple Ads Attribution not supported");
+        reject(@"UNSUPPORTED_IOS_VERSION", @"Apple Ads Attribution requires iOS 15.0 or later", nil);
+    }
+}
+
+#pragma mark - Additional SDK Methods
+
+RCT_EXPORT_METHOD(disableASAAttributionTracking:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSLog(@"[AppstackReactNative] disableASAAttributionTracking called");
+    
+    if (@available(iOS 15.0, *)) {
+        NSLog(@"[AppstackReactNative] iOS 15.0+ detected, proceeding with disable ASA Attribution");
+        @try {
+            NSLog(@"[AppstackReactNative] Looking up AppstackBridge class for disable ASA...");
+            // Use Swift bridge class for disable ASA Attribution
+            Class BridgeClass = NSClassFromString(@"react_native_appstack_sdk.AppstackBridge");
+            
+            if (BridgeClass) {
+                NSLog(@"[AppstackReactNative] AppstackBridge class found for disable ASA!");
+                
+                if ([BridgeClass respondsToSelector:@selector(disableASAAttributionTracking)]) {
+                    NSLog(@"[AppstackReactNative] 'disableASAAttributionTracking' method found, calling...");
+                    [BridgeClass performSelector:@selector(disableASAAttributionTracking)];
+                    NSLog(@"[AppstackReactNative] disableASAAttributionTracking method called successfully via bridge");
+                } else {
+                    NSLog(@"[AppstackReactNative] ERROR: 'disableASAAttributionTracking' method not found on AppstackBridge");
+                }
+            } else {
+                NSLog(@"[AppstackReactNative] ERROR: AppstackBridge class not found for disable ASA. Trying alternative class name...");
+                
+                // Try alternative Swift class name format
+                Class AltBridgeClass = NSClassFromString(@"AppstackBridge");
+                if (AltBridgeClass) {
+                    NSLog(@"[AppstackReactNative] Alternative AppstackBridge class found for disable ASA!");
+                    if ([AltBridgeClass respondsToSelector:@selector(disableASAAttributionTracking)]) {
+                        NSLog(@"[AppstackReactNative] Calling disableASAAttributionTracking via alternative bridge class");
+                        [AltBridgeClass performSelector:@selector(disableASAAttributionTracking)];
+                        NSLog(@"[AppstackReactNative] disableASAAttributionTracking method called successfully via alternative bridge");
+                    } else {
+                        NSLog(@"[AppstackReactNative] ERROR: 'disableASAAttributionTracking' method not found on alternative AppstackBridge");
+                    }
+                } else {
+                    NSLog(@"[AppstackReactNative] ERROR: Neither AppstackBridge class variant found for disable ASA");
+                }
+            }
+            
+            NSLog(@"[AppstackReactNative] disableASAAttributionTracking completed, resolving promise");
+            resolve(@(YES));
+        } @catch (NSException *exception) {
+            NSLog(@"[AppstackReactNative] disableASAAttributionTracking failed with exception: %@", exception.reason);
+            reject(@"ASA_DISABLE_ERROR", exception.reason, nil);
         }
     } else {
         NSLog(@"[AppstackReactNative] ERROR: iOS version < 15.0, Apple Ads Attribution not supported");
