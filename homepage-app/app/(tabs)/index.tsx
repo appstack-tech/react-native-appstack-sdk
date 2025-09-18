@@ -7,6 +7,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import AppstackSDK from 'react-native-appstack-sdk';
+import { EventType } from 'react-native-appstack-sdk';
 
 export default function HomeScreen() {
   const [isSDKInitialized, setIsSDKInitialized] = useState(false);
@@ -30,10 +31,13 @@ export default function HomeScreen() {
 
       // Read API key from environment
       // const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY;
-      let apiKey = 'your-appstack-api-key'; // 'o37...' if you want to use the real key;
+      let apiKey = 'qa96lv2r6rb7d9758cnr8w8q';
+      let endpointUrl = 'https://api.event.dev.appstack.tech/android/';
+
       if (Platform.OS === 'ios') {
-        apiKey = 'your-appstack-api-key'; // 'o37...' if you want to use the real key;
+        endpointUrl = 'https://api.event.dev.appstack.tech';
       }
+
       if (!apiKey || apiKey.trim() === '') {
         const msg = 'Missing EXPO_PUBLIC_APPSTACK_API_KEY. Set it in your env (e.g. eas.json env or .env) to initialize the SDK.';
         console.warn(msg);
@@ -46,7 +50,7 @@ export default function HomeScreen() {
       await AppstackSDK.configure(
         apiKey.trim(),
         true, // isDebug - enable debug mode for development
-        'https://api.event.dev.appstack.tech/android/', // endpointBaseUrl - custom endpoint
+        endpointUrl, // endpointBaseUrl - custom endpoint
         0 // logLevel - 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
       );
       setIsSDKInitialized(true);
@@ -92,7 +96,7 @@ export default function HomeScreen() {
     }
 
     try {
-      await AppstackSDK.sendEvent('PURCHASE', 29.99);
+      await AppstackSDK.sendEvent('PURCHASE', EventType.PURCHASE, 29.99);
       Alert.alert('Success!', 'Revenue event sent successfully');
       console.log('PURCHASE event with revenue sent successfully');
     } catch (error) {
@@ -124,7 +128,7 @@ export default function HomeScreen() {
     }
 
     try {
-      await AppstackSDK.sendEvent('CUSTOM_EVENT_NAME', 15.50);
+      await AppstackSDK.sendEvent('CUSTOM_EVENT_NAME', EventType.CUSTOM, 15.50);
       Alert.alert('Success!', 'Custom event sent successfully');
       console.log('CUSTOM_EVENT_NAME event sent successfully');
     } catch (error) {

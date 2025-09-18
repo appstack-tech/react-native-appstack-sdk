@@ -36,7 +36,13 @@ import AppstackSDK
             // Use provided event_type parameter
             if let enumEvent = EventType(rawValue: eventTypeString.uppercased()) {
                 finalEventType = enumEvent
-                finalEventName = enumEvent == .CUSTOM ? eventName : nil
+                if enumEvent == .CUSTOM {
+                    // For CUSTOM event type, use the provided eventName
+                    finalEventName = eventName
+                } else {
+                    // For non-CUSTOM event types, use eventType as eventName
+                    finalEventName = eventTypeString
+                }
             } else {
                 // Invalid event type, fallback to CUSTOM
                 finalEventType = .CUSTOM
@@ -46,7 +52,13 @@ import AppstackSDK
             // Fallback to legacy behavior - try to parse eventName as EventType
             if let enumEvent = EventType(rawValue: eventNameString.uppercased()) {
                 finalEventType = enumEvent
-                finalEventName = enumEvent == .CUSTOM ? eventNameString : nil
+                if enumEvent == .CUSTOM {
+                    // For CUSTOM event type, use the eventNameString as the name
+                    finalEventName = eventNameString
+                } else {
+                    // For non-CUSTOM event types, use eventNameString as eventName
+                    finalEventName = eventNameString
+                }
             } else {
                 // For custom events, use CUSTOM type
                 finalEventType = .CUSTOM

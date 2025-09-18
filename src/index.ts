@@ -36,7 +36,7 @@ export interface AppstackSDKInterface {
    * @param revenue - Optional revenue value (can be number or string)
    * @returns Promise that resolves when the event is sent successfully
    */
-  sendEvent(eventName?: string, eventType?: EventType | string, revenue?: number | string): Promise<boolean>;
+  sendEvent(eventType?: EventType | string, eventName?: string, revenue?: number | string): Promise<boolean>;
 
   /**
    * Enable Apple Search Ads Attribution tracking
@@ -67,7 +67,7 @@ export interface AppstackSDKInterface {
  * 
  * // Send events
  * await AppstackSDK.sendEvent('PURCHASE'); // Without revenue
- * await AppstackSDK.sendEvent('PURCHASE', 29.99); // With revenue
+ * await AppstackSDK.sendEvent('PURCHASE', null, 29.99); // With revenue
  * 
  * // Enable Apple Ads Attribution (iOS only)
  * if (Platform.OS === 'ios') {
@@ -127,7 +127,7 @@ class AppstackSDK implements AppstackSDKInterface {
   /**
    * Send an event with optional revenue parameter
    */
-  async sendEvent(eventName?: string, eventType?: EventType | string, revenue?: number | string): Promise<boolean> {
+  async sendEvent(eventType?: EventType | string, eventName?: string, revenue?: number | string): Promise<boolean> {
     // Validate that at least one of eventName or eventType is provided
     if ((!eventName || eventName.trim() === '') && (!eventType || eventType.toString().trim() === '')) {
       throw new Error('Either eventName or eventType must be provided');
@@ -148,12 +148,12 @@ class AppstackSDK implements AppstackSDKInterface {
       const eventTypeString = eventType ? eventType.toString() : null;
       
       return await AppstackReactNative.sendEvent(
-        eventName?.trim() || null, 
         eventTypeString?.trim() || null, 
+        eventName?.trim() || null, 
         numericRevenue ?? 0.0
       );
     } catch (error) {
-      console.error(`Failed to send event (eventName: '${eventName}', eventType: '${eventType}'):`, error);
+      console.error(`Failed to send event (eventType: '${eventType}', eventName: '${eventName}'):`, error);
       throw error;
     }
   }

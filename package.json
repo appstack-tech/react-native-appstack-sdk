@@ -1,6 +1,6 @@
 {
   "name": "react-native-appstack-sdk",
-  "version": "0.0.0-placeholder",
+  "version": "1.0.0",
   "description": "React Native bridge for Appstack iOS SDK - Track events and revenue with SKAdNetwork integration",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",

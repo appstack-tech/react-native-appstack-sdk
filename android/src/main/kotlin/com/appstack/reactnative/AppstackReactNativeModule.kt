@@ -112,7 +112,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
     }
 
     @ReactMethod
-    fun sendEvent(eventName: String?, eventType: String?, revenue: Double?, promise: Promise) {
+    fun sendEvent(eventType: String?, eventName: String?, revenue: Double?, promise: Promise) {
         try {
             // At least one of eventName or eventType should be provided
             if ((eventName.isNullOrBlank()) && (eventType.isNullOrBlank())) {
@@ -131,7 +131,18 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
                 } catch (e: IllegalArgumentException) {
                     EventType.CUSTOM
                 }
-                finalEventName = if (finalEventType == EventType.CUSTOM) eventName?.trim() else null
+                
+                if (finalEventType == EventType.CUSTOM) {
+                    // For CUSTOM event type, eventName is required
+                    if (eventName.isNullOrBlank()) {
+                        promise.reject("INVALID_EVENT_NAME", "eventName is required when eventType is CUSTOM")
+                        return
+                    }
+                    finalEventName = eventName.trim()
+                } else {
+                    // For non-CUSTOM event types, use eventType as eventName
+                    finalEventName = eventType.trim()
+                }
             } else if (!eventName.isNullOrBlank()) {
                 // Fallback to legacy behavior - try to parse eventName as EventType
                 finalEventType = try {
@@ -154,7 +165,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             
             promise.resolve(true)
         } catch (exception: Exception) {
-            promise.reject("EVENT_SEND_ERROR", "Failed to send event (eventName: '$eventName', eventType: '$eventType'): ${exception.message}", exception)
+            promise.reject("EVENT_SEND_ERROR", "Failed to send event (eventType: '$eventType', eventName: '$eventName'): ${exception.message}", exception)
         }
     }
 

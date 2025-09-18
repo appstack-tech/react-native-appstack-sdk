@@ -5,6 +5,66 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.10] - 2025-01-20
+
+### Changed
+- **BREAKING**: Switched `sendEvent` parameter order to `(eventType, eventName, revenue)` for better developer experience
+- **BREAKING**: Updated all platform implementations (iOS, Android, TypeScript) to use new parameter order
+- **BREAKING**: Updated all documentation and examples to reflect new parameter order
+
+### Added
+- **Enhanced Event Handling**: Improved event name resolution logic for better consistency
+  - Non-CUSTOM event types now use the eventType value as the event name automatically
+  - CUSTOM event types require an explicit eventName parameter (validation added)
+- **Better Error Messages**: More descriptive error messages for invalid event configurations
+- **Platform Consistency**: Unified behavior across iOS and Android platforms
+
+### Fixed
+- **Null Value Elimination**: Developers can now call `sendEvent(EventType.PURCHASE)` without needing null values
+- **Event Name Resolution**: Fixed inconsistent event name handling between different event types
+- **Validation Logic**: Added proper validation for CUSTOM event types requiring event names
+
+### Migration Guide
+```typescript
+// OLD (0.0.9 and earlier)
+await AppstackSDK.sendEvent(null, EventType.PURCHASE, 29.99);
+await AppstackSDK.sendEvent('user_registration');
+
+// NEW (0.0.10+)
+await AppstackSDK.sendEvent(EventType.PURCHASE, null, 29.99);
+await AppstackSDK.sendEvent(EventType.CUSTOM, 'user_registration');
+```
+
+## [0.0.9] - 2025-09-18
+
+## Changed
+- Tried to fix the SDK non-null values problem
+
+## [0.0.8] - 2025-09-18
+
+## Changed
+- Tried to fix the SDK non-null values problem
+
+## [0.0.7] - 2025-09-18
+
+## Changed
+- Tried to fix the SDK non-null values problem
+
+## [0.0.6] - 2025-09-18
+
+## Changed
+- Tried to fix the SDK non-null values problem
+
+## [0.0.5] - 2025-09-18
+
+## Changed
+- Updated the infrastructure of the SDK and the bridges to match the new methods signatures.
+
+## [0.0.4] - 2025-09-18
+
+## Changed
+- Updated the version of the iOS SDK bridge.
+
 ## [0.0.3] - 2025-09-17
 
 ## Changed

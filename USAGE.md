@@ -34,7 +34,7 @@ const App = () => {
   }, []);
 
   const trackPurchase = () => {
-    AppstackSDK.sendEvent(null, 'PURCHASE', 29.99);
+    AppstackSDK.sendEvent('PURCHASE', null, 29.99);
   };
 
   // ... your app
@@ -75,11 +75,11 @@ npx react-native clean
 **Wrong revenue values:**
 ```typescript
 // ✅ Use decimal dollars
-AppstackSDK.sendEvent(null, 'PURCHASE', 29.99);
+AppstackSDK.sendEvent('PURCHASE', null, 29.99);
 
 // ✅ Convert cents to dollars  
 const cents = 2999;
-AppstackSDK.sendEvent(null, 'PURCHASE', cents / 100);
+AppstackSDK.sendEvent('PURCHASE', null, cents / 100);
 ```
 </details>
 

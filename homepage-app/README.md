@@ -72,19 +72,19 @@ await AppstackSDK.configure('your-api-key');
 #### Standard Events
 ```typescript
 // Event without revenue
-await AppstackSDK.sendEvent(null, 'SIGN_UP');
+await AppstackSDK.sendEvent('SIGN_UP');
 
 // Event with revenue
-await AppstackSDK.sendEvent(null, 'PURCHASE', 29.99);
+await AppstackSDK.sendEvent('PURCHASE', null, 29.99);
 
 // Revenue as string
-await AppstackSDK.sendEvent(null, 'PURCHASE', '29.99');
+await AppstackSDK.sendEvent('PURCHASE', null, '29.99');
 ```
 
 #### Custom Events
 ```typescript
 // Custom event names are automatically handled
-await AppstackSDK.sendEvent('CUSTOM_EVENT_NAME', 'CUSTOM', 15.50);
+await AppstackSDK.sendEvent('CUSTOM', 'CUSTOM_EVENT_NAME', 15.50);
 ```
 
 #### Supported Event Types
