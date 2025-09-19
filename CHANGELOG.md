@@ -5,7 +5,12 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.10] - 2025-01-20
+## [0.0.11] - 2025-09-19
+
+## Changed
+- **Modified the regex defined in `react-native-appstack-sdk.podspec`**
+
+## [0.0.10] - 2025-09-18
 
 ### Changed
 - **BREAKING**: Switched `sendEvent` parameter order to `(eventType, eventName, revenue)` for better developer experience
