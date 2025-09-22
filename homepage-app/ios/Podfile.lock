@@ -1675,7 +1675,7 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
-  - react-native-appstack-sdk (0.0.10):
+  - react-native-appstack-sdk (0.0.12):
     - RCT-Folly
     - RCTRequired
     - RCTTypeSafety
