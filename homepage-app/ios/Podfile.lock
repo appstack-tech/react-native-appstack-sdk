@@ -6,7 +6,7 @@ PODS:
   - EXJSONUtils (0.15.0)
   - EXManifests (0.16.6):
     - ExpoModulesCore
-  - Expo (53.0.20):
+  - Expo (53.0.23):
     - DoubleConversion
     - ExpoModulesCore
     - glog
@@ -278,7 +278,7 @@ PODS:
     - ExpoModulesCore
   - ExpoHaptics (14.1.4):
     - ExpoModulesCore
-  - ExpoHead (5.1.4):
+  - ExpoHead (5.1.7):
     - ExpoModulesCore
   - ExpoImage (2.4.0):
     - ExpoModulesCore
@@ -320,7 +320,7 @@ PODS:
     - ExpoModulesCore
   - ExpoSymbols (0.4.5):
     - ExpoModulesCore
-  - ExpoSystemUI (5.0.10):
+  - ExpoSystemUI (5.0.11):
     - ExpoModulesCore
   - ExpoWebBrowser (14.2.0):
     - ExpoModulesCore
@@ -1675,7 +1675,7 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
-  - react-native-appstack-sdk (0.0.12):
+  - react-native-appstack-sdk (0.0.13):
     - RCT-Folly
     - RCTRequired
     - RCTTypeSafety
@@ -2302,10 +2302,10 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - SDWebImage (5.21.1):
-    - SDWebImage/Core (= 5.21.1)
-  - SDWebImage/Core (5.21.1)
-  - SDWebImageAVIFCoder (0.11.0):
+  - SDWebImage (5.21.2):
+    - SDWebImage/Core (= 5.21.2)
+  - SDWebImage/Core (5.21.2)
+  - SDWebImageAVIFCoder (0.11.1):
     - libavif/core (>= 0.11.0)
     - SDWebImage (~> 5.10)
   - SDWebImageSVGCoder (1.7.0):
@@ -2638,7 +2638,7 @@ SPEC CHECKSUMS:
   EXConstants: 98bcf0f22b820f9b28f9fee55ff2daededadd2f8
   EXJSONUtils: 1d3e4590438c3ee593684186007028a14b3686cd
   EXManifests: 691a779b04e4f2c96da46fb9bef4f86174fefcb5
-  Expo: a40d525c930dd1c8a158e082756ee071955baccb
+  Expo: dd7f49380001a55ea776f905f8b3c1c540160b09
   expo-dev-client: 9b1e78baf0dd87b005f035d180bbb07c05917fad
   expo-dev-launcher: 35dc0269b5fc1f628abc00e08e5a969e7809eff4
   expo-dev-menu: 0771fa9c5c405e07aa15e55a699b8a4a984ea77a
@@ -2648,14 +2648,14 @@ SPEC CHECKSUMS:
   ExpoFileSystem: 7f92f7be2f5c5ed40a7c9efc8fa30821181d9d63
   ExpoFont: cf508bc2e6b70871e05386d71cab927c8524cc8e
   ExpoHaptics: 0ff6e0d83cd891178a306e548da1450249d54500
-  ExpoHead: a7b66cbaeeb51f4a85338d335a0f5467e29a2c90
+  ExpoHead: 520990db7d4e4a09a9142b2e03bcb08b85b97e0e
   ExpoImage: e4102c93d1dbe99ff54b075452d1bc9d6ec21b7c
   ExpoKeepAwake: bf0811570c8da182bfb879169437d4de298376e7
   ExpoLinking: d5c183998ca6ada66ff45e407e0f965b398a8902
   ExpoModulesCore: 00a1b5c73248465bd0b93f59f8538c4573dac579
   ExpoSplashScreen: 0ad5acac1b5d2953c6e00d4319f16d616f70d4dd
   ExpoSymbols: c5612a90fb9179cdaebcd19bea9d8c69e5d3b859
-  ExpoSystemUI: c2724f9d5af6b1bb74e013efadf9c6a8fae547a2
+  ExpoSystemUI: 433a971503b99020318518ed30a58204288bab2d
   ExpoWebBrowser: dc39a88485f007e61a3dff05d6a75f22ab4a2e92
   EXUpdatesInterface: 7ff005b7af94ee63fa452ea7bb95d7a8ff40277a
   fast_float: 06eeec4fe712a76acc9376682e4808b05ce978b6
@@ -2698,7 +2698,7 @@ SPEC CHECKSUMS:
   React-logger: 85fa3509931497c72ccd2547fcc91e7299d8591e
   React-Mapbuffer: 96a2f2a176268581733be182fa6eebab1c0193be
   React-microtasksnativemodule: bda561d2648e1e52bd9e5a87f8889836bdbde2e2
-  react-native-appstack-sdk: 83b6d82d135ea0754538f5d5d88c66e5e937bbd4
+  react-native-appstack-sdk: f3b5b217e46f67e1981d29b07dec28853289f596
   react-native-safe-area-context: 562163222d999b79a51577eda2ea8ad2c32b4d06
   react-native-webview: 520bcb79c3f2af91e157cdd695732a34ab5f25c8
   React-NativeModulesApple: 1ecb83880dd11baf2228f8dd89d8419c387e03ad
@@ -2735,8 +2735,8 @@ SPEC CHECKSUMS:
   RNGestureHandler: 7d0931a61d7ba0259f32db0ba7d0963c3ed15d2b
   RNReanimated: 2313402fe27fecb7237619e9c6fcee3177f08a65
   RNScreens: 482e9707f9826230810c92e765751af53826d509
-  SDWebImage: f29024626962457f3470184232766516dee8dfea
-  SDWebImageAVIFCoder: 00310d246aab3232ce77f1d8f0076f8c4b021d90
+  SDWebImage: 9f177d83116802728e122410fb25ad88f5c7608a
+  SDWebImageAVIFCoder: afe194a084e851f70228e4be35ef651df0fc5c57
   SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748

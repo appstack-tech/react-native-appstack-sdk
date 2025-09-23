@@ -31,7 +31,7 @@ export default function HomeScreen() {
 
       // Read API key from environment
       // const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY;
-      let apiKey = 'qa96lv2r6rb7d9758cnr8w8q';
+      let apiKey = 'h6i3g37nfk7qo42dgqsxpb4z';
       let endpointUrl = 'https://api.event.dev.appstack.tech/android/';
 
       if (Platform.OS === 'ios') {
