@@ -1,0 +1,29 @@
+//
+//  AppstackBridge.h
+//  react-native-appstack-sdk
+//
+//  Created by React Native Appstack SDK
+//
+
+#import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface AppstackBridge : NSObject
+
++ (void)configureWithApiKey:(NSString *)apiKey 
+                    isDebug:(BOOL)isDebug 
+            endpointBaseUrl:(NSString * _Nullable)endpointBaseUrl 
+                   logLevel:(NSInteger)logLevel;
+
++ (void)sendEvent:(NSString * _Nullable)eventType 
+        eventName:(NSString * _Nullable)eventName 
+          revenue:(NSDecimalNumber * _Nullable)revenue;
+
++ (void)enableAppleAdsAttribution;
+
++ (void)disableASAAttributionTracking;
+
+@end
+
+NS_ASSUME_NONNULL_END

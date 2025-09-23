@@ -1,7 +1,8 @@
 import Foundation
 import AppstackSDK
 
-@objc public class AppstackBridge: NSObject {
+@objc(AppstackBridge)
+public class AppstackBridge: NSObject {
     
     @objc public static func configure(apiKey: String, isDebug: Bool, endpointBaseUrl: String?, logLevel: Int) {
         // Convert Int logLevel to LogLevel enum

@@ -1,6 +1,5 @@
 #import "AppstackReactNative.h"
-// Import the Swift module to make AppstackBridge available
-#import "react_native_appstack_sdk-Swift.h"
+#import "AppstackBridge.h"
 
 @implementation AppstackReactNative
 
