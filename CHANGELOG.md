@@ -5,6 +5,10 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.14] - 2025-09-26
+
+- **Release the probabilistic matching attribution on iOS (update iOS SDK version to 2.2.0)**
+
 ## [0.0.13] - 2025-09-23
 
 - **Update the iOS bridge configuration to ensure that every command eas build works correctly**
