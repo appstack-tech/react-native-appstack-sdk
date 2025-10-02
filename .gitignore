@@ -49,6 +49,7 @@ ios/build/
 # Android
 android/build/
 android/app/build/
+android/.cxx/
 *.apk
 
 # macOS

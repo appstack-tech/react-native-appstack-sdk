@@ -94,6 +94,21 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
+
+        // Enable 16KB page size support
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
+    }
+
+    // Configure ABI splits for better APK optimization
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            universalApk true
+        }
     }
     signingConfigs {
         debug {
@@ -120,7 +135,12 @@ android {
     packagingOptions {
         jniLibs {
             useLegacyPackaging (findProperty('expo.useLegacyPackaging')?.toBoolean() ?: false)
+            // Ensure 16KB page size alignment for native libraries
+            pickFirsts += ['**/lib/**/*.so']
         }
+        // Ensure proper alignment for 16KB page sizes
+        doNotStrip '*/arm64-v8a/*.so'
+        doNotStrip '*/armeabi-v7a/*.so'
     }
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'

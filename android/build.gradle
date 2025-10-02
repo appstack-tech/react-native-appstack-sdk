@@ -6,17 +6,25 @@ version = '1.0.0'
 
 android {
     namespace 'com.appstack.reactnative'
-    compileSdkVersion 34
+    compileSdkVersion 35
 
     defaultConfig {
         minSdkVersion 21
+        targetSdkVersion 35
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
-        
+
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++17"
-                arguments "-DANDROID_STL=c++_shared"
+                arguments "-DANDROID_STL=c++_shared",
+                          "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384"
+                // Enable 16KB page size support
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
             }
+        }
+
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
         }
     }
 
@@ -46,6 +54,15 @@ android {
         }
     }
 
+    packagingOptions {
+        jniLibs {
+            // Ensure proper alignment for 16KB page size compatibility
+            useLegacyPackaging = false
+        }
+        // Keep first occurrence of duplicate libraries
+        pickFirsts += ['**/lib/**/*.so']
+    }
+
 }
 
 repositories {
@@ -61,7 +78,7 @@ repositories {
 dependencies {
     compileOnly 'com.facebook.react:react-native:+'
 
-    implementation 'tech.appstack.android-sdk:appstack-android-sdk:0.0.10'
+    implementation 'tech.appstack.android-sdk:appstack-android-sdk:0.0.11'
 
     implementation 'androidx.annotation:annotation:1.7.1'
 
@@ -71,6 +88,69 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
 
-// No need for codegen generation task since files are in source tree
+// Task to realign third-party native libraries for 16KB page size support
+tasks.register('realign16KBLibraries') {
+    doLast {
+        // Find objcopy tool from NDK
+        def ndkDir = android.ndkDirectory
+        if (ndkDir == null) {
+            println "WARNING: NDK directory not found, skipping 16KB realignment"
+            return
+        }
+        
+        def objcopyPath = null
+        def possiblePaths = [
+            "${ndkDir}/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-objcopy",
+            "${ndkDir}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-objcopy",
+            "${ndkDir}/toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-objcopy.exe"
+        ]
+        
+        for (path in possiblePaths) {
+            if (file(path).exists()) {
+                objcopyPath = path
+                break
+            }
+        }
+        
+        if (objcopyPath == null) {
+            println "WARNING: llvm-objcopy not found, skipping 16KB realignment"
+            return
+        }
+        
+        println "Realigning native libraries for 16KB page size support..."
+        
+        // Find all .so files in the build intermediates
+        def processedCount = 0
+        fileTree(buildDir) {
+            include '**/merged_jni_libs/**/*.so'
+            include '**/stripped_native_libs/**/*.so'
+        }.each { soFile ->
+            try {
+                println "Processing: ${soFile.name}"
+                exec {
+                    commandLine objcopyPath, 
+                        '--set-section-alignment', '.text=16384',
+                        '--set-section-alignment', '.data=16384',
+                        '--set-section-alignment', '.rodata=16384',
+                        '--set-section-alignment', '.bss=16384',
+                        soFile.absolutePath
+                    ignoreExitValue = true
+                }
+                processedCount++
+            } catch (Exception e) {
+                println "WARNING: Could not process ${soFile.name}: ${e.message}"
+            }
+        }
+        
+        println "Realigned ${processedCount} native libraries for 16KB compatibility"
+    }
+}
+
+// Hook the realignment task after JNI libs are merged
+tasks.configureEach { task ->
+    if (task.name.contains('mergeJniLibFolders') || task.name.contains('mergeNativeLibs')) {
+        task.finalizedBy 'realign16KBLibraries'
+    }
+}
 
 
