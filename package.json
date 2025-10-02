@@ -25,7 +25,8 @@
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__",
-    "!**/.*"
+    "!**/.*",
+    "android/build/generated/source/codegen/jni/**"
   ],
   "scripts": {
     "test": "jest",
@@ -109,6 +110,9 @@
   "codegenConfig": {
     "name": "AppstackReactNativeSpec",
     "type": "modules",
-    "jsSrcsDir": "src"
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.appstack.reactnative"
+    }
   }
 }

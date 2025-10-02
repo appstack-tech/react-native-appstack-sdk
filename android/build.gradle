@@ -11,6 +11,13 @@ android {
     defaultConfig {
         minSdkVersion 21
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17"
+                arguments "-DANDROID_STL=c++_shared"
+            }
+        }
     }
 
     buildTypes {
@@ -30,6 +37,13 @@ android {
 
     kotlinOptions {
         jvmTarget = '17'
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+            version "3.22.1"
+        }
     }
 
 }
@@ -56,5 +70,7 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
+
+// No need for codegen generation task since files are in source tree
 
 
