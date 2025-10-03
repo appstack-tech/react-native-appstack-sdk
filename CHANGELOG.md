@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.15] - 2025-09-26
 
+- **Update the podspec to support newArchBuild**
+- **Update Android SDK version to 0.0.12**
+
+## [0.0.15] - 2025-09-26
+
 - **Make the React Native SDK supports 16KB pages without needing any modifications on app's side**
-- **update iOS SDK version to 2.3.0**
+- **Update iOS SDK (still flagged as 2.2.0)**
 
 ## [0.0.14] - 2025-09-26
 

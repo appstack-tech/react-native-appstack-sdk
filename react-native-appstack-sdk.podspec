@@ -43,7 +43,11 @@ Pod::Spec.new do |s|
         "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
     }
     s.dependency "React-Codegen"
-    s.dependency "RCT-Folly"
+    # RCT-Folly dependency for new architecture support
+    # Note: RCT-Folly may not be available in all CocoaPods environments
+    # For React Native 0.81.4, this dependency is causing build issues
+    # TODO: Re-enable when RCT-Folly is available in CocoaPods trunk for RN 0.81.4
+    # s.dependency "RCT-Folly"
     s.dependency "RCTRequired"
     s.dependency "RCTTypeSafety"
     s.dependency "ReactCommon/turbomodule/core"
