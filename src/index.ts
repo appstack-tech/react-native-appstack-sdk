@@ -1,11 +1,13 @@
 import { NativeModules, Platform } from 'react-native';
 import { EventType } from './types';
 
-const LINKING_ERROR =
-  `The package 'react-native-appstack-sdk' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'cd ios && pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
+// Lazy evaluation of LINKING_ERROR to avoid calling Platform.select during module initialization
+const getLinkingError = () => {
+  return `The package 'react-native-appstack-sdk' doesn't seem to be linked. Make sure: \n\n` +
+    Platform.select({ ios: "- You have run 'cd ios && pod install'\n", default: '' }) +
+    '- You rebuilt the app after installing the package\n' +
+    '- You are not using Expo Go\n';
+};
 
 const AppstackReactNative = NativeModules.AppstackReactNative
   ? NativeModules.AppstackReactNative
@@ -13,7 +15,7 @@ const AppstackReactNative = NativeModules.AppstackReactNative
       {} as any,
       {
         get() {
-          throw new Error(LINKING_ERROR);
+          throw new Error(getLinkingError());
         },
       }
     ) as any;
