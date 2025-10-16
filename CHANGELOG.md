@@ -5,6 +5,10 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.17] - 2025-10-16
+
+- **Update iOS SDK to 2.5.0 (using the new iOS SDK automatic release publication on public repo)**
+
 ## [0.0.16] - 2025-09-26
 
 - **Update the podspec to support newArchBuild**
