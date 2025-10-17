@@ -33,9 +33,6 @@ Please define in your `ios/Podfile.properties.json` the following mendatory elem
 }
 ```
 
-**!!! WARNING !!!** : Please, avoid at all cost to define `"ios.useFrameworks": "static"` in this file, it can induce some errors as stated in [this link](https://github.com/expo/expo/issues/32142)
-**!!! WARNING !!!** : Please, define `"newArchEnabled": "true"`, or you could have some errors when using our SDKs
-
 **Android configuration:**
 - **Minimum SDK:** Android 5.0 (API level 21)
 - **Target SDK:** 34+
