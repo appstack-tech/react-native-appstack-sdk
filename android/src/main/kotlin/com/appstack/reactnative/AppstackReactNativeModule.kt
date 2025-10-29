@@ -204,4 +204,14 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             promise.reject("STATUS_ERROR", "Failed to get SDK status: ${exception.message}", exception)
         }
     }
+
+    @ReactMethod
+    fun getAppstackId(promise: Promise) {
+        try {
+            val appstackId = AppstackAttributionSdk.getAppstackId()
+            promise.resolve(appstackId)
+        } catch (exception: Exception) {
+            promise.reject("GET_APPSTACK_ID_ERROR", "Failed to get Appstack ID: ${exception.message}", exception)
+        }
+    }
 }

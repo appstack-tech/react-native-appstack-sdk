@@ -88,4 +88,8 @@ public class AppstackBridge: NSObject {
     @objc public static func disableASAAttributionTracking() {
         AppstackASAAttribution.shared.disableASAAttributionTracking()
     }
+    
+    @objc public static func getAppstackId() -> String {
+        return AppstackAttributionSdk.shared.getAppstackId()
+    }
 }

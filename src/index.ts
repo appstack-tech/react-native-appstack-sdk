@@ -47,6 +47,12 @@ export interface AppstackSDKInterface {
    * @deprecated Use enableAppleAdsAttribution() instead
    */
   enableAppleAdsAttribution(): Promise<boolean>;
+
+  /**
+   * Get the Appstack ID for the current user/device
+   * @returns Promise that resolves with the Appstack ID string
+   */
+  getAppstackId(): Promise<string>;
 }
 
 /**
@@ -172,6 +178,18 @@ class AppstackSDK implements AppstackSDKInterface {
       return await AppstackReactNative.enableAppleAdsAttribution();
     } catch (error) {
       console.error('Failed to enable Apple Ads Attribution:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get the Appstack ID for the current user/device
+   */
+  async getAppstackId(): Promise<string> {
+    try {
+      return await AppstackReactNative.getAppstackId();
+    } catch (error) {
+      console.error('Failed to get Appstack ID:', error);
       throw error;
     }
   }

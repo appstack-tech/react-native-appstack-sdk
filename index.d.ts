@@ -3,6 +3,7 @@ declare module 'react-native-appstack-sdk' {
     configure(apiKey: string, isDebug?: boolean, endpointBaseUrl?: string, logLevel?: number): Promise<boolean>;
     sendEvent(eventType?: EventType | string, eventName?: string, revenue?: number | string): Promise<boolean>;
     enableAppleAdsAttribution(): Promise<boolean>;
+    getAppstackId(): Promise<string>;
   }
 
   export enum EventType {
@@ -59,6 +60,7 @@ declare module 'react-native-appstack-sdk' {
     configure(apiKey: string, isDebug?: boolean, endpointBaseUrl?: string, logLevel?: number): Promise<boolean>;
     sendEvent(eventType?: EventType | string, eventName?: string, revenue?: number | string): Promise<boolean>;
     enableAppleAdsAttribution(): Promise<boolean>;
+    getAppstackId(): Promise<string>;
   }
 
   const appstackSDK: AppstackSDK;

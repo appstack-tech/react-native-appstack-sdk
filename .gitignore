@@ -67,3 +67,6 @@ android/.cxx/
 
 # Android build
 android/sdk/build/
+android/.gradle/
+android/.settings/
+android/bin/

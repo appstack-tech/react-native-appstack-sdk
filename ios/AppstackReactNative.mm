@@ -185,4 +185,25 @@ RCT_EXPORT_METHOD(disableASAAttributionTracking:(RCTPromiseResolveBlock)resolve
     }
 }
 
+RCT_EXPORT_METHOD(getAppstackId:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSLog(@"[AppstackReactNative] getAppstackId called");
+    
+    @try {
+        NSLog(@"[AppstackReactNative] Calling AppstackBridge.getAppstackId directly...");
+        
+        // Call the Swift bridge method directly
+        NSString *appstackId = [AppstackBridge getAppstackId];
+        
+        NSLog(@"[AppstackReactNative] getAppstackId method called successfully via bridge, ID: %@", appstackId);
+        
+        NSLog(@"[AppstackReactNative] getAppstackId completed, resolving promise");
+        resolve(appstackId);
+    } @catch (NSException *exception) {
+        NSLog(@"[AppstackReactNative] getAppstackId failed with exception: %@", exception.reason);
+        reject(@"GET_APPSTACK_ID_ERROR", exception.reason, nil);
+    }
+}
+
 @end
