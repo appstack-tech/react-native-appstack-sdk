@@ -37,6 +37,8 @@ const App = () => {
     AppstackSDK.sendEvent('PURCHASE', null, 29.99);
   };
 
+  const appstacKId = AppstackSDK.getAppstackId()
+
   // ... your app
 };
 ```

@@ -145,6 +145,16 @@ if (Platform.OS === 'ios') {
 }
 ```
 
+### `getAppstackId(): Promise<string>`
+Get the Appstack ID (equivalent to an install ID).
+
+**Returns:** Promise that will returns a string containing the Appstack ID
+
+**Example:**
+```typescript
+const appstackId = AppstackSDK.getAppstackId();
+```
+
 ---
 
 ## Advanced
