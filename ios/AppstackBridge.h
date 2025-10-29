@@ -24,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)disableASAAttributionTracking;
 
++ (NSString *)getAppstackId;
+
 @end
 
 NS_ASSUME_NONNULL_END
