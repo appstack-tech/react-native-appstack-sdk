@@ -53,6 +53,12 @@ export interface AppstackSDKInterface {
    * @returns Promise that resolves with the Appstack ID string
    */
   getAppstackId(): Promise<string>;
+
+  /**
+   * Check if the SDK is disabled
+   * @returns Promise that resolves to true if the SDK is disabled, false otherwise
+   */
+  isSdkDisabled(): Promise<boolean>;
 }
 
 /**
@@ -190,6 +196,22 @@ class AppstackSDK implements AppstackSDKInterface {
       return await AppstackReactNative.getAppstackId();
     } catch (error) {
       console.error('Failed to get Appstack ID:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if the SDK is disabled
+   */
+  async isSdkDisabled(): Promise<boolean> {
+    try {
+      const isDisabled = await AppstackReactNative.isSdkDisabled();
+      if (isDisabled) {
+        console.warn('⚠️ Appstack SDK is currently disabled. All SDK operations will be skipped. Please check your API key and try again.');
+      }
+      return isDisabled;
+    } catch (error) {
+      console.error('Failed to check if SDK is disabled:', error);
       throw error;
     }
   }

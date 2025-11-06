@@ -155,6 +155,19 @@ Get the Appstack ID (equivalent to an install ID).
 const appstackId = AppstackSDK.getAppstackId();
 ```
 
+### `isSdkDisabled(): Promise<boolean>`
+Check if the SDK is disabled.
+
+**Returns:** Promise that resolves to `true` if the SDK is disabled, `false` otherwise
+
+**Example:**
+```typescript
+const isDisabled = await AppstackSDK.isSdkDisabled();
+if (isDisabled) {
+  console.log('SDK is disabled');
+}
+```
+
 ---
 
 ## Advanced

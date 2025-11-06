@@ -12,6 +12,7 @@ import { EventType } from 'react-native-appstack-sdk';
 export default function HomeScreen() {
   const [isSDKInitialized, setIsSDKInitialized] = useState(false);
   const [sdkError, setSdkError] = useState<string | null>(null);
+  const [isSDKDisabled, setIsSDKDisabled] = useState<boolean | null>(null);
 
   // Initialize SDK when component mounts
   useEffect(() => {
@@ -137,6 +138,18 @@ export default function HomeScreen() {
     }
   };
 
+  const handleCheckDisabled = async () => {
+    try {
+      const disabled = await AppstackSDK.isSdkDisabled();
+      setIsSDKDisabled(disabled);
+      Alert.alert('SDK Status', `SDK is ${disabled ? 'disabled' : 'enabled'}`);
+      console.log('SDK disabled status:', disabled);
+    } catch (error) {
+      console.error('Failed to check SDK disabled status:', error);
+      Alert.alert('Error', 'Failed to check SDK disabled status');
+    }
+  };
+
   const reinitializeWithBasicConfig = async () => {
     try {
       console.log('Reinitializing with basic configuration...');
@@ -181,6 +194,11 @@ export default function HomeScreen() {
         <ThemedText style={{ color: isSDKInitialized ? 'green' : 'red' }}>
           {isSDKInitialized ? '✅ SDK Initialized' : '⏳ Initializing SDK...'}
         </ThemedText>
+        {isSDKDisabled !== null && (
+          <ThemedText style={{ color: isSDKDisabled ? 'orange' : 'green', marginTop: 4 }}>
+            {isSDKDisabled ? '🚫 SDK Disabled' : '✅ SDK Enabled'}
+          </ThemedText>
+        )}
         {sdkError && (
           <ThemedText style={{ color: 'red', marginTop: 4 }}>{sdkError}</ThemedText>
         )}
@@ -211,6 +229,14 @@ export default function HomeScreen() {
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleCustomEvent}>
           <ThemedText style={styles.buttonText}>Send Custom Event ($15.50)</ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+
+      {/* SDK Status Checks */}
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">SDK Status Checks</ThemedText>
+        <TouchableOpacity style={[styles.button, { backgroundColor: '#FF9500' }]} onPress={handleCheckDisabled}>
+          <ThemedText style={styles.buttonText}>Check if SDK is Disabled</ThemedText>
         </TouchableOpacity>
       </ThemedView>
 

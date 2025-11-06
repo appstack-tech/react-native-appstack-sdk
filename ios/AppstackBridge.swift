@@ -92,4 +92,8 @@ public class AppstackBridge: NSObject {
     @objc public static func getAppstackId() -> String {
         return AppstackAttributionSdk.shared.getAppstackId() ?? ""
     }
+
+    @objc public static func isSdkDisabled() -> Bool {
+        return AppstackAttributionSdk.shared.isSdkDisabled()
+    }
 }

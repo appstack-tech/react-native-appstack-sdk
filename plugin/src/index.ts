@@ -18,100 +18,21 @@ try {
 }
 
 /**
- * Fallback plugin function that modifies Android files directly
+ * Fallback plugin function - no Android modifications needed
+ * React Native autolinking handles the Android setup via react-native.config.js
  */
 const withAppstackSDKFallback = (config: any) => {
-  try {
-    const projectRoot = config.projectRoot || config.modRequest?.projectRoot || process.cwd();
-    
-    // Add to settings.gradle
-    const settingsGradlePath = path.join(projectRoot, 'android/settings.gradle');
-    if (fs.existsSync(settingsGradlePath)) {
-      let settingsGradleContents = fs.readFileSync(settingsGradlePath, 'utf8');
-      
-      const includeStatement = `include ':react-native-appstack-sdk'
-project(':react-native-appstack-sdk').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-appstack-sdk/android/sdk')`;
-      
-      if (!settingsGradleContents.includes(':react-native-appstack-sdk')) {
-        settingsGradleContents += '\n' + includeStatement + '\n';
-        fs.writeFileSync(settingsGradlePath, settingsGradleContents);
-      }
-    }
-
-    // Add to app/build.gradle
-    const appBuildGradlePath = path.join(projectRoot, 'android/app/build.gradle');
-    if (fs.existsSync(appBuildGradlePath)) {
-      let buildGradleContents = fs.readFileSync(appBuildGradlePath, 'utf8');
-      const dependency = "    implementation project(':react-native-appstack-sdk')";
-      
-      if (!buildGradleContents.includes(dependency)) {
-        // Find dependencies section and add our dependency
-        const dependenciesMatch = buildGradleContents.match(/(dependencies\s*{[^}]*)/s);
-        if (dependenciesMatch) {
-          buildGradleContents = buildGradleContents.replace(
-            dependenciesMatch[0],
-            dependenciesMatch[0] + '\n' + dependency
-          );
-          fs.writeFileSync(appBuildGradlePath, buildGradleContents);
-        }
-      }
-    }
-  } catch (error) {
-    console.warn('Failed to modify Android files:', error);
-  }
-
+  // No Android modifications needed - autolinking handles everything
   return config;
 };
 
 /**
  * Full-featured plugin using @expo/config-plugins
+ * No Android modifications needed - React Native autolinking handles everything
  */
 const withAppstackSDKFull = (config: any) => {
-  if (!withDangerousMod) {
-    return withAppstackSDKFallback(config);
-  }
-
-  return withDangerousMod(config, [
-    'android',
-    async (config: any) => {
-      const projectRoot = config.modRequest.projectRoot;
-      
-      // Add to settings.gradle
-      const settingsGradlePath = path.join(projectRoot, 'android/settings.gradle');
-      if (fs.existsSync(settingsGradlePath)) {
-        let settingsGradleContents = fs.readFileSync(settingsGradlePath, 'utf8');
-        
-        const includeStatement = `include ':react-native-appstack-sdk'
-project(':react-native-appstack-sdk').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-appstack-sdk/android/sdk')`;
-        
-        if (!settingsGradleContents.includes(':react-native-appstack-sdk')) {
-          settingsGradleContents += '\n' + includeStatement + '\n';
-          fs.writeFileSync(settingsGradlePath, settingsGradleContents);
-        }
-      }
-
-      // Add to app/build.gradle
-      const appBuildGradlePath = path.join(projectRoot, 'android/app/build.gradle');
-      if (fs.existsSync(appBuildGradlePath)) {
-        let buildGradleContents = fs.readFileSync(appBuildGradlePath, 'utf8');
-        const dependency = "    implementation project(':react-native-appstack-sdk')";
-        
-        if (!buildGradleContents.includes(dependency)) {
-          // Find dependencies section and add our dependency
-          const dependenciesMatch = buildGradleContents.match(/(dependencies\s*{[^}]*)/s);
-          if (dependenciesMatch) {
-            buildGradleContents = buildGradleContents.replace(
-              dependenciesMatch[0],
-              dependenciesMatch[0] + '\n' + dependency
-            );
-            fs.writeFileSync(appBuildGradlePath, buildGradleContents);
-          }
-        }
-      }
-
-      return config;
-    },
-  ]);
+  // No Android modifications needed - autolinking handles everything via react-native.config.js
+  return config;
 };
 
 /**

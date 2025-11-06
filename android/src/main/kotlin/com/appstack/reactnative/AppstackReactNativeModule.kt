@@ -214,4 +214,14 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             promise.reject("GET_APPSTACK_ID_ERROR", "Failed to get Appstack ID: ${exception.message}", exception)
         }
     }
+
+    @ReactMethod
+    fun isSdkDisabled(promise: Promise) {
+        try {
+            val disabled = AppstackAttributionSdk.isSdkDisabled()
+            promise.resolve(disabled)
+        } catch (exception: Exception) {
+            promise.reject("STATUS_ERROR", "Failed to check if SDK is disabled: ${exception.message}", exception)
+        }
+    }
 }

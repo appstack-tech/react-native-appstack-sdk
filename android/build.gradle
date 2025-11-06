@@ -37,6 +37,16 @@ android {
             debuggable true
         }
     }
+    
+    // Ensure library variants are properly published for Gradle dependency resolution
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+        }
+        singleVariant('debug') {
+            withSourcesJar()
+        }
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -78,7 +88,7 @@ repositories {
 dependencies {
     compileOnly 'com.facebook.react:react-native:+'
 
-    implementation 'tech.appstack.android-sdk:appstack-android-sdk:0.0.13'
+    implementation 'tech.appstack.android-sdk:appstack-android-sdk:0.0.15'
 
     implementation 'androidx.annotation:annotation:1.7.1'
 

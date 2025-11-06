@@ -189,20 +189,41 @@ RCT_EXPORT_METHOD(getAppstackId:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     NSLog(@"[AppstackReactNative] getAppstackId called");
-    
+
     @try {
         NSLog(@"[AppstackReactNative] Calling AppstackBridge.getAppstackId directly...");
-        
+
         // Call the Swift bridge method directly
         NSString *appstackId = [AppstackBridge getAppstackId];
-        
+
         NSLog(@"[AppstackReactNative] getAppstackId method called successfully via bridge, ID: %@", appstackId);
-        
+
         NSLog(@"[AppstackReactNative] getAppstackId completed, resolving promise");
         resolve(appstackId);
     } @catch (NSException *exception) {
         NSLog(@"[AppstackReactNative] getAppstackId failed with exception: %@", exception.reason);
         reject(@"GET_APPSTACK_ID_ERROR", exception.reason, nil);
+    }
+}
+
+RCT_EXPORT_METHOD(isSdkDisabled:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSLog(@"[AppstackReactNative] isSdkDisabled called");
+
+    @try {
+        NSLog(@"[AppstackReactNative] Calling AppstackBridge.isSdkDisabled directly...");
+
+        // Call the Swift bridge method directly
+        BOOL isDisabled = [AppstackBridge isSdkDisabled];
+
+        NSLog(@"[AppstackReactNative] isDisabled method called successfully via bridge, disabled: %@", isDisabled ? @"YES" : @"NO");
+
+        NSLog(@"[AppstackReactNative] isDisabled completed, resolving promise");
+        resolve(@(isDisabled));
+    } @catch (NSException *exception) {
+        NSLog(@"[AppstackReactNative] isDisabled failed with exception: %@", exception.reason);
+        reject(@"STATUS_ERROR", exception.reason, nil);
     }
 }
 
