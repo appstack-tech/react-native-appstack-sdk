@@ -7,7 +7,6 @@ import com.facebook.react.module.annotations.ReactModule
 // Import the SDK from the Maven dependency
 import com.appstack.attribution.AppstackAttributionSdk
 import com.appstack.attribution.EventType
-import com.appstack.attribution.InitListener
 
 @ReactModule(name = AppstackReactNativeModule.NAME)
 class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
@@ -56,23 +55,6 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
                 promise.reject("SDK_CLASSES_ERROR", "SDK classes not available: ${e.message}", e)
                 return
             }
-            // Track if promise has been resolved/rejected
-            var promiseHandled = false
-            
-            // Create InitListener with better error handling
-            val initListener = object : InitListener {
-                override fun onError(throwable: Throwable) {
-                    Log.e(TAG, "SDK initialization failed", throwable)
-                    // Log full stack trace for debugging
-                    Log.e(TAG, "Full stack trace: ", throwable)
-                    if (!promiseHandled) {
-                        promiseHandled = true
-                        val errorMessage = throwable.message ?: "Unknown initialization error"
-                        val errorCause = throwable.cause?.message ?: "No cause available"
-                        promise.reject("CONFIGURATION_ERROR", "SDK initialization failed: $errorMessage. Cause: $errorCause", throwable)
-                    }
-                }
-            }
             
             // Check if SDK is already initialized
             try {
@@ -84,27 +66,26 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             
             Log.d(TAG, "Calling AppstackAttributionSdk.configure...")
             
-            AppstackAttributionSdk.configure(
-                context = context,
-                apiKey = apiKey.trim(),
-                isDebug = isDebug,
-                endpointBaseUrl = endpointBaseUrl ?: "https://api.event.dev.appstack.tech/android/",
-                logLevel = logLevelEnum,
-                listener = initListener
-            )
+            // Configure the SDK (new version doesn't require InitListener)
+            if (endpointBaseUrl != null) {
+                AppstackAttributionSdk.configure(
+                    context = context,
+                    apiKey = apiKey.trim(),
+                    isDebug = isDebug,
+                    endpointBaseUrl = endpointBaseUrl,
+                    logLevel = logLevelEnum
+                )
+            } else {
+                AppstackAttributionSdk.configure(
+                    context = context,
+                    apiKey = apiKey.trim(),
+                    isDebug = isDebug,
+                    logLevel = logLevelEnum
+                )
+            }
             
             Log.d(TAG, "SDK configure method called successfully")
-            
-            // Since InitListener only has onError callback, we need to wait a bit to see if initialization succeeds
-            // If no error occurs within 3 seconds, we assume success
-            val handler = android.os.Handler(android.os.Looper.getMainLooper())
-            handler.postDelayed({
-                if (!promiseHandled) {
-                    promiseHandled = true
-                    Log.d(TAG, "SDK initialization completed successfully (no error received)")
-                    promise.resolve(true)
-                }
-            }, 3000) // 3 second timeout
+            promise.resolve(true)
         } catch (exception: Exception) {
             Log.e(TAG, "Exception during SDK configuration", exception)
             promise.reject("CONFIGURATION_ERROR", "Failed to configure SDK: ${exception.message}", exception)
@@ -112,7 +93,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
     }
 
     @ReactMethod
-    fun sendEvent(eventType: String?, eventName: String?, revenue: Double?, promise: Promise) {
+    fun sendEvent(eventType: String?, eventName: String?, parameters: ReadableMap?, promise: Promise) {
         try {
             // At least one of eventName or eventType should be provided
             if ((eventName.isNullOrBlank()) && (eventType.isNullOrBlank())) {
@@ -132,16 +113,16 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
                     EventType.CUSTOM
                 }
                 
-                if (finalEventType == EventType.CUSTOM) {
-                    // For CUSTOM event type, eventName is required
+                // For CUSTOM event type, eventName is required
+                // For non-CUSTOM event types, name should be null (SDK will use the event type)
+                finalEventName = if (finalEventType == EventType.CUSTOM) {
                     if (eventName.isNullOrBlank()) {
                         promise.reject("INVALID_EVENT_NAME", "eventName is required when eventType is CUSTOM")
                         return
                     }
-                    finalEventName = eventName.trim()
+                    eventName.trim()
                 } else {
-                    // For non-CUSTOM event types, use eventType as eventName
-                    finalEventName = eventType.trim()
+                    null
                 }
             } else if (!eventName.isNullOrBlank()) {
                 // Fallback to legacy behavior - try to parse eventName as EventType
@@ -150,6 +131,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
                 } catch (e: IllegalArgumentException) {
                     EventType.CUSTOM
                 }
+                // For CUSTOM, use the name; for others, use null
                 finalEventName = if (finalEventType == EventType.CUSTOM) eventName.trim() else null
             } else {
                 // This shouldn't happen due to validation above, but just in case
@@ -157,10 +139,13 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
                 finalEventName = "UNKNOWN_EVENT"
             }
 
+            // Convert ReadableMap to Map<String, Any>
+            val parametersMap = parameters?.toHashMap()
+
             AppstackAttributionSdk.sendEvent(
                 event = finalEventType,
                 name = finalEventName,
-                revenue = revenue
+                parameters = parametersMap
             )
             
             promise.resolve(true)

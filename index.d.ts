@@ -1,9 +1,10 @@
 declare module 'react-native-appstack-sdk' {
   export interface AppstackSDKInterface {
     configure(apiKey: string, isDebug?: boolean, endpointBaseUrl?: string, logLevel?: number): Promise<boolean>;
-    sendEvent(eventType?: EventType | string, eventName?: string, revenue?: number | string): Promise<boolean>;
+    sendEvent(eventType?: EventType | string, eventName?: string, parameters?: Record<string, any>): Promise<boolean>;
     enableAppleAdsAttribution(): Promise<boolean>;
     getAppstackId(): Promise<string>;
+    isSdkDisabled(): Promise<boolean>;
   }
 
   export enum EventType {
@@ -58,9 +59,10 @@ declare module 'react-native-appstack-sdk' {
   export class AppstackSDK implements AppstackSDKInterface {
     static getInstance(): AppstackSDK;
     configure(apiKey: string, isDebug?: boolean, endpointBaseUrl?: string, logLevel?: number): Promise<boolean>;
-    sendEvent(eventType?: EventType | string, eventName?: string, revenue?: number | string): Promise<boolean>;
+    sendEvent(eventType?: EventType | string, eventName?: string, parameters?: Record<string, any>): Promise<boolean>;
     enableAppleAdsAttribution(): Promise<boolean>;
     getAppstackId(): Promise<string>;
+    isSdkDisabled(): Promise<boolean>;
   }
 
   const appstackSDK: AppstackSDK;

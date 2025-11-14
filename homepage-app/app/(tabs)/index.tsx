@@ -32,7 +32,7 @@ export default function HomeScreen() {
 
       // Read API key from environment
       // const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY;
-      let apiKey = 'h6i3g37nfk7qo42dgqsxpb4z';
+      let apiKey = 'pk_blehR';
       let endpointUrl = 'https://api.event.dev.appstack.tech/android/';
 
       if (Platform.OS === 'ios') {
@@ -97,7 +97,7 @@ export default function HomeScreen() {
     }
 
     try {
-      await AppstackSDK.sendEvent(EventType.PURCHASE, "PURCHASE", 29.99);
+      await AppstackSDK.sendEvent(EventType.PURCHASE, "PURCHASE", { revenue: 29.99, currency: 'USD' });
       Alert.alert('Success!', 'Revenue event sent successfully');
       console.log('PURCHASE event with revenue sent successfully');
     } catch (error) {
@@ -129,7 +129,7 @@ export default function HomeScreen() {
     }
 
     try {
-      await AppstackSDK.sendEvent(EventType.CUSTOM, 'CUSTOM_EVENT_NAME', 15.50);
+      await AppstackSDK.sendEvent(EventType.CUSTOM, 'CUSTOM_EVENT_NAME', { revenue: 15.50, currency: 'USD', category: 'test' });
       Alert.alert('Success!', 'Custom event sent successfully');
       console.log('CUSTOM_EVENT_NAME event sent successfully');
     } catch (error) {

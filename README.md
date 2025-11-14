@@ -65,7 +65,7 @@ const App = () => {
   }, []);
 
   const trackPurchase = () => {
-    AppstackSDK.sendEvent(EventType.PURCHASE, null, 29.99);
+    AppstackSDK.sendEvent(EventType.PURCHASE, null, { revenue: 29.99, currency: 'USD' });
   };
 
   // ... your app
@@ -90,13 +90,13 @@ if (!success) {
 }
 ```
 
-### `sendEvent(eventType?: EventType | string, eventName?: string, revenue?: number | string): Promise<boolean>`
-Tracks custom events with optional revenue data. Use this for all user actions you want to measure.
+### `sendEvent(eventType?: EventType | string, eventName?: string, parameters?: Record<string, any>): Promise<boolean>`
+Tracks custom events with optional parameters. Use this for all user actions you want to measure.
 
 **Parameters:**
 - `eventType` - Event type from the EventType enum (preferred method for standard events)
 - `eventName` - Event name (for backward compatibility or custom event names)
-- `revenue` - Optional revenue amount in dollars (e.g., 29.99 for $29.99)
+- `parameters` - Optional parameters object (e.g., `{ revenue: 29.99, currency: 'USD', productId: '123' }`)
 
 **Returns:** Promise that resolves to `true` if event was sent successfully
 
@@ -105,20 +105,24 @@ Tracks custom events with optional revenue data. Use this for all user actions y
 import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 
 // Using EventType enum (recommended)
-await AppstackSDK.sendEvent(EventType.PURCHASE, null, 29.99);
+await AppstackSDK.sendEvent(EventType.PURCHASE, null, { revenue: 29.99, currency: 'USD' });
 await AppstackSDK.sendEvent(EventType.SIGN_UP);
 await AppstackSDK.sendEvent(EventType.ADD_TO_CART);
 
 // Using string event types
-await AppstackSDK.sendEvent('PURCHASE', null, 29.99);
+await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
 await AppstackSDK.sendEvent('SIGN_UP');
 
 // Backward compatibility - using eventName only
 await AppstackSDK.sendEvent(null, 'user_registration');
-await AppstackSDK.sendEvent(null, 'purchase', 29.99);
+await AppstackSDK.sendEvent(null, 'purchase', { revenue: 29.99 });
 
-// Custom events with custom names
-await AppstackSDK.sendEvent(EventType.CUSTOM, 'my_custom_event', 15.50);
+// Custom events with custom names and parameters
+await AppstackSDK.sendEvent(EventType.CUSTOM, 'my_custom_event', { 
+  revenue: 15.50, 
+  productId: 'prod_123',
+  category: 'electronics'
+});
 ```
 
 **Available EventType values:**

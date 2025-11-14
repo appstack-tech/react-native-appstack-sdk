@@ -34,7 +34,7 @@ const App = () => {
   }, []);
 
   const trackPurchase = () => {
-    AppstackSDK.sendEvent('PURCHASE', null, 29.99);
+    AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
   };
 
   const appstacKId = AppstackSDK.getAppstackId()
@@ -76,12 +76,12 @@ npx react-native clean
 
 **Wrong revenue values:**
 ```typescript
-// ✅ Use decimal dollars
-AppstackSDK.sendEvent('PURCHASE', null, 29.99);
+// ✅ Use decimal dollars in parameters
+AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
 
 // ✅ Convert cents to dollars  
 const cents = 2999;
-AppstackSDK.sendEvent('PURCHASE', null, cents / 100);
+AppstackSDK.sendEvent('PURCHASE', null, { revenue: cents / 100, currency: 'USD' });
 ```
 </details>
 

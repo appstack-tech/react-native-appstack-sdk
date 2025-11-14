@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)sendEvent:(NSString * _Nullable)eventType 
         eventName:(NSString * _Nullable)eventName 
-          revenue:(NSDecimalNumber * _Nullable)revenue;
+       parameters:(NSDictionary * _Nullable)parameters;
 
 + (void)enableAppleAdsAttribution;
 

@@ -28,7 +28,7 @@ public class AppstackBridge: NSObject {
         )
     }
     
-    @objc public static func sendEvent(_ eventType: String?, eventName: String?, revenue: NSDecimalNumber?) {
+    @objc public static func sendEvent(_ eventType: String?, eventName: String?, parameters: NSDictionary?) {
         // Determine the EventType enum to use
         let finalEventType: EventType
         let finalEventName: String?
@@ -37,13 +37,9 @@ public class AppstackBridge: NSObject {
             // Use provided event_type parameter
             if let enumEvent = EventType(rawValue: eventTypeString.uppercased()) {
                 finalEventType = enumEvent
-                if enumEvent == .CUSTOM {
-                    // For CUSTOM event type, use the provided eventName
-                    finalEventName = eventName
-                } else {
-                    // For non-CUSTOM event types, use eventType as eventName
-                    finalEventName = eventTypeString
-                }
+                // For CUSTOM event type, eventName is required
+                // For non-CUSTOM event types, name should be nil (SDK will use the event type)
+                finalEventName = (enumEvent == .CUSTOM) ? eventName : nil
             } else {
                 // Invalid event type, fallback to CUSTOM
                 finalEventType = .CUSTOM
@@ -53,13 +49,8 @@ public class AppstackBridge: NSObject {
             // Fallback to legacy behavior - try to parse eventName as EventType
             if let enumEvent = EventType(rawValue: eventNameString.uppercased()) {
                 finalEventType = enumEvent
-                if enumEvent == .CUSTOM {
-                    // For CUSTOM event type, use the eventNameString as the name
-                    finalEventName = eventNameString
-                } else {
-                    // For non-CUSTOM event types, use eventNameString as eventName
-                    finalEventName = eventNameString
-                }
+                // For CUSTOM, use the name; for others, use nil
+                finalEventName = (enumEvent == .CUSTOM) ? eventNameString : nil
             } else {
                 // For custom events, use CUSTOM type
                 finalEventType = .CUSTOM
@@ -71,13 +62,13 @@ public class AppstackBridge: NSObject {
             finalEventName = "UNKNOWN_EVENT"
         }
         
-        // Convert NSDecimalNumber to Double
-        let revenueDouble = revenue?.doubleValue
+        // Convert NSDictionary to Swift Dictionary
+        let parametersDict = parameters as? [String: Any]
         
         AppstackAttributionSdk.shared.sendEvent(
             event: finalEventType,
             name: finalEventName,
-            revenue: revenueDouble
+            parameters: parametersDict
         )
     }
     

@@ -32,13 +32,13 @@ export interface AppstackSDKInterface {
   configure(apiKey: string, isDebug?: boolean, endpointBaseUrl?: string, logLevel?: number): Promise<boolean>;
 
   /**
-   * Send an event with optional revenue parameter
+   * Send an event with optional parameters
    * @param eventName - Event name (must match those configured in Appstack dashboard) - for backward compatibility
    * @param eventType - Event type from EventType enum (preferred method)
-   * @param revenue - Optional revenue value (can be number or string)
+   * @param parameters - Optional parameters object (e.g., { revenue: 29.99, currency: 'USD' })
    * @returns Promise that resolves when the event is sent successfully
    */
-  sendEvent(eventType?: EventType | string, eventName?: string, revenue?: number | string): Promise<boolean>;
+  sendEvent(eventType?: EventType | string, eventName?: string, parameters?: Record<string, any>): Promise<boolean>;
 
   /**
    * Enable Apple Search Ads Attribution tracking
@@ -80,8 +80,8 @@ export interface AppstackSDKInterface {
  * );
  * 
  * // Send events
- * await AppstackSDK.sendEvent('PURCHASE'); // Without revenue
- * await AppstackSDK.sendEvent('PURCHASE', null, 29.99); // With revenue
+ * await AppstackSDK.sendEvent('PURCHASE'); // Without parameters
+ * await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' }); // With parameters
  * 
  * // Enable Apple Ads Attribution (iOS only)
  * if (Platform.OS === 'ios') {
@@ -139,32 +139,22 @@ class AppstackSDK implements AppstackSDKInterface {
   }
 
   /**
-   * Send an event with optional revenue parameter
+   * Send an event with optional parameters
    */
-  async sendEvent(eventType?: EventType | string, eventName?: string, revenue?: number | string): Promise<boolean> {
+  async sendEvent(eventType?: EventType | string, eventName?: string, parameters?: Record<string, any>): Promise<boolean> {
     // Validate that at least one of eventName or eventType is provided
     if ((!eventName || eventName.trim() === '') && (!eventType || eventType.toString().trim() === '')) {
       throw new Error('Either eventName or eventType must be provided');
     }
 
     try {
-      let numericRevenue: number | null = null;
-      
-      if (revenue !== undefined && revenue !== null) {
-        // Convert and validate revenue
-        numericRevenue = typeof revenue === 'string' ? parseFloat(revenue) : revenue;
-        if (isNaN(numericRevenue)) {
-          throw new Error('Revenue must be a valid number or numeric string');
-        }
-      }
-      
       // Convert eventType to string if it's an enum
       const eventTypeString = eventType ? eventType.toString() : null;
       
       return await AppstackReactNative.sendEvent(
         eventTypeString?.trim() || null, 
         eventName?.trim() || null, 
-        numericRevenue ?? 0.0
+        parameters || null
       );
     } catch (error) {
       console.error(`Failed to send event (eventType: '${eventType}', eventName: '${eventName}'):`, error);

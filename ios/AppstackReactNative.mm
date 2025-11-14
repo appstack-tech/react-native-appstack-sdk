@@ -54,11 +54,11 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
 
 RCT_EXPORT_METHOD(sendEvent:(NSString *)eventType
                  eventName:(NSString *)eventName
-                 revenue:(id _Nullable)revenue
+                 parameters:(id _Nullable)parameters
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    NSLog(@"[AppstackReactNative] sendEvent called with eventType: %@, eventName: %@, revenue: %@", eventType, eventName, revenue);
+    NSLog(@"[AppstackReactNative] sendEvent called with eventType: %@, eventName: %@, parameters: %@", eventType, eventName, parameters);
     
     // At least one of eventName or eventType should be provided
     if ((!eventName || [eventName length] == 0) && (!eventType || [eventType length] == 0)) {
@@ -77,45 +77,20 @@ RCT_EXPORT_METHOD(sendEvent:(NSString *)eventType
     }
     
     @try {
-        NSDecimalNumber *revenueDecimal = nil;
-        
-        if (revenue != nil && revenue != [NSNull null]) {
-            NSLog(@"[AppstackReactNative] Processing revenue: %@ (class: %@)", revenue, NSStringFromClass([revenue class]));
-            
-            if ([revenue isKindOfClass:[NSNumber class]]) {
-                // Handle number values
-                revenueDecimal = [NSDecimalNumber decimalNumberWithDecimal:[revenue decimalValue]];
-                NSLog(@"[AppstackReactNative] Revenue processed as NSNumber: %@", revenueDecimal);
-            } else if ([revenue isKindOfClass:[NSString class]]) {
-                // Handle string values
-                NSString *revenueString = (NSString *)revenue;
-                if ([revenueString length] > 0) {
-                    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-                    formatter.numberStyle = NSNumberFormatterDecimalStyle;
-                    NSNumber *revenueNumber = [formatter numberFromString:revenueString];
-                    
-                    if (revenueNumber != nil) {
-                        revenueDecimal = [NSDecimalNumber decimalNumberWithDecimal:[revenueNumber decimalValue]];
-                        NSLog(@"[AppstackReactNative] Revenue processed as NSString: %@", revenueDecimal);
-                    } else {
-                        NSLog(@"[AppstackReactNative] sendEvent failed: Invalid revenue string");
-                        reject(@"INVALID_REVENUE", @"Revenue string must be a valid number", nil);
-                        return;
-                    }
-                }
+        // Convert parameters: handle NSNull by converting to nil
+        NSDictionary *parametersDict = nil;
+        if (parameters != nil && parameters != [NSNull null]) {
+            if ([parameters isKindOfClass:[NSDictionary class]]) {
+                parametersDict = (NSDictionary *)parameters;
             } else {
-                NSLog(@"[AppstackReactNative] sendEvent failed: Invalid revenue type");
-                reject(@"INVALID_REVENUE", @"Revenue must be a number, string, or null", nil);
-                return;
+                NSLog(@"[AppstackReactNative] Warning: parameters is not a dictionary, ignoring");
             }
-        } else {
-            NSLog(@"[AppstackReactNative] Revenue is null or NSNull, proceeding without revenue");
         }
         
         NSLog(@"[AppstackReactNative] Calling AppstackBridge.sendEvent directly...");
         
-        // Call the Swift bridge method directly
-        [AppstackBridge sendEvent:eventType eventName:eventName revenue:revenueDecimal];
+        // Call the Swift bridge method directly with parameters
+        [AppstackBridge sendEvent:eventType eventName:eventName parameters:parametersDict];
         
         NSLog(@"[AppstackReactNative] sendEvent method called successfully via bridge");
         

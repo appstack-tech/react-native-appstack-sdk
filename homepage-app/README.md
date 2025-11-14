@@ -71,20 +71,28 @@ await AppstackSDK.configure('your-api-key');
 
 #### Standard Events
 ```typescript
-// Event without revenue
+// Event without parameters
 await AppstackSDK.sendEvent('SIGN_UP');
 
-// Event with revenue
-await AppstackSDK.sendEvent('PURCHASE', null, 29.99);
+// Event with parameters (including revenue)
+await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
 
-// Revenue as string
-await AppstackSDK.sendEvent('PURCHASE', null, '29.99');
+// Event with multiple parameters
+await AppstackSDK.sendEvent('PURCHASE', null, { 
+  revenue: 29.99, 
+  currency: 'USD',
+  productId: 'prod_123'
+});
 ```
 
 #### Custom Events
 ```typescript
-// Custom event names are automatically handled
-await AppstackSDK.sendEvent('CUSTOM', 'CUSTOM_EVENT_NAME', 15.50);
+// Custom event names with parameters
+await AppstackSDK.sendEvent('CUSTOM', 'CUSTOM_EVENT_NAME', { 
+  revenue: 15.50, 
+  currency: 'USD',
+  category: 'electronics'
+});
 ```
 
 #### Supported Event Types
@@ -101,7 +109,7 @@ await AppstackSDK.sendEvent('CUSTOM', 'CUSTOM_EVENT_NAME', 15.50);
 ```typescript
 try {
   await AppstackSDK.configure('your-api-key');
-  await AppstackSDK.sendEvent('PURCHASE', 29.99);
+  await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
 } catch (error) {
   console.error('SDK Error:', error.message);
   // Handle error appropriately

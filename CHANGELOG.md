@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [2.0.0] - 2025-11-14
+
+- **Update Appstack iOS SDK to version 3.0.0**
+- **Update Appstack Android SDK to version 1.0.0 (from 0.0.15)**
+- **BREAKING CHANGE: `sendEvent` method now accepts `parameters` object instead of `revenue` parameter**
+  - Old: `sendEvent(eventType, eventName, revenue)`
+  - New: `sendEvent(eventType, eventName, parameters)` where parameters can include `{ revenue: 29.99, currency: 'USD', ... }`
+- **CRITICAL FIX: Fixed iOS and Android bridges to correctly pass `null` for name parameter on non-CUSTOM event types**
+  - This was preventing events from being sent to the endpoint
+  - Now matches the working Flutter SDK implementation
+- **CRITICAL FIX: Fixed iOS Objective-C bridge to properly handle NSNull when parameters is null**
+  - React Native converts JavaScript `null` to `NSNull`, which needs to be converted to `nil` for Swift
+  - This was causing "JSON value '<null>' of type NSNull cannot be converted to NSDictionary" errors
+- **Android: Removed `InitListener` requirement from `configure` method (simplified initialization)**
+- **iOS: Updated bridge to support new SDK parameter-based event tracking**
+- **Major SDK dependency updates for improved stability and performance**
+
 ## [0.0.22] - 2025-11-06
 
 - **Add a isSdkDisabled() method to know if the SDK is disabled in one of the bridges**
