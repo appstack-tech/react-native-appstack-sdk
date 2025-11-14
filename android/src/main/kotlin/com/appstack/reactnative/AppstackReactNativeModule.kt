@@ -140,7 +140,12 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             }
 
             // Convert ReadableMap to Map<String, Any>
-            val parametersMap = parameters?.toHashMap()
+            // toHashMap() returns HashMap<String, Any?>, but the SDK expects Map<String, Any>?
+            // Filter out null values and cast to satisfy the non-null value type.
+            val parametersMap: Map<String, Any>? = parameters
+                ?.toHashMap()
+                ?.filterValues { it != null }
+                ?.mapValues { entry -> entry.value as Any }
 
             AppstackAttributionSdk.sendEvent(
                 event = finalEventType,
