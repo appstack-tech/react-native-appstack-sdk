@@ -1,0 +1,72 @@
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+
+# Generated files
+lib/
+
+# iOS
+ios/build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Android
+android/build/
+android/app/build/
+android/.cxx/
+*.apk
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# JetBrains
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Android build
+android/sdk/build/
+android/.gradle/
+android/.settings/
+android/bin/

@@ -1,0 +1,43 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const pkg = require('../../package.json');
+// Try to import @expo/config-plugins, but provide fallback if not available
+let ConfigPlugin;
+let createRunOncePlugin;
+let withDangerousMod;
+try {
+    const configPlugins = require('@expo/config-plugins');
+    ConfigPlugin = configPlugins.ConfigPlugin;
+    createRunOncePlugin = configPlugins.createRunOncePlugin;
+    withDangerousMod = configPlugins.withDangerousMod;
+}
+catch (error) {
+    console.warn('@expo/config-plugins not available, using fallback plugin implementation');
+}
+/**
+ * Fallback plugin function - no Android modifications needed
+ * React Native autolinking handles the Android setup via react-native.config.js
+ */
+const withAppstackSDKFallback = (config) => {
+    // No Android modifications needed - autolinking handles everything
+    return config;
+};
+/**
+ * Full-featured plugin using @expo/config-plugins
+ * No Android modifications needed - React Native autolinking handles everything
+ */
+const withAppstackSDKFull = (config) => {
+    // No Android modifications needed - autolinking handles everything via react-native.config.js
+    return config;
+};
+/**
+ * Main plugin function
+ */
+const withAppstackSDK = (config) => {
+    // Apply Android modifications
+    config = withAppstackSDKFull(config);
+    return config;
+};
+// Export the plugin with fallback support
+const plugin = createRunOncePlugin ? createRunOncePlugin(withAppstackSDK, pkg.name, pkg.version) : withAppstackSDK;
+exports.default = plugin;

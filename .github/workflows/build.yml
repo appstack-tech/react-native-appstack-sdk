@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  push:
+    tags: [ '[0-9]+.[0-9]+.[0-9]+' ]
+
+jobs:
+  # Build and publish on version tags
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'npm'    
+    - name: Update package.json version
+      run: |
+        npm version ${{ github.ref_name }} --no-git-tag-version
+        echo "✅ Updated package.json version to ${{ github.ref_name }}"
+    
+    - name: Build and test
+      run: ./build.sh --clean
+    
+    - name: Create npm package
+      run: npm pack
+    
+    - name: Publish to npm
+      run: npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
