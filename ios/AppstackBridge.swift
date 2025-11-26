@@ -3,7 +3,11 @@ import AppstackSDK
 
 @objc(AppstackBridge)
 public class AppstackBridge: NSObject {
-    
+
+    private static func eventTypeFromString(_ string: String) -> EventType? {
+        return EventType.allCases.first { $0.rawValue == string.uppercased() }
+    }
+
     @objc public static func configure(apiKey: String, isDebug: Bool, endpointBaseUrl: String?, logLevel: Int) {
         // Convert Int logLevel to LogLevel enum
         let logLevelEnum: LogLevel
@@ -35,7 +39,7 @@ public class AppstackBridge: NSObject {
         
         if let eventTypeString = eventType, !eventTypeString.isEmpty {
             // Use provided event_type parameter
-            if let enumEvent = EventType(rawValue: eventTypeString.uppercased()) {
+            if let enumEvent = eventTypeFromString(eventTypeString) {
                 finalEventType = enumEvent
                 // For CUSTOM event type, eventName is required
                 // For non-CUSTOM event types, name should be nil (SDK will use the event type)
@@ -47,7 +51,7 @@ public class AppstackBridge: NSObject {
             }
         } else if let eventNameString = eventName, !eventNameString.isEmpty {
             // Fallback to legacy behavior - try to parse eventName as EventType
-            if let enumEvent = EventType(rawValue: eventNameString.uppercased()) {
+            if let enumEvent = eventTypeFromString(eventNameString) {
                 finalEventType = enumEvent
                 // For CUSTOM, use the name; for others, use nil
                 finalEventName = (enumEvent == .CUSTOM) ? eventNameString : nil

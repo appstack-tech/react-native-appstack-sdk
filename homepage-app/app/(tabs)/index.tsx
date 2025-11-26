@@ -6,8 +6,7 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import AppstackSDK from 'react-native-appstack-sdk';
-import { EventType } from 'react-native-appstack-sdk';
+import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 
 export default function HomeScreen() {
   const [isSDKInitialized, setIsSDKInitialized] = useState(false);
