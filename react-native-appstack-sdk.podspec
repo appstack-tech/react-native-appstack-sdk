@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
 
-  s.platforms    = { :ios => "13.0" }
+  s.platforms    = { :ios => "15.0" }
   s.source       = { :git => "https://github.com/your-org/react-native-appstack-sdk.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/*.{h,m,mm,swift}"
@@ -40,7 +40,8 @@ Pod::Spec.new do |s|
         'SWIFT_OPTIMIZATION_LEVEL' => '-Onone',
         "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
         "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
-        "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
+        "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
+        'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
     }
     s.dependency "React-Codegen"
     # RCT-Folly dependency for new architecture support
@@ -60,7 +61,8 @@ Pod::Spec.new do |s|
     'SWIFT_OPTIMIZATION_LEVEL' => '-Onone',
     'CLANG_ENABLE_MODULES' => 'YES',
     'CLANG_ENABLE_MODULE_DEBUGGING' => 'YES',
-    'SWIFT_INSTALL_OBJC_HEADER' => 'YES'
+    'SWIFT_INSTALL_OBJC_HEADER' => 'YES',
+    'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
   }
   end
 end

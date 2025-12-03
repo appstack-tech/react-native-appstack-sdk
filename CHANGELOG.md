@@ -5,6 +5,14 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **Fix iOS deployment target mismatch causing compilation errors**
+  - Updated podspec to specify iOS 15.0 minimum deployment target to match AppstackSDK framework requirements
+  - Previous iOS 13.0 specification caused compiler to strip SDK methods on conditional compilation directives
+  - This was causing "missing member 'sendEvent', 'getAppstackId'" errors during pod install
+
 ## [1.0.2] - 2025-11-26
 
 - **Fix a compatibility bug with older Swift version on iOS for sendEvent**
