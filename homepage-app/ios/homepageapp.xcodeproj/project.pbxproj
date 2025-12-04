@@ -11,8 +11,8 @@
 		2EA397AB40CBB458856D0177 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9E5ADD56ADAD27154C79537A /* PrivacyInfo.xcprivacy */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		82F2B4E9035CE71FCFAD3885 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DD3FF864CB60EF0112A5622 /* ExpoModulesProvider.swift */; };
+		8EA5414F24D60EDEE7F96FF1 /* libPods-homepageapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B8077042A88BE15E94F037FA /* libPods-homepageapp.a */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		EC33727EEA3721822DC57220 /* libPods-homepageapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 176EB7EA17FBF4E68BB39599 /* libPods-homepageapp.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -20,12 +20,12 @@
 		13B07F961A680F5B00A75B9A /* homepageapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = homepageapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = homepageapp/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = homepageapp/Info.plist; sourceTree = "<group>"; };
-		176EB7EA17FBF4E68BB39599 /* libPods-homepageapp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-homepageapp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		250828F4786087905CE03B77 /* Pods-homepageapp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-homepageapp.release.xcconfig"; path = "Target Support Files/Pods-homepageapp/Pods-homepageapp.release.xcconfig"; sourceTree = "<group>"; };
-		416F384DB1AA5CEF2F3651DF /* Pods-homepageapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-homepageapp.debug.xcconfig"; path = "Target Support Files/Pods-homepageapp/Pods-homepageapp.debug.xcconfig"; sourceTree = "<group>"; };
+		5E67F26D8DD9CCA3B9BF6D9D /* Pods-homepageapp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-homepageapp.release.xcconfig"; path = "Target Support Files/Pods-homepageapp/Pods-homepageapp.release.xcconfig"; sourceTree = "<group>"; };
+		772619178F25F1F7B7F2B31B /* Pods-homepageapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-homepageapp.debug.xcconfig"; path = "Target Support Files/Pods-homepageapp/Pods-homepageapp.debug.xcconfig"; sourceTree = "<group>"; };
 		9DD3FF864CB60EF0112A5622 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-homepageapp/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		9E5ADD56ADAD27154C79537A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = homepageapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = homepageapp/SplashScreen.storyboard; sourceTree = "<group>"; };
+		B8077042A88BE15E94F037FA /* libPods-homepageapp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-homepageapp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = homepageapp/AppDelegate.swift; sourceTree = "<group>"; };
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EC33727EEA3721822DC57220 /* libPods-homepageapp.a in Frameworks */,
+				8EA5414F24D60EDEE7F96FF1 /* libPods-homepageapp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,9 +62,19 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				176EB7EA17FBF4E68BB39599 /* libPods-homepageapp.a */,
+				B8077042A88BE15E94F037FA /* libPods-homepageapp.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		34B5A65B59EE7F0FC0D492D0 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				772619178F25F1F7B7F2B31B /* Pods-homepageapp.debug.xcconfig */,
+				5E67F26D8DD9CCA3B9BF6D9D /* Pods-homepageapp.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		5E171EFB5588AB8071BF9154 /* ExpoModulesProviders */ = {
@@ -89,8 +99,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				E04C54DCF36799D230030AE5 /* Pods */,
 				5E171EFB5588AB8071BF9154 /* ExpoModulesProviders */,
+				34B5A65B59EE7F0FC0D492D0 /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -122,16 +132,6 @@
 			name = homepageapp;
 			sourceTree = "<group>";
 		};
-		E04C54DCF36799D230030AE5 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				416F384DB1AA5CEF2F3651DF /* Pods-homepageapp.debug.xcconfig */,
-				250828F4786087905CE03B77 /* Pods-homepageapp.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -139,14 +139,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "homepageapp" */;
 			buildPhases = (
-				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
+				20E40393D61A602625DC7E7C /* [CP] Check Pods Manifest.lock */,
 				CB4C0C251F31D43E94C10777 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				3D49C4818E4094FA46713349 /* [CP] Embed Pods Frameworks */,
+				A16444EA427797C664A5FBDD /* [CP] Embed Pods Frameworks */,
+				B2D58D5A2F0CA7304C3F5254 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -220,7 +220,7 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n# Source .xcode.env.updates if it exists to allow\n# SKIP_BUNDLING to be unset if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.updates\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.updates\"\nfi\n# Source local changes to allow overrides\n# if needed\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n\n";
 		};
-		08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */ = {
+		20E40393D61A602625DC7E7C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -242,7 +242,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		3D49C4818E4094FA46713349 /* [CP] Embed Pods Frameworks */ = {
+		A16444EA427797C664A5FBDD /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -266,7 +266,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-homepageapp/Pods-homepageapp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
+		B2D58D5A2F0CA7304C3F5254 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -341,7 +341,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 416F384DB1AA5CEF2F3651DF /* Pods-homepageapp.debug.xcconfig */;
+			baseConfigurationReference = 772619178F25F1F7B7F2B31B /* Pods-homepageapp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -377,7 +377,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 250828F4786087905CE03B77 /* Pods-homepageapp.release.xcconfig */;
+			baseConfigurationReference = 5E67F26D8DD9CCA3B9BF6D9D /* Pods-homepageapp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
