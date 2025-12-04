@@ -5,6 +5,26 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2025-12-04
+
+### Fixed
+- **Complete Swift compatibility fix for EAS Build and standard iOS environments**
+  - Updated Appstack SDK to version without experimental Swift feature dependencies
+  - Removed conditional compilation guards from `AppstackBridge.swift`
+  - Cleaned up EAS Build configuration by removing experimental Swift flags
+  - SDK now works in all iOS build environments without requiring `$NonescapableTypes` feature flag
+- **Fixed EventType enum compatibility**
+  - Replaced `EventType(rawValue:)` initializer with `allCases.first` approach
+  - Ensures compatibility across different Swift compiler versions
+
+### Changed
+- **Simplified iOS bridge implementation**
+  - Removed all conditional compilation directives
+  - Direct method calls to SDK without feature guards
+- **Cleaned up build configuration**
+  - Removed experimental Swift compiler flags from `eas.json`
+  - Standard iOS build compatibility restored
+
 ## [1.0.3] - 2025-12-03
 
 ### Fixed
