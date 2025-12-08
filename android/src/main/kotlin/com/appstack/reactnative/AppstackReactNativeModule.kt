@@ -219,9 +219,10 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
     fun getAttributionParams(promise: Promise) {
         try {
             val params = AppstackAttributionSdk.getAttributionParams()
-            val writableMap = WritableNativeMap()
             
-            // Convert Map<String, Any> to WritableMap
+            // Convert Map<String, Any> to WritableMap using Arguments factory
+            val writableMap = Arguments.createMap()
+            
             params?.forEach { (key, value) ->
                 when (value) {
                     is String -> writableMap.putString(key, value)
@@ -229,6 +230,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
                     is Double -> writableMap.putDouble(key, value)
                     is Boolean -> writableMap.putBoolean(key, value)
                     is Long -> writableMap.putDouble(key, value.toDouble())
+                    is Float -> writableMap.putDouble(key, value.toDouble())
                     null -> writableMap.putNull(key)
                     else -> writableMap.putString(key, value.toString())
                 }
