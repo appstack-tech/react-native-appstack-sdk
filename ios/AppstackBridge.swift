@@ -91,4 +91,9 @@ public class AppstackBridge: NSObject {
     @objc public static func isSdkDisabled() -> Bool {
         return AppstackAttributionSdk.shared.isSdkDisabled()
     }
+    
+    @objc public static func getAttributionParams() -> NSDictionary {
+        let params = AppstackAttributionSdk.shared.getAttributionParams()
+        return params as NSDictionary? ?? [:]
+    }
 }

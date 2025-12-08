@@ -7,6 +7,7 @@ export interface Spec extends TurboModule {
   enableAppleAdsAttribution(): Promise<boolean>;
   getAppstackId(): Promise<string>;
   isSdkDisabled(): Promise<boolean>;
+  getAttributionParams(): Promise<Record<string, any>>;
 }
 
 // Support both old and new architecture

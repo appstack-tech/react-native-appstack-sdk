@@ -59,6 +59,12 @@ export interface AppstackSDKInterface {
    * @returns Promise that resolves to true if the SDK is disabled, false otherwise
    */
   isSdkDisabled(): Promise<boolean>;
+
+  /**
+   * Get attribution parameters from the SDK
+   * @returns Promise that resolves with the attribution parameters object
+   */
+  getAttributionParams(): Promise<Record<string, any>>;
 }
 
 /**
@@ -202,6 +208,18 @@ class AppstackSDK implements AppstackSDKInterface {
       return isDisabled;
     } catch (error) {
       console.error('Failed to check if SDK is disabled:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get attribution parameters from the SDK
+   */
+  async getAttributionParams(): Promise<Record<string, any>> {
+    try {
+      return await AppstackReactNative.getAttributionParams();
+    } catch (error) {
+      console.error('Failed to get attribution parameters:', error);
       throw error;
     }
   }

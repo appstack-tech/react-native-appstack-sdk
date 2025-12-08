@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)isSdkDisabled;
 
++ (NSDictionary *)getAttributionParams;
+
 @end
 
 NS_ASSUME_NONNULL_END

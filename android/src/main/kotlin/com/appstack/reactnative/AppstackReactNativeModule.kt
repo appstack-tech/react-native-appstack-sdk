@@ -214,4 +214,29 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
             promise.reject("STATUS_ERROR", "Failed to check if SDK is disabled: ${exception.message}", exception)
         }
     }
+
+    @ReactMethod
+    fun getAttributionParams(promise: Promise) {
+        try {
+            val params = AppstackAttributionSdk.getAttributionParams()
+            val writableMap = WritableNativeMap()
+            
+            // Convert Map<String, Any> to WritableMap
+            params?.forEach { (key, value) ->
+                when (value) {
+                    is String -> writableMap.putString(key, value)
+                    is Int -> writableMap.putInt(key, value)
+                    is Double -> writableMap.putDouble(key, value)
+                    is Boolean -> writableMap.putBoolean(key, value)
+                    is Long -> writableMap.putDouble(key, value.toDouble())
+                    null -> writableMap.putNull(key)
+                    else -> writableMap.putString(key, value.toString())
+                }
+            }
+            
+            promise.resolve(writableMap)
+        } catch (exception: Exception) {
+            promise.reject("ATTRIBUTION_PARAMS_ERROR", "Failed to get attribution parameters: ${exception.message}", exception)
+        }
+    }
 }

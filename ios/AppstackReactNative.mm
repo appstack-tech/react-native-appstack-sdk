@@ -202,4 +202,25 @@ RCT_EXPORT_METHOD(isSdkDisabled:(RCTPromiseResolveBlock)resolve
     }
 }
 
+RCT_EXPORT_METHOD(getAttributionParams:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSLog(@"[AppstackReactNative] getAttributionParams called");
+
+    @try {
+        NSLog(@"[AppstackReactNative] Calling AppstackBridge.getAttributionParams directly...");
+
+        // Call the Swift bridge method directly
+        NSDictionary *params = [AppstackBridge getAttributionParams];
+
+        NSLog(@"[AppstackReactNative] getAttributionParams method called successfully via bridge, params: %@", params);
+
+        NSLog(@"[AppstackReactNative] getAttributionParams completed, resolving promise");
+        resolve(params);
+    } @catch (NSException *exception) {
+        NSLog(@"[AppstackReactNative] getAttributionParams failed with exception: %@", exception.reason);
+        reject(@"ATTRIBUTION_PARAMS_ERROR", exception.reason, nil);
+    }
+}
+
 @end

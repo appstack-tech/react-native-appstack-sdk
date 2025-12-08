@@ -5,6 +5,38 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-12-08
+
+### Added
+- **New `getAttributionParams()` method** across all platforms
+  - Retrieve attribution parameters from both iOS and Android SDKs
+  - Returns a Promise that resolves with an object containing all available attribution data
+  - Fully typed with TypeScript support
+  - Complete implementation across TypeScript, Objective-C, Swift, and Kotlin layers
+  
+### Changed
+- **Updated iOS bridge files**
+  - Added method declaration in `AppstackBridge.h`
+  - Added static method implementation in `AppstackBridge.swift`
+  - Added Objective-C export method in `AppstackReactNative.mm`
+  
+- **Updated Android bridge files**
+  - Added `@ReactMethod` for `getAttributionParams()` with proper type conversion from Kotlin Map to React Native WritableMap
+  - Supports String, Int, Double, Boolean, Long, and null value types
+  
+- **Updated TypeScript/JavaScript layer**
+  - Added method to `AppstackSDKInterface`
+  - Added implementation to main `AppstackSDK` class with error handling
+  - Added method signature to TurboModule spec
+
+### Updated
+- **Homepage app**
+  - Added UI section to display attribution parameters with styled visualization
+  - Added "Get Attribution Params" button (purple color, #5856D6)
+  - Displays retrieved parameters in a clean, readable format with key-value pairs
+  - Shows alert with JSON formatted parameters on retrieval
+  - Includes error handling and user feedback
+
 ## [1.0.4] - 2025-12-04
 
 ### Fixed

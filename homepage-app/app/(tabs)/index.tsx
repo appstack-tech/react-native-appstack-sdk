@@ -12,6 +12,7 @@ export default function HomeScreen() {
   const [isSDKInitialized, setIsSDKInitialized] = useState(false);
   const [sdkError, setSdkError] = useState<string | null>(null);
   const [isSDKDisabled, setIsSDKDisabled] = useState<boolean | null>(null);
+  const [attributionParams, setAttributionParams] = useState<Record<string, any> | null>(null);
 
   // Initialize SDK when component mounts
   useEffect(() => {
@@ -149,6 +150,18 @@ export default function HomeScreen() {
     }
   };
 
+  const handleGetAttributionParams = async () => {
+    try {
+      const params = await AppstackSDK.getAttributionParams();
+      setAttributionParams(params);
+      console.log('Attribution params retrieved:', params);
+      Alert.alert('Attribution Params', JSON.stringify(params, null, 2));
+    } catch (error) {
+      console.error('Failed to get attribution parameters:', error);
+      Alert.alert('Error', 'Failed to get attribution parameters');
+    }
+  };
+
   const reinitializeWithBasicConfig = async () => {
     try {
       console.log('Reinitializing with basic configuration...');
@@ -239,6 +252,29 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </ThemedView>
 
+      {/* Attribution Parameters */}
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Attribution Parameters</ThemedText>
+        <TouchableOpacity style={[styles.button, { backgroundColor: '#5856D6' }]} onPress={handleGetAttributionParams}>
+          <ThemedText style={styles.buttonText}>Get Attribution Params</ThemedText>
+        </TouchableOpacity>
+        {attributionParams && (
+          <ThemedView style={styles.paramsContainer}>
+            <ThemedText style={styles.paramsTitle}>📊 Attribution Data:</ThemedText>
+            {Object.entries(attributionParams).length > 0 ? (
+              Object.entries(attributionParams).map(([key, value]) => (
+                <ThemedView key={key} style={styles.paramItem}>
+                  <ThemedText style={styles.paramKey}>{key}:</ThemedText>
+                  <ThemedText style={styles.paramValue}>{String(value)}</ThemedText>
+                </ThemedView>
+              ))
+            ) : (
+              <ThemedText style={styles.emptyText}>No attribution parameters available</ThemedText>
+            )}
+          </ThemedView>
+        )}
+      </ThemedView>
+
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
@@ -313,5 +349,37 @@ const styles = StyleSheet.create({
     fontSize: 12,
     opacity: 0.7,
     marginBottom: 8,
+  },
+  paramsContainer: {
+    backgroundColor: '#f5f5f5',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#5856D6',
+  },
+  paramsTitle: {
+    fontWeight: '600',
+    marginBottom: 8,
+    fontSize: 14,
+  },
+  paramItem: {
+    marginVertical: 4,
+    paddingVertical: 4,
+  },
+  paramKey: {
+    fontWeight: '600',
+    fontSize: 12,
+    opacity: 0.7,
+  },
+  paramValue: {
+    fontSize: 12,
+    marginTop: 2,
+    fontFamily: 'monospace',
+  },
+  emptyText: {
+    fontStyle: 'italic',
+    opacity: 0.6,
+    fontSize: 12,
   },
 });
