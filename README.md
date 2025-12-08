@@ -1,6 +1,6 @@
 # React Native Appstack SDK
 
-Track events and revenue with this SDK. You will also be able to activate Apple Search Ads attribution for your iOS applications.
+Track events and revenue with this SDK. You will also be able to activate Apple Search Ads attribution for your iOS applications and retrieve detailed attribution parameters from both iOS and Android.
 
 [![npm version](https://badge.fury.io/js/react-native-appstack-sdk.svg)](https://badge.fury.io/js/react-native-appstack-sdk)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -59,6 +59,10 @@ const App = () => {
       if (Platform.OS === 'ios') {
         await AppstackSDK.enableAppleAdsAttribution();
       }
+      
+      // Get attribution parameters
+      const attributionParams = await AppstackSDK.getAttributionParams();
+      console.log('Attribution data:', attributionParams);
     };
     
     init();
@@ -171,6 +175,36 @@ if (isDisabled) {
   console.log('SDK is disabled');
 }
 ```
+
+### `getAttributionParams(): Promise<Record<string, any>>`
+Retrieve attribution parameters from the SDK. This returns all available attribution data that the SDK has collected.
+
+**Returns:** Promise that resolves to an object containing attribution parameters (key-value pairs)
+
+**Returns data on success:** Object with various attribution-related data depending on the platform and SDK configuration
+
+**Returns empty object:** `{}` if no attribution parameters are available
+
+**Example:**
+```typescript
+const attributionParams = await AppstackSDK.getAttributionParams();
+console.log('Attribution parameters:', attributionParams);
+
+// Example output (varies by platform):
+// {
+//   "attribution_source": "google_play",
+//   "install_timestamp": "1733629800",
+//   "attributed": "true",
+//   ...
+// }
+```
+
+**Use Cases:**
+- Retrieve attribution data for analytics
+- Check if the app was attributed to a specific campaign
+- Log attribution parameters for debugging
+- Send attribution data to your backend server
+- Analyze user acquisition sources
 
 ---
 
