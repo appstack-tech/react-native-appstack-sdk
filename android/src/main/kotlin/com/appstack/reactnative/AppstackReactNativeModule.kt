@@ -218,7 +218,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactCo
     @ReactMethod
     fun getAttributionParams(promise: Promise) {
         try {
-            val params = AppstackAttributionSdk.getAttributionParams()
+            val params = AppstackAttributionSdk.getAttributionParams(rawReferrer = null)
             
             // Convert Map<String, Any> to WritableMap using Arguments factory
             val writableMap = Arguments.createMap()

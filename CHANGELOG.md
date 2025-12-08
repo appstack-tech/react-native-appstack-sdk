@@ -5,6 +5,16 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2025-12-08
+
+### Fixed
+- **fix android build setup, worked**
+
+## [1.1.1] - 2025-12-08
+
+### Fixed
+- **Tried to fix android build setup, didn't work**
+
 ## [1.1.0] - 2025-12-08
 
 ### Added
