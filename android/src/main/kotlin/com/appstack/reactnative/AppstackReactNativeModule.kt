@@ -9,15 +9,55 @@ import com.appstack.attribution.AppstackAttributionSdk
 import com.appstack.attribution.EventType
 
 @ReactModule(name = AppstackReactNativeModule.NAME)
-class AppstackReactNativeModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class AppstackReactNativeModule(reactContext: ReactApplicationContext) : 
+    ReactContextBaseJavaModule(reactContext),
+    LifecycleEventListener {
 
     companion object {
         const val NAME = "AppstackReactNative"
         private const val TAG = "AppstackReactNativeModule"
     }
 
+    init {
+        // Register lifecycle listener to handle app background/foreground events
+        reactContext.addLifecycleEventListener(this)
+    }
+
     override fun getName(): String {
         return NAME
+    }
+
+    override fun onHostResume() {
+        // App came to foreground
+        Log.d(TAG, "App resumed (foreground)")
+    }
+
+    override fun onHostPause() {
+        // App went to background - flush data automatically
+        Log.d(TAG, "App paused (background) - flushing data")
+        try {
+            AppstackAttributionSdk.flush()
+            Log.d(TAG, "Data flushed successfully on app pause")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to flush data on app pause", e)
+        }
+    }
+
+    override fun onHostDestroy() {
+        // App is being destroyed - flush data one last time
+        Log.d(TAG, "App destroyed - flushing data")
+        try {
+            AppstackAttributionSdk.flush()
+            Log.d(TAG, "Data flushed successfully on app destroy")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to flush data on app destroy", e)
+        }
+    }
+
+    override fun onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy()
+        // Clean up lifecycle listener
+        reactApplicationContext.removeLifecycleEventListener(this)
     }
 
     @ReactMethod
