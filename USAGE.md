@@ -2,6 +2,14 @@
 
 Track events and revenue with Apple Search Ads attribution in your React Native app.
 
+## Overview
+
+This guide follows the same structure across Appstack SDKs:
+
+- Installation & platform configuration
+- Quick start
+- EAC recommendations
+
 ## Installation
 
 ```bash
@@ -53,6 +61,31 @@ Add to your `ios/YourApp/Info.plist`:
 ```
 
 ---
+
+## EAC recommendations
+
+### Revenue events (all ad networks)
+
+For any event that represents revenue, we recommend sending:
+
+- `revenue` **or** `price` (number)
+- `currency` (string, e.g. `EUR`, `USD`)
+
+```typescript
+import AppstackSDK from 'react-native-appstack-sdk';
+
+await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 4.99, currency: 'EUR' });
+```
+
+### Meta matching (send once per installation, as early as possible)
+
+To improve matching quality on Meta, send events including the following parameters if you can fullfill them:
+
+- `email`
+- `name` (first + last name in the same field)
+- `phone_number`
+- `date_of_birth` (recommended format: `YYYY-MM-DD`)
+```
 
 ### Troubleshooting
 

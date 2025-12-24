@@ -5,6 +5,63 @@ Track events and revenue with this SDK. You will also be able to activate Apple 
 [![npm version](https://badge.fury.io/js/react-native-appstack-sdk.svg)](https://badge.fury.io/js/react-native-appstack-sdk)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
+## Overview
+
+The Appstack React Native SDK lets you:
+
+- Track standardized and custom events
+- Track revenue events with currency (for ROAS / optimization)
+- Enable Apple Ads attribution on iOS
+- Retrieve the Appstack installation ID and attribution parameters
+
+## Features (with examples)
+
+### SDK initialization
+
+```typescript
+import { Platform } from 'react-native';
+import AppstackSDK from 'react-native-appstack-sdk';
+
+const apiKey = Platform.OS === 'ios' ? 'your-ios-api-key' : 'your-android-api-key';
+await AppstackSDK.configure(apiKey);
+```
+
+### Event tracking (standard + custom)
+
+```typescript
+import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
+
+// Standard
+await AppstackSDK.sendEvent(EventType.SIGN_UP);
+
+// Custom
+await AppstackSDK.sendEvent(EventType.CUSTOM, 'level_completed', { level: 12 });
+```
+
+### Revenue tracking (recommended for all ad networks)
+
+```typescript
+await AppstackSDK.sendEvent(EventType.PURCHASE, null, { revenue: 29.99, currency: 'EUR' });
+// `price` is also accepted instead of `revenue`
+```
+
+### Installation ID + attribution parameters
+
+```typescript
+const appstackId = await AppstackSDK.getAppstackId();
+const attributionParams = await AppstackSDK.getAttributionParams();
+```
+
+### Apple Ads attribution (iOS)
+
+```typescript
+import { Platform } from 'react-native';
+
+if (Platform.OS === 'ios') {
+  await AppstackSDK.enableAppleAdsAttribution();
+}
+```
+
 ## Installation
 
 ```bash
@@ -243,7 +300,7 @@ console.log('Attribution parameters:', attributionParams);
 
 **Event Tracking:**
 - Event names are case-sensitive and must match be standardized (already done for Android but not for iOS)
-- Revenue values needs to be converted to USD
+- For revenue events, always pass a `revenue` (or `price`) and a `currency` parameter
 - For now, we can't configure the endpoint to send the events for iOS, this will be patched in a future release.
 
 **Technical Limitations:**
@@ -257,3 +314,28 @@ console.log('Attribution parameters:', attributionParams);
 
 - [Complete Usage Guide](./USAGE.md)
 - [GitHub Repository](https://github.com/appstack-tech/react-native-appstack-sdk)
+
+---
+
+## EAC recommendations
+
+### Revenue events (all ad networks)
+
+For any event that represents revenue, we recommend sending:
+
+- `revenue` **or** `price` (number)
+- `currency` (string, e.g. `EUR`, `USD`)
+
+```typescript
+await AppstackSDK.sendEvent(EventType.PURCHASE, null, { revenue: 4.99, currency: 'EUR' });
+```
+
+### Meta matching (send once per installation, as early as possible)
+
+To improve matching quality on Meta, send events including the following parameters if you can fullfill them:
+
+- `email`
+- `name` (first + last name in the same field)
+- `phone_number`
+- `date_of_birth` (recommended format: `YYYY-MM-DD`)
+```
