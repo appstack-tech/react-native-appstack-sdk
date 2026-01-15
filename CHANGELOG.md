@@ -5,7 +5,12 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.0] - 2026-01-02
+## [1.4.1] - 2026-01-15
+
+### Added
+- **Fix some bugs linked to Apple Search Ads attribution (upgrade to iOS 3.3.1)**
+
+## [1.4.0] - 2026-01-14
 
 ### Added
 - **Rollback some buggy features coming from 3.2.0 (upgrade iOS to 3.3.0)**
