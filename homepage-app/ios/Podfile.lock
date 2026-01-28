@@ -1558,7 +1558,7 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-  - react-native-appstack-sdk (1.4.0):
+  - react-native-appstack-sdk (1.0.0):
     - RCTRequired
     - RCTTypeSafety
     - React-Codegen
@@ -2603,7 +2603,7 @@ SPEC CHECKSUMS:
   React-logger: 50fdb9a8236da90c0b1072da5c32ee03aeb5bf28
   React-Mapbuffer: 9050ee10c19f4f7fca8963d0211b2854d624973e
   React-microtasksnativemodule: f775db9e991c6f3b8ccbc02bfcde22770f96e23b
-  react-native-appstack-sdk: 6c09205202353631e70d543f7c6d80e6a59a3891
+  react-native-appstack-sdk: d4842cc97410b2566d87b870f9cc095ee2d5b3ce
   react-native-safe-area-context: 37e680fc4cace3c0030ee46e8987d24f5d3bdab2
   react-native-webview: b29007f4723bca10872028067b07abacfa1cb35a
   React-NativeModulesApple: 8969913947d5b576de4ed371a939455a8daf28aa

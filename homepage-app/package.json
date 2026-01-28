@@ -36,7 +36,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
-    "react-native-appstack-sdk": "1.4.0",
+    "react-native-appstack-sdk": "file:../react-native-appstack-sdk-1.0.1.tgz",
     "react-native-gesture-handler": "~2.28.0",
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",

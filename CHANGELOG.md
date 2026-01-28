@@ -5,6 +5,13 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-01-28
+
+### Changed
+- **Update Android SDK to 1.3.0**
+- **Update iOS SDK to 3.5.0**
+- **Refresh iOS SDK framework to add customer user ID support and async attribution params callback**
+
 ## [1.4.1] - 2026-01-15
 
 ### Added
