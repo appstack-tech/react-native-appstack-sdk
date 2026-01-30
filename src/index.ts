@@ -3,22 +3,21 @@ import { EventType } from './types';
 
 // Lazy evaluation of LINKING_ERROR to avoid calling Platform.select during module initialization
 const getLinkingError = () => {
-  return `The package 'react-native-appstack-sdk' doesn't seem to be linked. Make sure: \n\n` +
+  return (
+    `The package 'react-native-appstack-sdk' doesn't seem to be linked. Make sure: \n\n` +
     Platform.select({ ios: "- You have run 'cd ios && pod install'\n", default: '' }) +
     '- You rebuilt the app after installing the package\n' +
-    '- You are not using Expo Go\n';
+    '- You are not using Expo Go\n'
+  );
 };
 
 const AppstackReactNative = NativeModules.AppstackReactNative
   ? NativeModules.AppstackReactNative
-  : new Proxy(
-      {} as any,
-      {
-        get() {
-          throw new Error(getLinkingError());
-        },
-      }
-    ) as any;
+  : (new Proxy({} as any, {
+      get() {
+        throw new Error(getLinkingError());
+      },
+    }) as any);
 
 export interface AppstackSDKInterface {
   /**
@@ -27,9 +26,16 @@ export interface AppstackSDKInterface {
    * @param isDebug - Enable debug mode (optional, default false)
    * @param endpointBaseUrl - Custom endpoint base URL (optional)
    * @param logLevel - Log level: 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR (optional, default 1)
+   * @param customerUserId - Optional customer user ID to associate with the device/session
    * @returns Promise that resolves when configuration is successful
    */
-  configure(apiKey: string, isDebug?: boolean, endpointBaseUrl?: string, logLevel?: number): Promise<boolean>;
+  configure(
+    apiKey: string,
+    isDebug?: boolean,
+    endpointBaseUrl?: string,
+    logLevel?: number,
+    customerUserId?: string | null
+  ): Promise<boolean>;
 
   /**
    * Send an event with optional parameters
@@ -38,7 +44,11 @@ export interface AppstackSDKInterface {
    * @param parameters - Optional parameters object (e.g., { revenue: 29.99, currency: 'USD' })
    * @returns Promise that resolves when the event is sent successfully
    */
-  sendEvent(eventType?: EventType | string, eventName?: string, parameters?: Record<string, any>): Promise<boolean>;
+  sendEvent(
+    eventType?: EventType | string,
+    eventName?: string,
+    parameters?: Record<string, any>
+  ): Promise<boolean>;
 
   /**
    * Enable Apple Search Ads Attribution tracking
@@ -69,26 +79,27 @@ export interface AppstackSDKInterface {
 
 /**
  * Main Appstack SDK class for React Native
- * 
+ *
  * Usage example:
  * ```typescript
  * import AppstackSDK from 'react-native-appstack-sdk';
- * 
+ *
  * // Configure the SDK (basic)
  * await AppstackSDK.configure('your-api-key');
- * 
+ *
  * // Configure the SDK (with all parameters)
  * await AppstackSDK.configure(
  *   'your-api-key',
  *   true, // isDebug
  *   'https://api.event.dev.appstack.tech/android/', // endpointBaseUrl
- *   0 // logLevel (DEBUG)
+ *   0, // logLevel (DEBUG)
+ *   'user-123' // customerUserId (optional)
  * );
- * 
+ *
  * // Send events
  * await AppstackSDK.sendEvent('PURCHASE'); // Without parameters
  * await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' }); // With parameters
- * 
+ *
  * // Enable Apple Ads Attribution (iOS only)
  * if (Platform.OS === 'ios') {
  *   await AppstackSDK.enableAppleAdsAttribution();
@@ -113,7 +124,13 @@ class AppstackSDK implements AppstackSDKInterface {
   /**
    * Configure Appstack SDK with your API key and optional parameters
    */
-  async configure(apiKey: string, isDebug: boolean = false, endpointBaseUrl?: string, logLevel: number = 1): Promise<boolean> {
+  async configure(
+    apiKey: string,
+    isDebug: boolean = false,
+    endpointBaseUrl?: string,
+    logLevel: number = 1,
+    customerUserId?: string | null
+  ): Promise<boolean> {
     if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === '') {
       throw new Error('API key must be a non-empty string');
     }
@@ -122,7 +139,10 @@ class AppstackSDK implements AppstackSDKInterface {
       throw new Error('isDebug must be a boolean');
     }
 
-    if (endpointBaseUrl !== undefined && (typeof endpointBaseUrl !== 'string' || endpointBaseUrl.trim() === '')) {
+    if (
+      endpointBaseUrl !== undefined &&
+      (typeof endpointBaseUrl !== 'string' || endpointBaseUrl.trim() === '')
+    ) {
       throw new Error('endpointBaseUrl must be a non-empty string or undefined');
     }
 
@@ -130,12 +150,21 @@ class AppstackSDK implements AppstackSDKInterface {
       throw new Error('logLevel must be a number between 0 and 3');
     }
 
+    if (
+      customerUserId !== undefined &&
+      customerUserId !== null &&
+      (typeof customerUserId !== 'string' || customerUserId.trim() === '')
+    ) {
+      throw new Error('customerUserId must be a non-empty string, null, or undefined');
+    }
+
     try {
       const result = await AppstackReactNative.configure(
-        apiKey.trim(), 
-        isDebug, 
-        endpointBaseUrl?.trim() || null, 
-        logLevel
+        apiKey.trim(),
+        isDebug,
+        endpointBaseUrl?.trim() || null,
+        logLevel,
+        customerUserId != null ? customerUserId.trim() || null : null
       );
       return result;
     } catch (error) {
@@ -147,23 +176,33 @@ class AppstackSDK implements AppstackSDKInterface {
   /**
    * Send an event with optional parameters
    */
-  async sendEvent(eventType?: EventType | string, eventName?: string, parameters?: Record<string, any>): Promise<boolean> {
+  async sendEvent(
+    eventType?: EventType | string,
+    eventName?: string,
+    parameters?: Record<string, any>
+  ): Promise<boolean> {
     // Validate that at least one of eventName or eventType is provided
-    if ((!eventName || eventName.trim() === '') && (!eventType || eventType.toString().trim() === '')) {
+    if (
+      (!eventName || eventName.trim() === '') &&
+      (!eventType || eventType.toString().trim() === '')
+    ) {
       throw new Error('Either eventName or eventType must be provided');
     }
 
     try {
       // Convert eventType to string if it's an enum
       const eventTypeString = eventType ? eventType.toString() : null;
-      
+
       return await AppstackReactNative.sendEvent(
-        eventTypeString?.trim() || null, 
-        eventName?.trim() || null, 
+        eventTypeString?.trim() || null,
+        eventName?.trim() || null,
         parameters || null
       );
     } catch (error) {
-      console.error(`Failed to send event (eventType: '${eventType}', eventName: '${eventName}'):`, error);
+      console.error(
+        `Failed to send event (eventType: '${eventType}', eventName: '${eventName}'):`,
+        error
+      );
       throw error;
     }
   }
@@ -203,7 +242,9 @@ class AppstackSDK implements AppstackSDKInterface {
     try {
       const isDisabled = await AppstackReactNative.isSdkDisabled();
       if (isDisabled) {
-        console.warn('⚠️ Appstack SDK is currently disabled. All SDK operations will be skipped. Please check your API key and try again.');
+        console.warn(
+          '⚠️ Appstack SDK is currently disabled. All SDK operations will be skipped. Please check your API key and try again.'
+        );
       }
       return isDisabled;
     } catch (error) {

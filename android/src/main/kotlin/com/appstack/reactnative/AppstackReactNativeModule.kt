@@ -61,7 +61,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun configure(apiKey: String, isDebug: Boolean, endpointBaseUrl: String?, logLevel: Int, promise: Promise) {
+    fun configure(apiKey: String, isDebug: Boolean, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?, promise: Promise) {
         try {
             Log.d(TAG, "Configuring Appstack SDK with API key: ${apiKey.take(8)}...")
             
@@ -113,14 +113,16 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
                     apiKey = apiKey.trim(),
                     isDebug = isDebug,
                     endpointBaseUrl = endpointBaseUrl,
-                    logLevel = logLevelEnum
+                    logLevel = logLevelEnum,
+                    customerUserId = customerUserId?.takeIf { it.isNotBlank() }
                 )
             } else {
                 AppstackAttributionSdk.configure(
                     context = context,
                     apiKey = apiKey.trim(),
                     isDebug = isDebug,
-                    logLevel = logLevelEnum
+                    logLevel = logLevelEnum,
+                    customerUserId = customerUserId?.takeIf { it.isNotBlank() }
                 )
             }
             

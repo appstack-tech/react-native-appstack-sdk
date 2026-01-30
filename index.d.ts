@@ -1,7 +1,17 @@
 declare module 'react-native-appstack-sdk' {
   export interface AppstackSDKInterface {
-    configure(apiKey: string, isDebug?: boolean, endpointBaseUrl?: string, logLevel?: number): Promise<boolean>;
-    sendEvent(eventType?: EventType | string, eventName?: string, parameters?: Record<string, any>): Promise<boolean>;
+    configure(
+      apiKey: string,
+      isDebug?: boolean,
+      endpointBaseUrl?: string,
+      logLevel?: number,
+      customerUserId?: string | null
+    ): Promise<boolean>;
+    sendEvent(
+      eventType?: EventType | string,
+      eventName?: string,
+      parameters?: Record<string, any>
+    ): Promise<boolean>;
     enableAppleAdsAttribution(): Promise<boolean>;
     getAppstackId(): Promise<string>;
     isSdkDisabled(): Promise<boolean>;
@@ -37,8 +47,9 @@ declare module 'react-native-appstack-sdk' {
     isDebug?: boolean;
     endpointBaseUrl?: string;
     logLevel?: number;
+    customerUserId?: string;
   }
-  
+
   export class AppstackError extends Error {
     code: string;
     originalError?: Error;
@@ -58,8 +69,18 @@ declare module 'react-native-appstack-sdk' {
 
   export class AppstackSDK implements AppstackSDKInterface {
     static getInstance(): AppstackSDK;
-    configure(apiKey: string, isDebug?: boolean, endpointBaseUrl?: string, logLevel?: number): Promise<boolean>;
-    sendEvent(eventType?: EventType | string, eventName?: string, parameters?: Record<string, any>): Promise<boolean>;
+    configure(
+      apiKey: string,
+      isDebug?: boolean,
+      endpointBaseUrl?: string,
+      logLevel?: number,
+      customerUserId?: string | null
+    ): Promise<boolean>;
+    sendEvent(
+      eventType?: EventType | string,
+      eventName?: string,
+      parameters?: Record<string, any>
+    ): Promise<boolean>;
     enableAppleAdsAttribution(): Promise<boolean>;
     getAppstackId(): Promise<string>;
     isSdkDisabled(): Promise<boolean>;

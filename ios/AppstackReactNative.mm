@@ -21,10 +21,11 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
                  isDebug:(BOOL)isDebug
                  endpointBaseUrl:(NSString * _Nullable)endpointBaseUrl
                  logLevel:(NSInteger)logLevel
+                 customerUserId:(NSString * _Nullable)customerUserId
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    NSLog(@"[AppstackReactNative] configure called with apiKey: %@, isDebug: %@, endpointBaseUrl: %@, logLevel: %ld", apiKey, isDebug ? @"YES" : @"NO", endpointBaseUrl ?: @"nil", (long)logLevel);
+    NSLog(@"[AppstackReactNative] configure called with apiKey: %@, isDebug: %@, endpointBaseUrl: %@, logLevel: %ld, customerUserId: %@", apiKey, isDebug ? @"YES" : @"NO", endpointBaseUrl ?: @"nil", (long)logLevel, customerUserId ?: @"nil");
     
     if (!apiKey || [apiKey length] == 0) {
         NSLog(@"[AppstackReactNative] configure failed: Invalid API key");
@@ -37,7 +38,7 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
             NSLog(@"[AppstackReactNative] Calling AppstackBridge.configure directly...");
             
             // Call the Swift bridge method directly
-            [AppstackBridge configureWithApiKey:apiKey isDebug:isDebug endpointBaseUrl:endpointBaseUrl logLevel:logLevel];
+            [AppstackBridge configureWithApiKey:apiKey isDebug:isDebug endpointBaseUrl:endpointBaseUrl logLevel:logLevel customerUserId:customerUserId];
             
             NSLog(@"[AppstackReactNative] configure method called successfully via bridge");
             

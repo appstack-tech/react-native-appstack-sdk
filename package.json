@@ -85,13 +85,6 @@
     "node": ">= 16.0.0"
   },
   "packageManager": "^yarn@1.22.15",
-  "jest": {
-    "preset": "react-native",
-    "modulePathIgnorePatterns": [
-      "<rootDir>/example/node_modules",
-      "<rootDir>/lib/"
-    ]
-  },
   "react-native-builder-bob": {
     "source": "src",
     "output": "lib",

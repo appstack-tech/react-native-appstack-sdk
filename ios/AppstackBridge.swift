@@ -8,7 +8,7 @@ public class AppstackBridge: NSObject {
         return EventType.allCases.first { $0.rawValue == string.uppercased() }
     }
 
-    @objc public static func configure(apiKey: String, isDebug: Bool, endpointBaseUrl: String?, logLevel: Int) {
+    @objc public static func configure(apiKey: String, isDebug: Bool, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?) {
         // Convert Int logLevel to LogLevel enum
         let logLevelEnum: LogLevel
         switch logLevel {
@@ -28,7 +28,8 @@ public class AppstackBridge: NSObject {
             apiKey: apiKey,
             isDebug: isDebug,
             endpointBaseUrl: endpointBaseUrl,
-            logLevel: logLevelEnum
+            logLevel: logLevelEnum,
+            customerUserId: customerUserId
         )
     }
     
