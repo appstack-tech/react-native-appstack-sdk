@@ -43,7 +43,8 @@ Pod::Spec.new do |s|
         "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
         "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
         'IPHONEOS_DEPLOYMENT_TARGET' => '15.0',
-        'SWIFT_VERSION' => '6.0'
+        'SWIFT_VERSION' => '6.0',
+        'SWIFT_STRICT_CONCURRENCY' => 'minimal'
     }
     s.dependency "React-Codegen"
     # RCT-Folly dependency for new architecture support
@@ -68,7 +69,8 @@ Pod::Spec.new do |s|
     'CLANG_ENABLE_MODULE_DEBUGGING' => 'YES',
     'SWIFT_INSTALL_OBJC_HEADER' => 'YES',
     'IPHONEOS_DEPLOYMENT_TARGET' => '15.0',
-    'SWIFT_VERSION' => '6.0'
+    'SWIFT_VERSION' => '6.0',
+    'SWIFT_STRICT_CONCURRENCY' => 'minimal'
   }
   end
 end
