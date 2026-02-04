@@ -1,5 +1,5 @@
 import Foundation
-import AppstackSDK
+@preconcurrency import AppstackSDK
 
 @objc(AppstackBridge)
 public class AppstackBridge: NSObject {
