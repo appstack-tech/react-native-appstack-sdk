@@ -5,6 +5,15 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-02-04
+
+### Fixed
+- **iOS build:** Require Swift 6 for the `react-native-appstack-sdk` Pod so the vendored AppstackSDK.xcframework API is visible. Fixes "value of type 'AppstackAttributionSdk' has no member 'configure'" (and sendEvent, getAppstackId, getAttributionParams) when building with EAS or Xcode; the native framework was built with Swift 6 and exposes these methods only when the compiler has `$NonescapableTypes` (Swift 6). Clients must use **Xcode 16+** for iOS builds.
+- **Update iOS SDK to 3.6.0**
+
+### Added
+- **README:** iOS build requirement (Xcode 16+, Swift 6) and Troubleshooting section for the above error, including Expo + expo-apple-targets.
+
 ## [1.5.1] - 2026-01-30
 
 ### Changed

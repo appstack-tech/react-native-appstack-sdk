@@ -16,7 +16,8 @@ Pod::Spec.new do |s|
 
   s.source_files = "ios/*.{h,m,mm,swift}"
   s.public_header_files = "ios/AppstackBridge.h"
-  s.swift_version = '5.0'
+  # Must match Swift 6 so the vendored AppstackSDK.xcframework API is visible (see pod_target_xcconfig comment).
+  s.swift_version = '6.0'
   
   # Include Appstack XCFramework (supports all architectures)
   s.ios.vendored_frameworks = "ios/AppstackSDK.xcframework"
@@ -41,7 +42,8 @@ Pod::Spec.new do |s|
         "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
         "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
         "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
-        'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
+        'IPHONEOS_DEPLOYMENT_TARGET' => '15.0',
+        'SWIFT_VERSION' => '6.0'
     }
     s.dependency "React-Codegen"
     # RCT-Folly dependency for new architecture support
@@ -54,6 +56,9 @@ Pod::Spec.new do |s|
     s.dependency "ReactCommon/turbomodule/core"
   else
   # Base Swift configuration for proper bridging header generation
+  # SWIFT_VERSION 6 required: the vendored AppstackSDK.xcframework was built with Swift 6
+  # and exposes configure/sendEvent/getAppstackId/getAttributionParams only when the compiler
+  # has $NonescapableTypes (Swift 6). Without this, clients see "has no member 'configure'" etc.
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'SWIFT_OBJC_INTERFACE_HEADER_NAME' => 'react_native_appstack_sdk-Swift.h',
@@ -62,7 +67,8 @@ Pod::Spec.new do |s|
     'CLANG_ENABLE_MODULES' => 'YES',
     'CLANG_ENABLE_MODULE_DEBUGGING' => 'YES',
     'SWIFT_INSTALL_OBJC_HEADER' => 'YES',
-    'IPHONEOS_DEPLOYMENT_TARGET' => '15.0'
+    'IPHONEOS_DEPLOYMENT_TARGET' => '15.0',
+    'SWIFT_VERSION' => '6.0'
   }
   end
 end

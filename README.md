@@ -73,7 +73,8 @@ cd ios && pod install  # Only needed for iOS
 
 **iOS Configuration:**
 
-- **iOS version** 14.3+ recommended to use Apple Search Ads 
+- **iOS version** 14.3+ recommended to use Apple Search Ads
+- **Xcode 16+ and Swift 6** are required to build the iOS native module. The vendored AppstackSDK framework uses Swift 6 module interfaces; building with an older Swift version can cause errors like `value of type 'AppstackAttributionSdk' has no member 'configure'`. Ensure your EAS build image or local Xcode is recent enough (e.g. Xcode 16+).
 
 Add to `ios/YourApp/Info.plist`:
 ```xml
@@ -309,6 +310,20 @@ console.log('Attribution parameters:', attributionParams);
 - Network connectivity required for event transmission (events are queued offline)
 - Some attribution features require app to be distributed through official stores
 </details>
+
+## Troubleshooting
+
+### iOS: "value of type 'AppstackAttributionSdk' has no member 'configure'" (and sendEvent, getAppstackId, getAttributionParams)
+
+This occurs when the iOS native SDK (xcframework) is built with Swift 6 and its public API is conditionally exposed. The React Native SDK now forces **Swift 6** for the `react-native-appstack-sdk` Pod so the compiler sees the full API.
+
+- **EAS Build:** Use an image that includes **Xcode 16+** (e.g. `image: latest` or `macos-ventura-xcode-16`). Older Xcode images use Swift 5 and will hit this error.
+- **Expo + expo-apple-targets:** The error is unrelated to having a widget or other Apple target; it comes from the main app target’s Pod build. Ensuring Swift 6 for the Pod (as in the current podspec) and using Xcode 16+ on EAS should fix it.
+- **Local Xcode:** Upgrade to Xcode 16+ and run `cd ios && pod install` (or `npx expo prebuild --clean` if using Expo).
+
+### Android build issues
+
+See the [CHANGELOG](CHANGELOG.md) for version-specific Android fixes (e.g. Hermes, ProGuard).
 
 ## Documentation
 
