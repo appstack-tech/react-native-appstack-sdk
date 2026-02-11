@@ -93,8 +93,13 @@ public class AppstackBridge: NSObject {
         return AppstackAttributionSdk.shared.isSdkDisabled()
     }
     
-    @objc public static func getAttributionParams() -> NSDictionary {
-        let params = AppstackAttributionSdk.shared.getAttributionParams()
-        return params as NSDictionary? ?? [:]
+    @objc(getAttributionParamsWithCompletion:)
+    public static func getAttributionParams(
+        completion: @escaping @Sendable (NSDictionary?, NSError?) -> Void
+    ) {
+        Task {
+            let params = await AppstackAttributionSdk.shared.getAttributionParams()
+            completion(params as NSDictionary? ?? [:], nil)
+        }
     }
 }

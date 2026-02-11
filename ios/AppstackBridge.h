@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)isSdkDisabled;
 
-+ (NSDictionary *)getAttributionParams;
++ (void)getAttributionParamsWithCompletion:(void (^)(NSDictionary * _Nullable params, NSError * _Nullable error))completion;
 
 @end
 
