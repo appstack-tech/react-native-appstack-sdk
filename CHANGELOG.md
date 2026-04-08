@@ -5,10 +5,10 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.2] - 2026-04-01
+## [2.0.2] - 2026-04-08
 
 ### Changed
-- **iOS:** Update AppstackSDK to **4.0.2-rc2** (xcframework and bundled framework slices).
+- **iOS:** Update AppstackSDK to **4.0.2** (xcframework and bundled framework slices).
 - **iOS:** Adjust configuration in `Config.swift` for improved attribution handling.
 - **iOS:** Swift module interfaces now import UIKit, WebKit, and Darwin where required.
 - **iOS:** Update `Info.plist` and framework metadata for 4.0.2-rc2.
