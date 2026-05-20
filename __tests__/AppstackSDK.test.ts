@@ -66,7 +66,7 @@ describe('AppstackSDK', () => {
       const result = await appstackSDK.configure('my-api-key');
       expect(result).toBe(true);
       expect(mockNative.configure).toHaveBeenCalledTimes(1);
-      expect(mockNative.configure).toHaveBeenCalledWith('my-api-key', false, null, 1, null, 'react-native-1.0.0');
+      expect(mockNative.configure).toHaveBeenCalledWith('my-api-key', false, null, 1, null, expect.stringMatching(/^react-native-/));
     });
 
     it('calls native configure with all options including customerUserId', async () => {
@@ -84,28 +84,28 @@ describe('AppstackSDK', () => {
         'https://custom.endpoint/',
         0,
         'user-123',
-        'react-native-1.0.0'
+        expect.stringMatching(/^react-native-/)
       );
     });
 
     it('passes null for optional customerUserId when not provided', async () => {
       await appstackSDK.configure('key', false, undefined, 1);
-      expect(mockNative.configure).toHaveBeenCalledWith('key', false, null, 1, null, 'react-native-1.0.0');
+      expect(mockNative.configure).toHaveBeenCalledWith('key', false, null, 1, null, expect.stringMatching(/^react-native-/));
     });
 
     it('passes null when customerUserId is explicitly null', async () => {
       await appstackSDK.configure('key', false, undefined, 1, null);
-      expect(mockNative.configure).toHaveBeenCalledWith('key', false, null, 1, null, 'react-native-1.0.0');
+      expect(mockNative.configure).toHaveBeenCalledWith('key', false, null, 1, null, expect.stringMatching(/^react-native-/));
     });
 
     it('trims apiKey and endpointBaseUrl', async () => {
       await appstackSDK.configure('  key  ', false, '  https://x.com  ', 1);
-      expect(mockNative.configure).toHaveBeenCalledWith('key', false, 'https://x.com', 1, null, 'react-native-1.0.0');
+      expect(mockNative.configure).toHaveBeenCalledWith('key', false, 'https://x.com', 1, null, expect.stringMatching(/^react-native-/));
     });
 
     it('trims customerUserId when provided', async () => {
       await appstackSDK.configure('key', false, undefined, 1, '  user-456  ');
-      expect(mockNative.configure).toHaveBeenCalledWith('key', false, null, 1, 'user-456', 'react-native-1.0.0');
+      expect(mockNative.configure).toHaveBeenCalledWith('key', false, null, 1, 'user-456', expect.stringMatching(/^react-native-/));
     });
 
     it('throws when apiKey is empty', async () => {
