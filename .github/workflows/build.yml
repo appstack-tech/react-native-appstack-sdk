@@ -24,7 +24,8 @@ jobs:
     - name: Update package.json version
       run: |
         npm version ${{ github.ref_name }} --no-git-tag-version
-        echo "✅ Updated package.json version to ${{ github.ref_name }}"
+        sed -i "s/const WRAPPER_VERSION = 'react-native-[^']*'/const WRAPPER_VERSION = 'react-native-${{ github.ref_name }}'/" src/index.ts
+        echo "✅ Updated package.json and WRAPPER_VERSION to ${{ github.ref_name }}"
     
     - name: Build and test
       run: ./build.sh --ci --clean

@@ -1,6 +1,8 @@
 import { NativeModules, Platform } from 'react-native';
 import { EventType } from './types';
 
+const WRAPPER_VERSION = 'react-native-1.0.0';
+
 // Lazy evaluation of LINKING_ERROR to avoid calling Platform.select during module initialization
 const getLinkingError = () => {
   return (
@@ -164,7 +166,8 @@ class AppstackSDK implements AppstackSDKInterface {
         isDebug,
         endpointBaseUrl?.trim() || null,
         logLevel,
-        customerUserId != null ? customerUserId.trim() || null : null
+        customerUserId != null ? customerUserId.trim() || null : null,
+        WRAPPER_VERSION
       );
       return result;
     } catch (error) {

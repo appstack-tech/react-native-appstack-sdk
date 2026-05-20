@@ -33,25 +33,11 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     }
 
     override fun onHostPause() {
-        // App went to background - flush data automatically
-        Log.d(TAG, "App paused (background) - flushing data")
-        try {
-            AppstackAttributionSdk.flush()
-            Log.d(TAG, "Data flushed successfully on app pause")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to flush data on app pause", e)
-        }
+        Log.d(TAG, "App paused (background)")
     }
 
     override fun onHostDestroy() {
-        // App is being destroyed - flush data one last time
-        Log.d(TAG, "App destroyed - flushing data")
-        try {
-            AppstackAttributionSdk.flush()
-            Log.d(TAG, "Data flushed successfully on app destroy")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to flush data on app destroy", e)
-        }
+        Log.d(TAG, "App destroyed")
     }
 
     override fun onCatalystInstanceDestroy() {
@@ -61,7 +47,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun configure(apiKey: String, isDebug: Boolean, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?, promise: Promise) {
+    fun configure(apiKey: String, isDebug: Boolean, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?, wrapperVersion: String?, promise: Promise) {
         try {
             Log.d(TAG, "Configuring Appstack SDK with API key: ${apiKey.take(8)}...")
             
@@ -114,7 +100,8 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
                     isDebug = isDebug,
                     endpointBaseUrl = endpointBaseUrl,
                     logLevel = logLevelEnum,
-                    customerUserId = customerUserId?.takeIf { it.isNotBlank() }
+                    customerUserId = customerUserId?.takeIf { it.isNotBlank() },
+                    wrapperVersion = wrapperVersion
                 )
             } else {
                 AppstackAttributionSdk.configure(
@@ -122,7 +109,8 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
                     apiKey = apiKey.trim(),
                     isDebug = isDebug,
                     logLevel = logLevelEnum,
-                    customerUserId = customerUserId?.takeIf { it.isNotBlank() }
+                    customerUserId = customerUserId?.takeIf { it.isNotBlank() },
+                    wrapperVersion = wrapperVersion
                 )
             }
             
@@ -209,12 +197,8 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun flush(promise: Promise) {
-        try {
-            AppstackAttributionSdk.flush()
-            promise.resolve(true)
-        } catch (exception: Exception) {
-            promise.reject("FLUSH_ERROR", "Failed to flush events: ${exception.message}", exception)
-        }
+        // Events are sent immediately; flush is a no-op.
+        promise.resolve(true)
     }
 
     @ReactMethod

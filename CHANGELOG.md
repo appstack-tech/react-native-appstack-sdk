@@ -5,6 +5,15 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-05-20
+
+### Added
+- `wrapperVersion` is now automatically passed to the native iOS and Android SDKs on configure, identifying the React Native wrapper version (e.g. `react-native-2.1.0`). This is handled internally and not exposed to the public API.
+
+### Fixed
+- **Android:** Removed calls to `AppstackAttributionSdk.flush()` which no longer exists in the Android SDK (events are now sent immediately, batching was removed). The `flush()` method is kept as a no-op for backward compatibility.
+- **iOS (Expo/EAS):** Fixed `'React/RCTBridgeModule.h' file not found` build error on Expo SDK 55 / React Native 0.83+ by explicitly adding `React-Core` public and private header search paths to the podspec. These paths are no longer inherited automatically in newer React Native / Xcode 26 build environments.
+
 ## [2.0.5] - 2026-04-08
 
 ### Changed

@@ -11,11 +11,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AppstackBridge : NSObject
 
-+ (void)configureWithApiKey:(NSString *)apiKey 
-                    isDebug:(BOOL)isDebug 
-            endpointBaseUrl:(NSString * _Nullable)endpointBaseUrl 
++ (void)configureWithApiKey:(NSString *)apiKey
+                    isDebug:(BOOL)isDebug
+            endpointBaseUrl:(NSString * _Nullable)endpointBaseUrl
                    logLevel:(NSInteger)logLevel
-             customerUserId:(NSString * _Nullable)customerUserId;
+             customerUserId:(NSString * _Nullable)customerUserId
+             wrapperVersion:(NSString * _Nullable)wrapperVersion;
 
 + (void)sendEvent:(NSString * _Nullable)eventType 
         eventName:(NSString * _Nullable)eventName 

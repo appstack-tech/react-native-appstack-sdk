@@ -7,7 +7,8 @@ export interface Spec extends TurboModule {
     isDebug?: boolean,
     endpointBaseUrl?: string,
     logLevel?: number,
-    customerUserId?: string | null
+    customerUserId?: string | null,
+    wrapperVersion?: string | null
   ): Promise<boolean>;
   sendEvent(
     eventType: string | null,

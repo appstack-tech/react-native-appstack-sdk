@@ -39,7 +39,7 @@ Pod::Spec.new do |s|
         'SWIFT_OBJC_INTERFACE_HEADER_NAME' => 'react_native_appstack_sdk-Swift.h',
         'SWIFT_OBJC_BRIDGING_HEADER' => '',
         'SWIFT_OPTIMIZATION_LEVEL' => '-Onone',
-        "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
+        "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\" \"$(PODS_ROOT)/Headers/Public/React-Core\" \"$(PODS_ROOT)/Headers/Private/React-Core\"",
         "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
         "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
         'IPHONEOS_DEPLOYMENT_TARGET' => '15.0',
@@ -68,6 +68,7 @@ Pod::Spec.new do |s|
     'CLANG_ENABLE_MODULES' => 'YES',
     'CLANG_ENABLE_MODULE_DEBUGGING' => 'YES',
     'SWIFT_INSTALL_OBJC_HEADER' => 'YES',
+    'HEADER_SEARCH_PATHS' => '"$(PODS_ROOT)/Headers/Public/React-Core" "$(PODS_ROOT)/Headers/Private/React-Core"',
     'IPHONEOS_DEPLOYMENT_TARGET' => '15.0',
     'SWIFT_VERSION' => '6.0',
     'SWIFT_STRICT_CONCURRENCY' => 'minimal'
