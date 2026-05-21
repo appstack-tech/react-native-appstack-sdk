@@ -83,8 +83,7 @@ describe('AppstackSDK', () => {
         true,
         'https://custom.endpoint/',
         0,
-        'user-123',
-        expect.stringMatching(/^react-native-/)
+        'user-123'
       );
     });
 
