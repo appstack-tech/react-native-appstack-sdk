@@ -22,7 +22,6 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
                  endpointBaseUrl:(NSString * _Nullable)endpointBaseUrl
                  logLevel:(NSInteger)logLevel
                  customerUserId:(NSString * _Nullable)customerUserId
-                 wrapperVersion:(NSString * _Nullable)wrapperVersion
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -39,7 +38,7 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
             NSLog(@"[AppstackReactNative] Calling AppstackBridge.configure directly...");
             
             // Call the Swift bridge method directly
-            [AppstackBridge configureWithApiKey:apiKey isDebug:isDebug endpointBaseUrl:endpointBaseUrl logLevel:logLevel customerUserId:customerUserId wrapperVersion:wrapperVersion];
+            [AppstackBridge configureWithApiKey:apiKey isDebug:isDebug endpointBaseUrl:endpointBaseUrl logLevel:logLevel customerUserId:customerUserId];
             
             NSLog(@"[AppstackReactNative] configure method called successfully via bridge");
             

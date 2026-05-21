@@ -16,6 +16,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     companion object {
         const val NAME = "AppstackReactNative"
         private const val TAG = "AppstackReactNativeModule"
+        private const val WRAPPER_VERSION = "react-native-1.0.0"
     }
 
     init {
@@ -47,7 +48,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun configure(apiKey: String, isDebug: Boolean, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?, wrapperVersion: String?, promise: Promise) {
+    fun configure(apiKey: String, isDebug: Boolean, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?, promise: Promise) {
         try {
             Log.d(TAG, "Configuring Appstack SDK with API key: ${apiKey.take(8)}...")
             
@@ -101,7 +102,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
                     endpointBaseUrl = endpointBaseUrl,
                     logLevel = logLevelEnum,
                     customerUserId = customerUserId?.takeIf { it.isNotBlank() },
-                    wrapperVersion = wrapperVersion
+                    wrapperVersion = WRAPPER_VERSION
                 )
             } else {
                 AppstackAttributionSdk.configure(
@@ -110,7 +111,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
                     isDebug = isDebug,
                     logLevel = logLevelEnum,
                     customerUserId = customerUserId?.takeIf { it.isNotBlank() },
-                    wrapperVersion = wrapperVersion
+                    wrapperVersion = WRAPPER_VERSION
                 )
             }
             

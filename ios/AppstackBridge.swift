@@ -8,7 +8,9 @@ public class AppstackBridge: NSObject {
         return EventType.allCases.first { $0.rawValue == string.uppercased() }
     }
 
-    @objc public static func configure(apiKey: String, isDebug: Bool, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?, wrapperVersion: String?) {
+    private static let wrapperVersion = "react-native-1.0.0"
+
+    @objc public static func configure(apiKey: String, isDebug: Bool, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?) {
         // Convert Int logLevel to LogLevel enum
         let logLevelEnum: LogLevel
         switch logLevel {
@@ -30,7 +32,7 @@ public class AppstackBridge: NSObject {
             endpointBaseUrl: endpointBaseUrl,
             logLevel: logLevelEnum,
             customerUserId: customerUserId,
-            wrapperVersion: wrapperVersion
+            wrapperVersion: AppstackBridge.wrapperVersion
         )
     }
     

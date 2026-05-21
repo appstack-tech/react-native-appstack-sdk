@@ -24,7 +24,8 @@ jobs:
     - name: Update package.json version
       run: |
         npm version ${{ github.ref_name }} --no-git-tag-version
-        sed -i "s/const WRAPPER_VERSION = 'react-native-[^']*'/const WRAPPER_VERSION = 'react-native-${{ github.ref_name }}'/" src/index.ts
+        sed -i "s/private static let wrapperVersion = \"react-native-[^\"]*\"/private static let wrapperVersion = \"react-native-${{ github.ref_name }}\"/" ios/AppstackBridge.swift
+        sed -i "s/private const val WRAPPER_VERSION = \"react-native-[^\"]*\"/private const val WRAPPER_VERSION = \"react-native-${{ github.ref_name }}\"/" android/src/main/kotlin/com/appstack/reactnative/AppstackReactNativeModule.kt
         echo "✅ Updated package.json and WRAPPER_VERSION to ${{ github.ref_name }}"
     
     - name: Build and test

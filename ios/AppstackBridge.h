@@ -15,8 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
                     isDebug:(BOOL)isDebug
             endpointBaseUrl:(NSString * _Nullable)endpointBaseUrl
                    logLevel:(NSInteger)logLevel
-             customerUserId:(NSString * _Nullable)customerUserId
-             wrapperVersion:(NSString * _Nullable)wrapperVersion;
+             customerUserId:(NSString * _Nullable)customerUserId;
 
 + (void)sendEvent:(NSString * _Nullable)eventType 
         eventName:(NSString * _Nullable)eventName 
