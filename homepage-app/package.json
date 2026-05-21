@@ -13,30 +13,38 @@
     "web": "expo start --web",
     "lint": "expo lint"
   },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "react-native-appstack-sdk"
+        ]
+      }
+    }
+  },
   "dependencies": {
-    "@expo/config-plugins": "~54.0.1",
     "@expo/vector-icons": "^15.0.3",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
-    "expo": "54.0.22",
+    "expo": "~54.0.34",
     "expo-blur": "~15.0.7",
     "expo-constants": "~18.0.9",
-    "expo-dev-client": "~6.0.17",
-    "expo-font": "~14.0.8",
+    "expo-dev-client": "~6.0.21",
+    "expo-font": "~14.0.11",
     "expo-haptics": "~15.0.7",
     "expo-image": "~3.0.10",
-    "expo-linking": "~8.0.8",
-    "expo-router": "~6.0.14",
+    "expo-linking": "~8.0.12",
+    "expo-router": "~6.0.23",
     "expo-splash-screen": "~31.0.10",
     "expo-status-bar": "~3.0.8",
     "expo-symbols": "~1.0.7",
     "expo-system-ui": "~6.0.8",
-    "expo-web-browser": "~15.0.9",
+    "expo-web-browser": "~15.0.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
-    "react-native-appstack-sdk": "2.0.5",
+    "react-native-appstack-sdk": "2.1.0-rc5",
     "react-native-gesture-handler": "~2.28.0",
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",

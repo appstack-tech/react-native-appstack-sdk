@@ -2,10 +2,10 @@ import { Image } from 'expo-image';
 import { Platform, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { HelloWave } from '../../components/HelloWave';
+import ParallaxScrollView from '../../components/ParallaxScrollView';
+import { ThemedText } from '../../components/ThemedText';
+import { ThemedView } from '../../components/ThemedView';
 import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 
 export default function HomeScreen() {
@@ -32,7 +32,7 @@ export default function HomeScreen() {
 
       // Read API key from environment
       // const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY;
-      let apiKey = 'pk_blehR';
+      let apiKey = 'EXPO_PUBLIC_APPSTACK_API_KEY';
       let endpointUrl = 'https://api.event.dev.appstack.tech/android/';
 
       if (Platform.OS === 'ios') {
@@ -191,7 +191,7 @@ export default function HomeScreen() {
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
+          source={require('../../assets/images/partial-react-logo.png')}
           style={styles.reactLogo}
         />
       }>
