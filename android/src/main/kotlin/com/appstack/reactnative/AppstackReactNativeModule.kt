@@ -250,17 +250,8 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
             // Convert Map<String, Any> to WritableMap using Arguments factory
             val writableMap = Arguments.createMap()
             
-            params?.forEach { (key, value) ->
-                when (value) {
-                    is String -> writableMap.putString(key, value)
-                    is Int -> writableMap.putInt(key, value)
-                    is Double -> writableMap.putDouble(key, value)
-                    is Boolean -> writableMap.putBoolean(key, value)
-                    is Long -> writableMap.putDouble(key, value.toDouble())
-                    is Float -> writableMap.putDouble(key, value.toDouble())
-                    null -> writableMap.putNull(key)
-                    else -> writableMap.putString(key, value.toString())
-                }
+            params.forEach { (key, value) ->
+                writableMap.putString(key, value)
             }
             
             promise.resolve(writableMap)
