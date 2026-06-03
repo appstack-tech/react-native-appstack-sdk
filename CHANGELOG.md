@@ -5,6 +5,11 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0-rc1] - 2026-06-03
+
+### Changed
+- **iOS:** Updated `AppstackSDK.xcframework` to version 4.2.0-rc13. The public API (`configure`, `sendEvent`, `getAttributionParams`) is unchanged; the framework is now built with Swift 6.1.2 (previously 6.0.3).
+
 ## [2.1.0] - 2026-05-20
 
 ### Added
