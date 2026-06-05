@@ -35,6 +35,13 @@ jobs:
       run: npm pack
     
     - name: Publish to npm
-      run: npm publish --access public
+      run: |
+        if [[ "${{ github.ref_name }}" == *-rc* ]]; then
+          npm publish --access public --tag rc
+          echo "✅ Published ${{ github.ref_name }} under the 'rc' dist-tag"
+        else
+          npm publish --access public
+          echo "✅ Published ${{ github.ref_name }} under the 'latest' dist-tag"
+        fi
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
