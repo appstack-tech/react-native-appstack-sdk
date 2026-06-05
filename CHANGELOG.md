@@ -5,10 +5,14 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.2.0-rc1] - 2026-06-03
+## [2.2.0] - 2026-06-05
 
 ### Changed
-- **iOS:** Updated `AppstackSDK.xcframework` to version 4.2.0-rc13. The public API (`configure`, `sendEvent`, `getAttributionParams`) is unchanged; the framework is now built with Swift 6.1.2 (previously 6.0.3).
+- **iOS:** Updated `AppstackSDK.xcframework`; the framework is now built with Swift 6.1.2 (previously 6.0.3).
+- **iOS:** Improved install detection method for more reliable attribution of new installs.
+
+### Fixed
+- **Android:** Fixed K1 compiler error on unreachable types in `AppstackReactNativeModule` attribution params conversion.
 
 ## [2.1.0] - 2026-05-20
 
