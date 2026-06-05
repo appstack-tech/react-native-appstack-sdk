@@ -10,47 +10,47 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		O2V6ttBiDbRRszne5ZhwXmwbNJc=
+		Qjv9PG0ZwQxozieRRTAMQL5tZwM=
 		</data>
 		<key>Modules/AppstackSDK.swiftmodule/arm64-apple-ios-simulator.abi.json</key>
 		<data>
-		c3WCBKIWO9P33hLvhWzcH/jDC8c=
+		OSsT0UK2TOOZQ2x4dzmtRCcSnuI=
 		</data>
 		<key>Modules/AppstackSDK.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		YD2ugkzAhlqY2kQRgOUPyKCXtIQ=
+		TSHKNvL9z3R/Ci7QIQw6yV22SLQ=
 		</data>
 		<key>Modules/AppstackSDK.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		Ymb8uLYkU1yo7/KpvUwRLMKZzGQ=
+		5StijcBV3r2pV6W9mafgketOUwM=
 		</data>
 		<key>Modules/AppstackSDK.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		YD2ugkzAhlqY2kQRgOUPyKCXtIQ=
+		TSHKNvL9z3R/Ci7QIQw6yV22SLQ=
 		</data>
 		<key>Modules/AppstackSDK.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		IfFuUek2nmhv8DzZFGQ3LD+hJrA=
+		AcCsHcsXBiGiDuSqLfdMt1Dp1OE=
 		</data>
 		<key>Modules/AppstackSDK.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<data>
-		c3WCBKIWO9P33hLvhWzcH/jDC8c=
+		OSsT0UK2TOOZQ2x4dzmtRCcSnuI=
 		</data>
 		<key>Modules/AppstackSDK.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		7DuORGum6v2Df628vu7Y8J9pbV8=
+		t7Fy+OezOagcXTTerEM7AyVt43U=
 		</data>
 		<key>Modules/AppstackSDK.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		BPQEfBTiXPVQiF00UKUCcMgMCD8=
+		KBKWwJwA42tKwb8gSkHSDmGYEkA=
 		</data>
 		<key>Modules/AppstackSDK.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		7DuORGum6v2Df628vu7Y8J9pbV8=
+		t7Fy+OezOagcXTTerEM7AyVt43U=
 		</data>
 		<key>Modules/AppstackSDK.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		UjNmIFDA0KuygDCTmtWqKQ0WPOs=
+		4Ns+d3IbxEm8e75tJnC/7Co0CH0=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -70,70 +70,70 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			oEQG2m2SbWLHD4H3CMpSnryifikUg2NZLcGz3aOQvnA=
+			QT+fOgcQ9Ewo8DvFHWQA1ivRAzOIhgCtc2GMenlop5o=
 			</data>
 		</dict>
 		<key>Modules/AppstackSDK.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			SbCet6rxVCX+IJm7vQXRC2znp4C0ELT4uVEar+tgVJI=
+			VMRxW8/t8zeCkDCuvGdA0Ad8iVcFXjtfFE3vYUKjfHY=
 			</data>
 		</dict>
 		<key>Modules/AppstackSDK.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			N2DW7DexhTts7z9YgqvzrtCqcKPDtx4LEnF43VDCkp0=
+			dtYv7VR5cm45OKjisgbu0ZNPWa3AFrnzVa+QgaVSEdU=
 			</data>
 		</dict>
 		<key>Modules/AppstackSDK.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			SbCet6rxVCX+IJm7vQXRC2znp4C0ELT4uVEar+tgVJI=
+			VMRxW8/t8zeCkDCuvGdA0Ad8iVcFXjtfFE3vYUKjfHY=
 			</data>
 		</dict>
 		<key>Modules/AppstackSDK.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			ckGP9Y19YFgZniAiOhDQKpjKNdElAabGcEZtggm4QG0=
+			B4AGyceY9uL7SxZ/u/NJGZtdRt5tJViQ2ANLyK/hgM0=
 			</data>
 		</dict>
 		<key>Modules/AppstackSDK.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			oEQG2m2SbWLHD4H3CMpSnryifikUg2NZLcGz3aOQvnA=
+			QT+fOgcQ9Ewo8DvFHWQA1ivRAzOIhgCtc2GMenlop5o=
 			</data>
 		</dict>
 		<key>Modules/AppstackSDK.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			/qhT67ll0y/Np9zn7MhLqhj2NMOCLzkybB66xNnVk+s=
+			3xIq0YYzO5JFl9f4WRH1yBWf9ouHRKY7XkVyt4B/Zwg=
 			</data>
 		</dict>
 		<key>Modules/AppstackSDK.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			ixNWUEWguUckCoAH+aM6LKwq9aoUFFo7WLn478rp6mQ=
+			p69/E4DvmqXtM69wDcYg64beDhG2tfEleBUjH68YIjc=
 			</data>
 		</dict>
 		<key>Modules/AppstackSDK.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			/qhT67ll0y/Np9zn7MhLqhj2NMOCLzkybB66xNnVk+s=
+			3xIq0YYzO5JFl9f4WRH1yBWf9ouHRKY7XkVyt4B/Zwg=
 			</data>
 		</dict>
 		<key>Modules/AppstackSDK.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			GpWm4FIl2AzDQq1n/gjyBnr6ChMw8vMIaAWtsJrFcLg=
+			Yc3icEKWWrQ0jdxD7GL9xJmVGEUzZzMVxQIqN8Pd0UY=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
