@@ -15,6 +15,15 @@ on:
   workflow_dispatch:
   workflow_call:
 
+permissions:
+  contents: read
+
+# A new push to the same PR cancels its superseded in-progress run.
+# Tag/release runs have unique refs and are never affected.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   android:
     name: Android (Expo SDK ${{ matrix.expo-sdk }})
@@ -23,22 +32,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Add new Expo SDK majors here as they are released
+        # Keep in sync with the ios job's expo-sdk list below
         expo-sdk: ['54', '55', '56']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '22'
           cache: 'npm'
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
 
       - name: Run integration test
         run: ./integration-tests/run.sh ${{ matrix.expo-sdk }}
@@ -50,18 +61,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Add new Expo SDK majors here as they are released
+        # Keep in sync with the android job's expo-sdk list above
         expo-sdk: ['54', '55', '56']
         frameworks: ['default']
         include:
           # Static frameworks exercise different header search paths
-          # (common setup in apps using Firebase and similar pods)
+          # (common setup in apps using Firebase and similar pods).
+          # Runs only against the latest SDK to keep the matrix lean.
           - expo-sdk: '56'
             frameworks: 'static'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '22'
           cache: 'npm'
