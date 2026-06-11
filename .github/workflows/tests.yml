@@ -1,0 +1,32 @@
+name: Tests
+
+# Thin wrapper so all integration test checks display namespaced under a
+# single "tests /" group in the PR checks panel. The actual jobs live in
+# integration-tests.yml (also called by build.yml before stable publishes).
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - 'ios/**'
+      - 'src/**'
+      - 'react-native.config.js'
+      - '*.podspec'
+      - 'package.json'
+      - 'integration-tests/**'
+      - '.github/workflows/integration-tests.yml'
+      - '.github/workflows/tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A new push to the same PR cancels its superseded in-progress run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    uses: ./.github/workflows/integration-tests.yml
