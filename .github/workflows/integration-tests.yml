@@ -1,0 +1,44 @@
+name: Integration Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - 'ios/**'
+      - 'src/**'
+      - 'react-native.config.js'
+      - '*.podspec'
+      - 'package.json'
+      - 'integration-tests/**'
+      - '.github/workflows/integration-tests.yml'
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  android:
+    name: Android (Expo SDK ${{ matrix.expo-sdk }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # Add new Expo SDK majors here as they are released
+        expo-sdk: ['54', '55', '56']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Run integration test
+        run: ./integration-tests/run.sh ${{ matrix.expo-sdk }}
