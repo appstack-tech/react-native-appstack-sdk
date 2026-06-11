@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Android (Expo/EAS):** Fixed `package com.appstack.reactnative.com.appstack.reactnative does not exist` build error on Expo SDK 56 / React Native 0.84+. The new React Native Gradle plugin expands the package class name in `PackageList.java` to its fully-qualified name itself, so the fully-qualified `packageInstance` in `react-native.config.js` resulted in a duplicated package prefix. The instance is now declared unqualified, which works on both old and new toolchains.
 
 ### Added
-- Integration tests (`integration-tests/run.sh` + CI matrix) that scaffold a fresh Expo app per supported SDK major (54/55/56), install the packed SDK tarball, run `expo prebuild` and compile the Android project. Stable npm publishes are now gated on these tests passing (`-rc` tags still publish without them).
+- Integration tests (`integration-tests/run.sh` + CI matrix) that scaffold a fresh Expo app per supported SDK major (54/55/56), install the packed SDK tarball, run `expo prebuild` and build the native projects: Android (autolinking `PackageList.java` assertion + Gradle build) and iOS (`Podfile.lock` autolinking assertion + simulator `xcodebuild`, including a static-frameworks variant). Stable npm publishes are now gated on these tests passing (`-rc` tags still publish without them).
 
 ## [2.2.0] - 2026-06-05
 

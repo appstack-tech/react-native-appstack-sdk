@@ -42,3 +42,31 @@ jobs:
 
       - name: Run integration test
         run: ./integration-tests/run.sh ${{ matrix.expo-sdk }}
+
+  ios:
+    name: iOS (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.frameworks }} frameworks)
+    runs-on: macos-26
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        # Add new Expo SDK majors here as they are released
+        expo-sdk: ['54', '55', '56']
+        frameworks: ['default']
+        include:
+          # Static frameworks exercise different header search paths
+          # (common setup in apps using Firebase and similar pods)
+          - expo-sdk: '56'
+            frameworks: 'static'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Run integration test
+        run: >
+          ./integration-tests/run.sh ${{ matrix.expo-sdk }} --platform ios
+          ${{ matrix.frameworks == 'static' && '--static-frameworks' || '' }}
