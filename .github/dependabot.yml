@@ -4,4 +4,9 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
+    groups:
+      # One combined PR instead of one per action
+      github-actions:
+        patterns:
+          - '*'

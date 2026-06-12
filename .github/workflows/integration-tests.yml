@@ -1,28 +1,13 @@
 name: Integration Tests
 
+# Only callable: PRs trigger this via tests.yml (which displays all jobs
+# under a single "tests /" group), and build.yml calls it before stable
+# publishes. Concurrency/cancellation is handled by the callers.
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'android/**'
-      - 'ios/**'
-      - 'src/**'
-      - 'react-native.config.js'
-      - '*.podspec'
-      - 'package.json'
-      - 'integration-tests/**'
-      - '.github/workflows/integration-tests.yml'
-  workflow_dispatch:
   workflow_call:
 
 permissions:
   contents: read
-
-# A new push to the same PR cancels its superseded in-progress run.
-# Tag/release runs have unique refs and are never affected.
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   android:
@@ -84,3 +69,20 @@ jobs:
         run: >
           ./integration-tests/run.sh ${{ matrix.expo-sdk }} --platform ios
           ${{ matrix.frameworks == 'static' && '--static-frameworks' || '' }}
+
+  # Single aggregate check that summarizes the whole matrix. Point branch
+  # protection at this job only — new matrix entries are then covered
+  # automatically without updating protection rules.
+  tests:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    needs: [android, ios]
+    if: ${{ always() }}
+    steps:
+      - name: Check matrix results
+        run: |
+          if [[ "${{ needs.android.result }}" != "success" || "${{ needs.ios.result }}" != "success" ]]; then
+            echo "❌ Android: ${{ needs.android.result }}, iOS: ${{ needs.ios.result }}"
+            exit 1
+          fi
+          echo "✅ All integration tests passed"
