@@ -5,6 +5,11 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-06-24
+
+### Changed
+- **iOS:** Updated `AppstackSDK.xcframework` to the latest release. Adds `FIRST_OPEN` / `FIRST_OPEN_GUARDED` lifecycle events used internally for more reliable first-open and install detection (handled automatically by the SDK; not exposed in the public `EventType` API).
+
 ## [2.2.1] - 2026-06-11
 
 ### Fixed
