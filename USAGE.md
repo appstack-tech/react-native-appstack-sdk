@@ -51,17 +51,6 @@ const App = () => {
 };
 ```
 
-## iOS Configuration (Required)
-
-Add to your `ios/YourApp/Info.plist`:
-
-```xml
-<key>NSAdvertisingAttributionReportEndpoint</key>
-<string>https://ios-appstack.com/</string>
-```
-
----
-
 ## EAC recommendations
 
 ### Revenue events (all ad networks)
