@@ -47,6 +47,8 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
         reactApplicationContext.removeLifecycleEventListener(this)
     }
 
+    // setProxyUrl + configureWrapper are gated behind @RequiresOptIn(InternalAppstackApi).
+    @OptIn(com.appstack.attribution.InternalAppstackApi::class)
     @ReactMethod
     fun configure(apiKey: String, isDebug: Boolean, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?, promise: Promise) {
         try {
@@ -91,30 +93,17 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
                 Log.d(TAG, "Could not check SDK status before init: ${e.message}")
             }
             
-            Log.d(TAG, "Calling AppstackAttributionSdk.configure...")
-            
-            // Configure the SDK (new version doesn't require InitListener)
-            if (endpointBaseUrl != null) {
-                AppstackAttributionSdk.configure(
-                    context = context,
-                    apiKey = apiKey.trim(),
-                    isDebug = isDebug,
-                    endpointBaseUrl = endpointBaseUrl,
-                    logLevel = logLevelEnum,
-                    customerUserId = customerUserId?.takeIf { it.isNotBlank() },
-                    wrapperVersion = WRAPPER_VERSION
-                )
-            } else {
-                AppstackAttributionSdk.configure(
-                    context = context,
-                    apiKey = apiKey.trim(),
-                    isDebug = isDebug,
-                    logLevel = logLevelEnum,
-                    customerUserId = customerUserId?.takeIf { it.isNotBlank() },
-                    wrapperVersion = WRAPPER_VERSION
-                )
-            }
-            
+            Log.d(TAG, "Calling AppstackAttributionSdk.configureWrapper...")
+
+            // configureWrapper is the internal entry point that still accepts the RN wrapper version.
+            AppstackAttributionSdk.configureWrapper(
+                context = context,
+                apiKey = apiKey.trim(),
+                wrapperVersion = WRAPPER_VERSION,
+                logLevel = logLevelEnum,
+                customerUserId = customerUserId?.takeIf { it.isNotBlank() }
+            )
+
             Log.d(TAG, "SDK configure method called successfully")
             promise.resolve(true)
         } catch (exception: Exception) {
