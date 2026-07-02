@@ -13,8 +13,8 @@ Here, you will find the [npmjs.org](http://npmjs.org)[ react-native-appstack-sdk
 
 ### **iOS**
 
-- **iOS version:** 13.0+ (14.3+ recommended for Apple Ads)
-- **Xcode:** 14.0+
+- **iOS version:** 15.0+ (Apple Ads attribution requires 14.3+, always satisfied at this floor)
+- **Xcode:** 16.0+ (the vendored framework is built with Swift 6)
 - **React Native:** 0.72.0+
 
 ### **Android**
@@ -29,149 +29,133 @@ Here, you will find the [npmjs.org](http://npmjs.org)[ react-native-appstack-sdk
 
 ## **Initial setup**
 
-<Steps>
-  <Step title="Installation">
-    ```
-    npm install react-native-appstack-sdk@1.2.0
-    cd ios && pod install  # Only needed for iOS
-    ```
+### 1. Installation
 
-    **iOS - Configuring the SKAdNetwork attribution endpoint (optional)**
+```
+npm install react-native-appstack-sdk
+cd ios && pod install  # Only needed for iOS
+```
 
-    Add to `ios/YourApp/Info.plist`:
+**Android configuration**
 
-    ```kotlin
-    <key>NSAdvertisingAttributionReportEndpoint</key>
-    <string>https://ios-appstack.com/</string>
-    ```
+No additional configuration is needed for Android; the SDK will work automatically after installation.
 
-    **Android Configuration**
+### 2. Quickstart
 
-    No additional configuration is needed for Android; the SDK will work automatically after installation.
-  </Step>
-  <Step title="Quickstart">
-    ```javascript
-    import { useEffect } from 'react';
-    import { Platform } from 'react-native';
-    import AppstackSDK from 'react-native-appstack-sdk';
-    
-    const App = () => {
-      useEffect(() => {
-        const init = async () => {
-          const apiKey = Platform.OS === 'ios' 
-            ? process.env.APPSTACK_IOS_API_KEY 
-            : process.env.APPSTACK_ANDROID_API_KEY;
-          
-          await AppstackSDK.configure(apiKey);
-          
-          // Request tracking permission and enable Appple Ads Attribution
-          if (Platform.OS === 'ios') {
-            await AppstackSDK.enableAppleAdsAttribution();
-          }
-        };
-        
-        init();
-      }, []);
-    
-      const trackPurchase = () => {
-        AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
-      };
-    
-      // ... your app
+```javascript
+import { useEffect } from 'react';
+import { Platform } from 'react-native';
+import AppstackSDK from 'react-native-appstack-sdk';
+
+const App = () => {
+  useEffect(() => {
+    const init = async () => {
+      const apiKey = Platform.OS === 'ios'
+        ? process.env.APPSTACK_IOS_API_KEY
+        : process.env.APPSTACK_ANDROID_API_KEY;
+
+      await AppstackSDK.configure(apiKey);
+
+      // Request tracking permission and enable Apple Ads Attribution
+      if (Platform.OS === 'ios') {
+        await AppstackSDK.enableAppleAdsAttribution();
+      }
     };
-    ```
-  </Step>
-  <Step stepNumber={3} title="Configuration parameters">
-    Initializes the SDK with your API key. Must be called before any other SDK methods.
 
-    Parameters:
+    init();
+  }, []);
 
-    - `apiKey` - Your platform-specific API key from the Appstack dashboard
+  const trackPurchase = () => {
+    AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
+  };
 
-    Returns: A promise that resolves to `true` if configuration was successful
+  // ... your app
+};
+```
 
-    Example:
+### 3. Configuration parameters
 
-    ```javascript
-    const success = await AppstackSDK.configure('your-api-key-here');
-    if (!success) {
-      console.error('SDK configuration failed');
-    }
-    ```
-  </Step>
-  <Step stepNumber={4} title="Sending events">
-    Track user actions and revenue in your activities:
+Initializes the SDK with your API key. Must be called before any other SDK methods.
 
-    ```javascript
-    // Track events without parameters
-    await AppstackSDK.sendEvent('LOGIN');
-    await AppstackSDK.sendEvent('SIGN_UP');
-    
-    // Track events with parameters (including revenue)
-    await AppstackSDK.sendEvent(
-    	'PURCHASE', null, { revenue: 29.99, currency: 'USD' }
-    );
-    await AppstackSDK.sendEvent(
-    	'SUBSCRIBE', null, { revenue: 9.99, plan: 'monthly' }
-    );
-    
-    // Custom events
-    await AppstackSDK.sendEvent(
-    	'CUSTOM',
-    	'user_attributes',
-    	{
-    		email: "test@example.com", 
-    		name: "John Doe", 
-    		phone_number: "+33060000000", 
-    		date_of_birth: "2026-02-01" 
-    	}
-    );
-    ```
+Parameters:
 
-    **Available EventType values**
+- `apiKey` - Your platform-specific API key from the Appstack dashboard
 
-    It is recommended to use standard events for a smoother experience.
+Returns: A promise that resolves to `true` if configuration was successful
 
-    - `INSTALL` - App installation (tracked automatically)
-    - `LOGIN`, `SIGN_UP`, `REGISTER` - Authentication
-    - `PURCHASE`, `ADD_TO_CART`, `ADD_TO_WISHLIST`, `INITIATE_CHECKOUT`, `START_TRIAL`, `SUBSCRIBE` - Monetization
-    - `LEVEL_START`, `LEVEL_COMPLETE` - Game progression
-    - `TUTORIAL_COMPLETE`, `SEARCH`, `VIEW_ITEM`, `VIEW_CONTENT`, `SHARE` - Engagement
-    - `CUSTOM` - For application-specific eventsTracks custom events with optional parameters
+Example:
 
-    Tracks custom events with optional parameters:
+```javascript
+const success = await AppstackSDK.configure('your-api-key-here');
+if (!success) {
+  console.error('SDK configuration failed');
+}
+```
 
-    - `eventType` - Event type from EventType enum or string (e.g., 'PURCHASE', 'LOGIN')
-    - `eventName` - Event name for custom events (optional)
-    - `parameters` - Optional parameters object (e.g., `{ revenue: 29.99, currency: 'USD' }`)
+### 4. Sending events
 
-    Returns: A promise that resolves to `true` if event was sent successfully
+Track user actions and revenue in your app:
 
-    **Enhanced app campaigns**
+```javascript
+// Track events without parameters
+await AppstackSDK.sendEvent('LOGIN');
+await AppstackSDK.sendEvent('SIGN_UP');
 
-    <Tip>
-      When running enhanced app campaigns (EACs), it is highly recommended to send multiple parameters with the in-app event to improve matching quality.
-    </Tip>
-    For any event that represents revenue, we recommend sending:
+// Track events with parameters (including revenue)
+await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
+await AppstackSDK.sendEvent('SUBSCRIBE', null, { revenue: 9.99, plan: 'monthly' });
 
-    1. `revenue` or `price` (number)
-    2. `currency`(string, e.g. `EUR`, `USD`)
+// Custom events
+await AppstackSDK.sendEvent(
+  'CUSTOM',
+  'user_attributes',
+  {
+    email: "test@example.com",
+    name: "John Doe",
+    phone_number: "+33060000000",
+    date_of_birth: "2026-02-01"
+  }
+);
+```
 
-    ```kotlin
-    AppStackAttributionSdk.sendEvent(
-        EventType.PURCHASE,
-        parameters = mapOf("revenue" to 4.99, "currency" to "EUR")
-    )
-    ```
+**Available EventType values**
 
-    To improve matching quality on Meta, send events including the following parameters if you can fulfill them:
+It is recommended to use standard events for a smoother experience.
 
-    1. `email`
-    2. `name` (first + last name in the same field).
-    3. `phone_number`
-    4. `date_of_birth` (recommended format: `YYYY-MM-DD`).
-  </Step>
-</Steps>
+- `INSTALL` - App installation (tracked automatically)
+- `LOGIN`, `SIGN_UP`, `REGISTER` - Authentication
+- `PURCHASE`, `ADD_TO_CART`, `ADD_TO_WISHLIST`, `INITIATE_CHECKOUT`, `START_TRIAL`, `SUBSCRIBE` - Monetization
+- `LEVEL_START`, `LEVEL_COMPLETE` - Game progression
+- `TUTORIAL_COMPLETE`, `SEARCH`, `VIEW_ITEM`, `VIEW_CONTENT`, `SHARE` - Engagement
+- `CUSTOM` - For application-specific events
+
+Tracks custom events with optional parameters:
+
+- `eventType` - Event type from EventType enum or string (e.g., 'PURCHASE', 'LOGIN')
+- `eventName` - Event name for custom events (optional)
+- `parameters` - Optional parameters object (e.g., `{ revenue: 29.99, currency: 'USD' }`)
+
+Returns: A promise that resolves to `true` if the event was sent successfully
+
+**Enhanced app campaigns**
+
+> **Tip:** When running enhanced app campaigns (EACs), it is highly recommended to send multiple parameters with the in-app event to improve matching quality.
+
+For any event that represents revenue, we recommend sending:
+
+1. `revenue` or `price` (number)
+2. `currency` (string, e.g. `EUR`, `USD`)
+
+```javascript
+await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 4.99, currency: 'EUR' });
+```
+
+To improve matching quality on Meta, send events including the following parameters if you can fulfill them:
+
+1. `email`
+2. `name` (first + last name in the same field).
+3. `phone_number`
+4. `date_of_birth` (recommended format: `YYYY-MM-DD`).
 
 ## **Advanced usage**
 
@@ -184,7 +168,7 @@ Set up different API keys for different environments:
 APPSTACK_IOS_API_KEY=your_ios_dev_key
 APPSTACK_ANDROID_API_KEY=your_android_dev_key
 
-// .env.production  
+// .env.production
 APPSTACK_IOS_API_KEY=your_ios_prod_key
 APPSTACK_ANDROID_API_KEY=your_android_prod_key
 ```
@@ -192,8 +176,8 @@ APPSTACK_ANDROID_API_KEY=your_android_prod_key
 ```javascript
 import Config from 'react-native-config';
 
-const apiKey = Platform.OS === 'ios' 
-  ? Config.APPSTACK_IOS_API_KEY 
+const apiKey = Platform.OS === 'ios'
+  ? Config.APPSTACK_IOS_API_KEY
   : Config.APPSTACK_ANDROID_API_KEY;
 
 await AppstackSDK.configure(apiKey);
@@ -242,7 +226,7 @@ const initializeSDK = async () => {
   }
 
   const configured = await AppstackSDK.configure(apiKey);
-  
+
   if (configured && Platform.OS === 'ios') {
     await AppstackSDK.enableAppleAdsAttribution();
   }
@@ -281,7 +265,7 @@ const apiKey = "ak_live_1234567890abcdef"; // DON'T DO THIS
 
 ### **Platform constraints**
 
-- **iOS:** Requires iOS 13.0+, Apple Ads attribution needs iOS 14.3+
+- **iOS:** Requires iOS 15.0+; Apple Ads attribution needs iOS 14.3+
 - **Android:** Minimum API level 21 (Android 5.0)
 - **React Native:** 0.72.0+
 - Some Apple Ads features may not work in development/simulator environments
@@ -292,7 +276,7 @@ const apiKey = "ak_live_1234567890abcdef"; // DON'T DO THIS
 - Parameters are passed as an object and can include any key-value pairs
 - For revenue events, always pass a `revenue` (or `price`) and a `currency` parameter
 - The SDK must be initialized before any tracking calls
-- Network connectivis ity required for event transmission (events are queued offline)
+- Network connectivity required for event transmission (events are queued offline)
 
 ### **Technical limitations**
 
@@ -324,13 +308,12 @@ if (!success) {
 
 - Ensure iOS version is 14.3+
 - Verify the app is installed from the App Store or TestFlight
-- Check that `NSAdvertisingAttributionReportEndpoint` it is configured in Info.plist
 - Allow 24-48 hours for attribution data to appear
 
 ## **Support**
 
 For questions or issues:
 
-1. Check the [GitHub Repository](https://github.com/appstack-tech/appstack-android-sdk)
+1. Check the [GitHub Repository](https://github.com/appstack-tech/react-native-appstack-sdk)
 2. Contact our support team at [support@appstack.tech](mailto:support@appstack.tech)
 3. Open an issue in the repository

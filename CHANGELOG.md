@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **iOS:** Updated `AppstackSDK.xcframework` to the latest release. Adds `FIRST_OPEN` / `FIRST_OPEN_GUARDED` lifecycle events used internally for more reliable first-open and install detection (handled automatically by the SDK; not exposed in the public `EventType` API).
 
+### Fixed
+- **iOS:** Corrected inverted `debug`/`info` log levels in the SDK; the configured `logLevel` now maps to the intended verbosity.
+
 ## [2.2.1] - 2026-06-11
 
 ### Fixed
