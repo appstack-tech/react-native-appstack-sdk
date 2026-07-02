@@ -54,6 +54,14 @@ APP_DIR="${WORK_DIR}/${APP_NAME}"
 log()  { echo "▶ $*"; }
 fail() { echo "❌ $*" >&2; exit 1; }
 
+# Distinctive values the smoke entrypoint passes to configure(). The run_*_smoke
+# assertions grep the native bridge logs for these to confirm the arguments
+# actually marshal across the JS <-> native boundary (Tier 1 value check), not
+# just that the method was called. Keep them recognizable and stable.
+SMOKE_API_KEY="SMOKEKEY-abc12345"
+SMOKE_LOG_LEVEL="2"
+SMOKE_USER_ID="smoke-user-42"
+
 # Resolve adb: prefer PATH, fall back to ANDROID_HOME/ANDROID_SDK_ROOT.
 adb_bin() {
   if command -v adb >/dev/null 2>&1; then echo adb; return; fi
@@ -66,25 +74,39 @@ adb_bin() {
 # Write a throwaway root component that drives configure -> sendEvent ->
 # getAppstackId on launch and prints a sentinel. The blank template's index
 # imports ./App, so overwriting App.js is enough regardless of the `main` field.
+# The distinctive SMOKE_* values are injected from the shell so the run_*_smoke
+# assertions can confirm they arrive intact on the native side.
 write_smoke_entrypoint() {
   local app_dir="$1"
-  cat > "${app_dir}/App.js" <<'JS'
+  {
+    cat <<'JS_HEAD'
 import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
+JS_HEAD
+    printf '\n// Distinctive values injected by run.sh --smoke; the shell asserts the native\n'
+    printf '// bridge logs echo these back (Tier 1 argument-marshaling check).\n'
+    printf "const SMOKE_API_KEY = '%s';\n" "$SMOKE_API_KEY"
+    printf 'const SMOKE_LOG_LEVEL = %s;\n' "$SMOKE_LOG_LEVEL"
+    printf "const SMOKE_USER_ID = '%s';\n" "$SMOKE_USER_ID"
+    cat <<'JS_BODY'
 
 // Smoke entrypoint injected by integration-tests/run.sh --smoke.
-// Exercises the JS -> bridge -> native round trip and logs a sentinel that CI
-// greps for in logcat. A fake API key is fine: we assert the bridge resolves,
-// not that the backend accepts anything.
+// Exercises the JS -> bridge -> native round trip with known argument values and
+// logs a sentinel CI greps for. A fake API key is fine: we assert the bridge
+// received our values and resolved, not that the backend accepts them.
 export default function App() {
   const [status, setStatus] = useState('APPSTACK_SMOKE_RUNNING');
   useEffect(() => {
     (async () => {
       try {
-        await AppstackSDK.configure('smoke-test-key');
+        await AppstackSDK.configure(SMOKE_API_KEY, false, undefined, SMOKE_LOG_LEVEL, SMOKE_USER_ID);
         await AppstackSDK.sendEvent(EventType.CUSTOM, 'APPSTACK_SMOKE_EVENT');
         const id = await AppstackSDK.getAppstackId();
+        const uuidRe = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+        if (!id || !uuidRe.test(String(id))) {
+          throw new Error('getAppstackId returned a non-UUID value: ' + String(id));
+        }
         console.log('APPSTACK_SMOKE_OK id=' + String(id));
         setStatus('APPSTACK_SMOKE_OK');
       } catch (e) {
@@ -99,7 +121,8 @@ export default function App() {
     </View>
   );
 }
-JS
+JS_BODY
+  } > "${app_dir}/App.js"
 }
 
 # Install the release APK on an available device, launch it, and poll logcat for
@@ -157,6 +180,15 @@ run_android_smoke() {
       grep -F "$ok_js" <<<"$dump" | head -1 | sed 's/^/    /'
       if grep -qF "$ok_native" <<<"$dump"; then
         grep -F "$ok_native" <<<"$dump" | head -1 | sed 's/^/    (native) /'
+      fi
+      # Tier 1 value check: the Android bridge logs only the apiKey prefix
+      # (apiKey.take(8)), so assert that marshaled across the boundary.
+      local key_prefix="${SMOKE_API_KEY:0:8}"
+      if grep -qF "API key: ${key_prefix}" <<<"$dump"; then
+        log "Arg check OK: native bridge received apiKey prefix '${key_prefix}'"
+      else
+        grep -F "Configuring Appstack SDK" <<<"$dump" | head -3 >&2 || true
+        fail "Value check FAILED: apiKey did not reach native as '${key_prefix}...'"
       fi
       return 0
     fi
@@ -232,6 +264,19 @@ run_ios_smoke() {
     grep -F "$ok_js" "$capture" | head -1 | sed 's/^/    /'
     if grep -qF "$ok_native" "$capture"; then
       grep -F "$ok_native" "$capture" | head -1 | sed 's/^/    (native) /'
+    fi
+    # Tier 1 value check: the iOS bridge logs every configure arg, so assert the
+    # apiKey, logLevel, and customerUserId all marshaled across the boundary.
+    local args_ok=true
+    grep -qF "apiKey: ${SMOKE_API_KEY}" "$capture"        || args_ok=false
+    grep -qF "logLevel: ${SMOKE_LOG_LEVEL}" "$capture"     || args_ok=false
+    grep -qF "customerUserId: ${SMOKE_USER_ID}" "$capture" || args_ok=false
+    if [[ "$args_ok" == true ]]; then
+      log "Arg check OK: native bridge received apiKey/logLevel/customerUserId as sent"
+    else
+      grep -F "configure called with" "$capture" | head -3 >&2 || true
+      rm -f "$capture"
+      fail "Value check FAILED: configure args did not reach native as sent"
     fi
     rm -f "$capture"
     return 0
