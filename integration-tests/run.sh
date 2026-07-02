@@ -103,8 +103,10 @@ JS
 }
 
 # Install the release APK on an available device, launch it, and poll logcat for
-# the success/failure sentinel. Succeeds on either the JS sentinel or the SDK's
-# own native "configure ... successfully" log (belt and suspenders).
+# the success/failure sentinel. Success REQUIRES the JS sentinel APPSTACK_SMOKE_OK
+# (emitted only after the full configure -> sendEvent -> getAppstackId round trip);
+# the native "configure ... successfully" log is supplemental output only, since it
+# fires on configure alone and would otherwise let the check pass early.
 run_android_smoke() {
   local apk="$1" pkg="$2"
   local adb; adb="$(adb_bin)"
@@ -129,18 +131,16 @@ run_android_smoke() {
     || fail "Failed to launch $pkg"
 
   local ok_js="APPSTACK_SMOKE_OK"
-  local ok_native="SDK configure method called successfully"
+  local ok_native="SDK configure method called successfully"  # supplemental only
   local fail_js="APPSTACK_SMOKE_FAIL"
 
   log "Waiting for SDK round-trip sentinel in logcat (up to 90s)..."
   local dump=""
   for _ in $(seq 1 45); do
     dump="$("$adb" logcat -d 2>/dev/null || true)"
-    if grep -qF "$ok_js" <<<"$dump" || grep -qF "$ok_native" <<<"$dump"; then
-      log "Smoke sentinel found:"
-      grep -F -e "$ok_js" -e "$ok_native" <<<"$dump" | head -3 | sed 's/^/    /'
-      return 0
-    fi
+
+    # Immediate failure signals first, so a configure-then-fail run cannot slip
+    # through on the native configure log.
     if grep -qF "$fail_js" <<<"$dump"; then
       grep -F "$fail_js" <<<"$dump" | head -3 >&2
       fail "SDK smoke FAILED at runtime (JS reported an error)"
@@ -148,6 +148,17 @@ run_android_smoke() {
     if grep -qE "FATAL EXCEPTION|AndroidRuntime.*com\.appstack\.e2e" <<<"$dump"; then
       grep -E "FATAL EXCEPTION|AndroidRuntime" <<<"$dump" | head -8 >&2
       fail "App crashed at runtime during smoke"
+    fi
+
+    # Success requires the JS sentinel = full configure -> sendEvent ->
+    # getAppstackId round trip. The native log is printed only as context.
+    if grep -qF "$ok_js" <<<"$dump"; then
+      log "Smoke sentinel found (JS round-trip complete):"
+      grep -F "$ok_js" <<<"$dump" | head -1 | sed 's/^/    /'
+      if grep -qF "$ok_native" <<<"$dump"; then
+        grep -F "$ok_native" <<<"$dump" | head -1 | sed 's/^/    (native) /'
+      fi
+      return 0
     fi
     sleep 2
   done
@@ -157,8 +168,11 @@ run_android_smoke() {
 }
 
 # Install the .app on a booted simulator, launch it, and poll the unified log for
-# the sentinel. Succeeds on either the JS sentinel or the RCT bridge's own native
-# "configure method called successfully via bridge" NSLog (belt and suspenders).
+# the sentinel. Success REQUIRES the JS sentinel APPSTACK_SMOKE_OK (emitted only
+# after the full configure -> sendEvent -> getAppstackId round trip); the RCT
+# bridge's native "configure method called successfully via bridge" NSLog is
+# supplemental output only, since it fires on configure alone and would otherwise
+# let the check pass early.
 run_ios_smoke() {
   local app_path="$1" bundle_id="$2"
   [[ -d "$app_path" ]] || fail ".app not found at $app_path"
@@ -191,27 +205,34 @@ run_ios_smoke() {
     || { kill "$log_pid" 2>/dev/null || true; fail "simctl launch failed"; }
 
   local ok_js="APPSTACK_SMOKE_OK"
-  local ok_native="configure method called successfully via bridge"
+  local ok_native="configure method called successfully via bridge"  # supplemental only
   local fail_js="APPSTACK_SMOKE_FAIL"
 
   log "Waiting for SDK round-trip sentinel in the simulator log (up to 90s)..."
   local found=false
   for _ in $(seq 1 45); do
-    if grep -qF "$ok_js" "$capture" || grep -qF "$ok_native" "$capture"; then
-      found=true; break
-    fi
+    # Immediate failure signal first, so a configure-then-fail run cannot slip
+    # through on the native configure log.
     if grep -qF "$fail_js" "$capture"; then
       kill "$log_pid" 2>/dev/null || true
       grep -F "$fail_js" "$capture" | head -3 >&2
       fail "SDK smoke FAILED at runtime (JS reported an error)"
+    fi
+    # Success requires the JS sentinel = full configure -> sendEvent ->
+    # getAppstackId round trip.
+    if grep -qF "$ok_js" "$capture"; then
+      found=true; break
     fi
     sleep 2
   done
   kill "$log_pid" 2>/dev/null || true
 
   if [[ "$found" == true ]]; then
-    log "Smoke sentinel found:"
-    grep -F -e "$ok_js" -e "$ok_native" "$capture" | head -3 | sed 's/^/    /'
+    log "Smoke sentinel found (JS round-trip complete):"
+    grep -F "$ok_js" "$capture" | head -1 | sed 's/^/    /'
+    if grep -qF "$ok_native" "$capture"; then
+      grep -F "$ok_native" "$capture" | head -1 | sed 's/^/    (native) /'
+    fi
     rm -f "$capture"
     return 0
   fi
