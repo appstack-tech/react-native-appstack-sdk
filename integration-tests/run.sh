@@ -16,6 +16,14 @@ set -euo pipefail
 #   --static-frameworks   iOS only: build with `useFrameworks: "static"` via
 #                         expo-build-properties (exercises different header
 #                         search paths, common in apps using Firebase etc.)
+#   --smoke               After building, install the app on a running emulator
+#                         (Android) or simulator (iOS), launch it, and assert the
+#                         JS -> bridge -> native SDK round trip actually works at
+#                         runtime (catches bridge-registration / crash-on-init
+#                         bugs that a compile-only build cannot). Requires a
+#                         device to be available: Android via adb (in CI:
+#                         reactivecircus/android-emulator-runner), iOS via a
+#                         booted simulator (in CI: xcrun simctl boot).
 
 SDK_VERSION="${1:?Usage: $0 <expo-sdk-version> [--platform android|ios] [--quick] [--static-frameworks]}"
 shift
@@ -23,15 +31,20 @@ shift
 PLATFORM="android"
 QUICK_MODE=false
 STATIC_FRAMEWORKS=false
+SMOKE_MODE=false
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --platform) PLATFORM="${2:?--platform requires a value}"; shift 2 ;;
     --quick) QUICK_MODE=true; shift ;;
     --static-frameworks) STATIC_FRAMEWORKS=true; shift ;;
+    --smoke) SMOKE_MODE=true; shift ;;
     *) echo "Unknown option: $1" >&2; exit 2 ;;
   esac
 done
 [[ "$PLATFORM" == "android" || "$PLATFORM" == "ios" ]] || { echo "Invalid platform: $PLATFORM" >&2; exit 2; }
+if [[ "$SMOKE_MODE" == true && "$QUICK_MODE" == true ]]; then
+  echo "--smoke cannot be combined with --quick (smoke needs a full runnable build)" >&2; exit 2
+fi
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 WORK_DIR="${INTEGRATION_WORK_DIR:-$(mktemp -d "${TMPDIR:-/tmp}/appstack-e2e.XXXXXX")}"
@@ -40,6 +53,173 @@ APP_DIR="${WORK_DIR}/${APP_NAME}"
 
 log()  { echo "▶ $*"; }
 fail() { echo "❌ $*" >&2; exit 1; }
+
+# Resolve adb: prefer PATH, fall back to ANDROID_HOME/ANDROID_SDK_ROOT.
+adb_bin() {
+  if command -v adb >/dev/null 2>&1; then echo adb; return; fi
+  for base in "${ANDROID_HOME:-}" "${ANDROID_SDK_ROOT:-}"; do
+    [[ -n "$base" && -x "$base/platform-tools/adb" ]] && { echo "$base/platform-tools/adb"; return; }
+  done
+  fail "adb not found (set ANDROID_HOME or put platform-tools on PATH)"
+}
+
+# Write a throwaway root component that drives configure -> sendEvent ->
+# getAppstackId on launch and prints a sentinel. The blank template's index
+# imports ./App, so overwriting App.js is enough regardless of the `main` field.
+write_smoke_entrypoint() {
+  local app_dir="$1"
+  cat > "${app_dir}/App.js" <<'JS'
+import React, { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
+import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
+
+// Smoke entrypoint injected by integration-tests/run.sh --smoke.
+// Exercises the JS -> bridge -> native round trip and logs a sentinel that CI
+// greps for in logcat. A fake API key is fine: we assert the bridge resolves,
+// not that the backend accepts anything.
+export default function App() {
+  const [status, setStatus] = useState('APPSTACK_SMOKE_RUNNING');
+  useEffect(() => {
+    (async () => {
+      try {
+        await AppstackSDK.configure('smoke-test-key');
+        await AppstackSDK.sendEvent(EventType.CUSTOM, 'APPSTACK_SMOKE_EVENT');
+        const id = await AppstackSDK.getAppstackId();
+        console.log('APPSTACK_SMOKE_OK id=' + String(id));
+        setStatus('APPSTACK_SMOKE_OK');
+      } catch (e) {
+        console.error('APPSTACK_SMOKE_FAIL ' + (e && e.message ? e.message : String(e)));
+        setStatus('APPSTACK_SMOKE_FAIL');
+      }
+    })();
+  }, []);
+  return (
+    <View>
+      <Text>{status}</Text>
+    </View>
+  );
+}
+JS
+}
+
+# Install the release APK on an available device, launch it, and poll logcat for
+# the success/failure sentinel. Succeeds on either the JS sentinel or the SDK's
+# own native "configure ... successfully" log (belt and suspenders).
+run_android_smoke() {
+  local apk="$1" pkg="$2"
+  local adb; adb="$(adb_bin)"
+
+  log "Waiting for an Android device/emulator..."
+  "$adb" get-state >/dev/null 2>&1 || "$adb" wait-for-device
+  # Wait for full boot so the launcher/JS runtime is ready.
+  local booted=""
+  for _ in $(seq 1 60); do
+    booted="$("$adb" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')"
+    [[ "$booted" == "1" ]] && break
+    sleep 2
+  done
+  [[ "$booted" == "1" ]] || fail "No booted Android device/emulator available for --smoke"
+
+  log "Installing release APK: $(basename "$apk")"
+  "$adb" install -r -d "$apk" >/dev/null || fail "adb install failed"
+
+  "$adb" logcat -c || true
+  log "Launching $pkg ..."
+  "$adb" shell monkey -p "$pkg" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 \
+    || fail "Failed to launch $pkg"
+
+  local ok_js="APPSTACK_SMOKE_OK"
+  local ok_native="SDK configure method called successfully"
+  local fail_js="APPSTACK_SMOKE_FAIL"
+
+  log "Waiting for SDK round-trip sentinel in logcat (up to 90s)..."
+  local dump=""
+  for _ in $(seq 1 45); do
+    dump="$("$adb" logcat -d 2>/dev/null || true)"
+    if grep -qF "$ok_js" <<<"$dump" || grep -qF "$ok_native" <<<"$dump"; then
+      log "Smoke sentinel found:"
+      grep -F -e "$ok_js" -e "$ok_native" <<<"$dump" | head -3 | sed 's/^/    /'
+      return 0
+    fi
+    if grep -qF "$fail_js" <<<"$dump"; then
+      grep -F "$fail_js" <<<"$dump" | head -3 >&2
+      fail "SDK smoke FAILED at runtime (JS reported an error)"
+    fi
+    if grep -qE "FATAL EXCEPTION|AndroidRuntime.*com\.appstack\.e2e" <<<"$dump"; then
+      grep -E "FATAL EXCEPTION|AndroidRuntime" <<<"$dump" | head -8 >&2
+      fail "App crashed at runtime during smoke"
+    fi
+    sleep 2
+  done
+  echo "---- last 40 logcat lines ----" >&2
+  "$adb" logcat -d 2>/dev/null | tail -40 >&2 || true
+  fail "Timed out waiting for SDK smoke sentinel (no round-trip confirmation)"
+}
+
+# Install the .app on a booted simulator, launch it, and poll the unified log for
+# the sentinel. Succeeds on either the JS sentinel or the RCT bridge's own native
+# "configure method called successfully via bridge" NSLog (belt and suspenders).
+run_ios_smoke() {
+  local app_path="$1" bundle_id="$2"
+  [[ -d "$app_path" ]] || fail ".app not found at $app_path"
+
+  # Prefer an already-booted simulator; otherwise boot the first available iPhone.
+  local udid
+  udid="$(xcrun simctl list devices booted | grep -Eo '[0-9A-Fa-f-]{36}' | head -1 || true)"
+  if [[ -z "$udid" ]]; then
+    udid="$(xcrun simctl list devices available | grep -E 'iPhone' | grep -Eo '[0-9A-Fa-f-]{36}' | head -1 || true)"
+    [[ -n "$udid" ]] || fail "No iOS simulator available for --smoke"
+    log "Booting simulator ${udid} ..."
+    xcrun simctl boot "$udid" || true
+  fi
+  xcrun simctl bootstatus "$udid" >/dev/null 2>&1 || true
+
+  log "Installing app on simulator: $(basename "$app_path")"
+  xcrun simctl install "$udid" "$app_path" || fail "simctl install failed"
+
+  # Capture the unified log (NSLog + any os_log-routed JS output) in the
+  # background, filtered to our bridge/sentinel to keep it cheap.
+  local capture; capture="$(mktemp "${TMPDIR:-/tmp}/appstack-ios-smoke.XXXXXX")"
+  xcrun simctl spawn "$udid" log stream --level debug --style syslog \
+    --predicate 'eventMessage CONTAINS "AppstackReactNative" OR eventMessage CONTAINS "APPSTACK_SMOKE"' \
+    > "$capture" 2>/dev/null &
+  local log_pid=$!
+  sleep 1
+
+  log "Launching ${bundle_id} ..."
+  xcrun simctl launch "$udid" "$bundle_id" >/dev/null 2>&1 \
+    || { kill "$log_pid" 2>/dev/null || true; fail "simctl launch failed"; }
+
+  local ok_js="APPSTACK_SMOKE_OK"
+  local ok_native="configure method called successfully via bridge"
+  local fail_js="APPSTACK_SMOKE_FAIL"
+
+  log "Waiting for SDK round-trip sentinel in the simulator log (up to 90s)..."
+  local found=false
+  for _ in $(seq 1 45); do
+    if grep -qF "$ok_js" "$capture" || grep -qF "$ok_native" "$capture"; then
+      found=true; break
+    fi
+    if grep -qF "$fail_js" "$capture"; then
+      kill "$log_pid" 2>/dev/null || true
+      grep -F "$fail_js" "$capture" | head -3 >&2
+      fail "SDK smoke FAILED at runtime (JS reported an error)"
+    fi
+    sleep 2
+  done
+  kill "$log_pid" 2>/dev/null || true
+
+  if [[ "$found" == true ]]; then
+    log "Smoke sentinel found:"
+    grep -F -e "$ok_js" -e "$ok_native" "$capture" | head -3 | sed 's/^/    /'
+    rm -f "$capture"
+    return 0
+  fi
+  echo "---- last 40 captured log lines ----" >&2
+  tail -40 "$capture" >&2 || true
+  rm -f "$capture"
+  fail "Timed out waiting for SDK smoke sentinel (no round-trip confirmation)"
+}
 
 log "Expo SDK ${SDK_VERSION} / ${PLATFORM} integration test (workdir: ${WORK_DIR})"
 
@@ -118,9 +298,21 @@ if [[ "$PLATFORM" == "android" ]]; then
     exit 0
   fi
 
-  # 6a. Full Android compile (debug — same Java compile path that release uses)
-  log "Building Android app (assembleDebug)..."
-  ./gradlew --no-daemon :app:assembleDebug
+  if [[ "$SMOKE_MODE" == true ]]; then
+    # 6a. Build a runnable release APK (Expo default: debug-signed, non-minified,
+    # JS bundle embedded → launches without Metro) and drive it on a device.
+    write_smoke_entrypoint "$APP_DIR"
+    log "Building Android app (assembleRelease, runnable/self-contained)..."
+    ./gradlew --no-daemon :app:assembleRelease
+    APK="$(ls app/build/outputs/apk/release/*.apk 2>/dev/null | head -1)"
+    [[ -n "$APK" ]] || fail "Release APK not found after assembleRelease"
+    run_android_smoke "$APK" "com.appstack.e2e"
+    log "✅ Android runtime smoke passed (SDK bridge round-trip confirmed)"
+  else
+    # 6a. Full Android compile (debug — same Java compile path that release uses)
+    log "Building Android app (assembleDebug)..."
+    ./gradlew --no-daemon :app:assembleDebug
+  fi
 else
   # 5b. Install pods and assert the SDK pod was autolinked
   cd ios
@@ -142,16 +334,36 @@ else
   # 6b. Full simulator build (no signing required)
   WORKSPACE="$(ls -d *.xcworkspace | head -1)"
   SCHEME="${WORKSPACE%.xcworkspace}"
-  log "Building iOS app (xcodebuild, scheme ${SCHEME})..."
-  xcodebuild -workspace "$WORKSPACE" \
-    -scheme "$SCHEME" \
-    -configuration Debug \
-    -sdk iphonesimulator \
-    -destination 'generic/platform=iOS Simulator' \
-    -derivedDataPath build \
-    CODE_SIGNING_ALLOWED=NO \
-    COMPILER_INDEX_STORE_ENABLE=NO \
-    build
+  if [[ "$SMOKE_MODE" == true ]]; then
+    # Release embeds the JS bundle → the app launches without Metro. Simulator
+    # builds need no code signing.
+    write_smoke_entrypoint "$APP_DIR"
+    log "Building iOS app (xcodebuild Release, runnable/self-contained; scheme ${SCHEME})..."
+    xcodebuild -workspace "$WORKSPACE" \
+      -scheme "$SCHEME" \
+      -configuration Release \
+      -sdk iphonesimulator \
+      -destination 'generic/platform=iOS Simulator' \
+      -derivedDataPath build \
+      CODE_SIGNING_ALLOWED=NO \
+      COMPILER_INDEX_STORE_ENABLE=NO \
+      build
+    APP_PATH="$(ls -d build/Build/Products/Release-iphonesimulator/*.app 2>/dev/null | head -1)"
+    [[ -n "$APP_PATH" ]] || fail "Built .app not found after Release build"
+    run_ios_smoke "$APP_PATH" "com.appstack.e2e"
+    log "✅ iOS runtime smoke passed (SDK bridge round-trip confirmed)"
+  else
+    log "Building iOS app (xcodebuild, scheme ${SCHEME})..."
+    xcodebuild -workspace "$WORKSPACE" \
+      -scheme "$SCHEME" \
+      -configuration Debug \
+      -sdk iphonesimulator \
+      -destination 'generic/platform=iOS Simulator' \
+      -derivedDataPath build \
+      CODE_SIGNING_ALLOWED=NO \
+      COMPILER_INDEX_STORE_ENABLE=NO \
+      build
+  fi
 fi
 
 log "✅ Expo SDK ${SDK_VERSION} / ${PLATFORM} integration test passed"
