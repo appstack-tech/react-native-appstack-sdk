@@ -1,5 +1,5 @@
 import Foundation
-@preconcurrency import AppstackSDK
+@_spi(AppstackInternal) @preconcurrency import AppstackSDK
 
 @objc(AppstackBridge)
 public class AppstackBridge: NSObject {
@@ -28,8 +28,6 @@ public class AppstackBridge: NSObject {
         
         AppstackAttributionSdk.shared.configure(
             apiKey: apiKey,
-            isDebug: isDebug,
-            endpointBaseUrl: endpointBaseUrl,
             logLevel: logLevelEnum,
             customerUserId: customerUserId,
             wrapperVersion: AppstackBridge.wrapperVersion

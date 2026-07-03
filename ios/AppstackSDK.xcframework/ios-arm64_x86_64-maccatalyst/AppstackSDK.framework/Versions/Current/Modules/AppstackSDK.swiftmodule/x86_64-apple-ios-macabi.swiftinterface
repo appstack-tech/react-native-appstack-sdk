@@ -1,6 +1,6 @@
 // swift-interface-format-version: 1.0
 // swift-compiler-version: Apple Swift version 6.1.2 effective-5.10 (swiftlang-6.1.2.1.2 clang-1700.0.13.5)
-// swift-module-flags: -target arm64-apple-ios15.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name AppstackSDK
+// swift-module-flags: -target x86_64-apple-ios15.0-macabi -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name AppstackSDK
 // swift-module-flags-ignorable:  -interface-compiler-version 6.1.2
 import AdServices
 import AdSupport
@@ -26,8 +26,6 @@ import os
   @available(*, deprecated, renamed: "configure(apiKey:logLevel:customerUserId:)", message: "endpointBaseUrl is no longer used; drop it from your configure() call. This overload will be removed in the next major version.")
   public func configure(apiKey appstackApiKey: Swift.String, endpointBaseUrl: Swift.String?, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil)
   public func configure(apiKey appstackApiKey: Swift.String, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil)
-  @_spi(AppstackInternal) public func configure(apiKey appstackApiKey: Swift.String, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil, wrapperVersion: Swift.String?)
-  @_spi(AppstackInternal) public func setProxyUrl(_ url: Swift.String)
   public func sendEvent(event: AppstackSDK.EventType, name: Swift.String? = nil, parameters: [Swift.String : Any]? = nil)
   public func getAppstackId() -> Swift.String?
   public func isSdkDisabled() -> Swift.Bool

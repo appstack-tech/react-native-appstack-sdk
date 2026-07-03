@@ -88,7 +88,7 @@ repositories {
 dependencies {
     compileOnly 'com.facebook.react:react-native:+'
 
-    implementation 'tech.appstack.android-sdk:appstack-android-sdk:1.4.0'
+    implementation 'tech.appstack.android-sdk:appstack-android-sdk:1.5.0-rc0'
 
     implementation 'androidx.annotation:annotation:1.7.1'
 
