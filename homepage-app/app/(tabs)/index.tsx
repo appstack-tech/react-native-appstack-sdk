@@ -32,12 +32,8 @@ export default function HomeScreen() {
 
       // Read API key from environment
       // const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY;
-      let apiKey = 'EXPO_PUBLIC_APPSTACK_API_KEY';
-      let endpointUrl = 'https://api.event.dev.appstack.tech/android/';
-
-      if (Platform.OS === 'ios') {
-        endpointUrl = 'https://api.event.dev.appstack.tech';
-      }
+      //let apiKey = 'EXPO_PUBLIC_APPSTACK_API_KEY';
+      let apiKey = "q40jebdl91tgelzcrp5pbnbh"
 
       if (!apiKey || apiKey.trim() === '') {
         const msg = 'Missing EXPO_PUBLIC_APPSTACK_API_KEY. Set it in your env (e.g. eas.json env or .env) to initialize the SDK.';
@@ -47,11 +43,13 @@ export default function HomeScreen() {
         return;
       }
 
-      // Configure the SDK with the provided key and all available parameters
+      // The dev endpoint is applied natively via the APPSTACK_DEV_PROXY_URL manifest key
+      // (ios/homepageapp/Info.plist + android/app/src/main/AndroidManifest.xml), not through
+      // configure() — isDebug and endpointBaseUrl are deprecated no-ops in the wrapper.
       await AppstackSDK.configure(
         apiKey.trim(),
-        true, // isDebug - enable debug mode for development
-        endpointUrl, // endpointBaseUrl - custom endpoint
+        true, // isDebug - deprecated/ignored
+        undefined, // endpointBaseUrl - deprecated/ignored (see APPSTACK_DEV_PROXY_URL)
         0 // logLevel - 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
       );
       setIsSDKInitialized(true);
