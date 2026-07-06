@@ -11,17 +11,19 @@ public class AppstackBridge: NSObject {
     private static let wrapperVersion = "react-native-1.0.0"
 
     @objc public static func configure(apiKey: String, isDebug: Bool, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?) {
-        // Convert Int logLevel to LogLevel enum
+        // Translate the JS-side logLevel contract (0=DEBUG, 1=INFO, 2=WARN, 3=ERROR;
+        // verbosity descending) into the native LogLevel enum (off/error/info/debug;
+        // verbosity ascending). This keeps iOS consistent with Android and with the
+        // documented JS values. iOS has no dedicated WARN tier, so WARN folds down to
+        // .error — quieter than INFO, and there are no warn-level logs on iOS to lose.
         let logLevelEnum: LogLevel
         switch logLevel {
         case 0:
-            logLevelEnum = .off
-        case 1:
-            logLevelEnum = .error
-        case 2:
             logLevelEnum = .debug
-        case 3:
+        case 1:
             logLevelEnum = .info
+        case 2, 3:
+            logLevelEnum = .error
         default:
             logLevelEnum = .info
         }
