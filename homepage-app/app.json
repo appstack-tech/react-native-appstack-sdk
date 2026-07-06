@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.example.homepageapp",
+      "bundleIdentifier": "com.example.homepageapp"
     },
     "android": {
       "adaptiveIcon": {
