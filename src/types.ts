@@ -79,7 +79,7 @@ export interface AppstackConfig {
   apiKey: string;
 
   /**
-   * Enable debug logs (optional, default false)
+   * @deprecated Ignored; use `logLevel` instead. Still accepted for backward compatibility.
    */
   isDebug?: boolean;
 

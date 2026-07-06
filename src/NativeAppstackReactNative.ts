@@ -4,7 +4,6 @@ import { TurboModuleRegistry, NativeModules } from 'react-native';
 export interface Spec extends TurboModule {
   configure(
     apiKey: string,
-    isDebug?: boolean,
     endpointBaseUrl?: string,
     logLevel?: number,
     customerUserId?: string | null

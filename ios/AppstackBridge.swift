@@ -10,7 +10,7 @@ public class AppstackBridge: NSObject {
 
     private static let wrapperVersion = "react-native-1.0.0"
 
-    @objc public static func configure(apiKey: String, isDebug: Bool, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?) {
+    @objc public static func configure(apiKey: String, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?) {
         // Translate the JS-side logLevel contract (0=DEBUG, 1=INFO, 2=WARN, 3=ERROR;
         // verbosity descending) into the native LogLevel enum (off/error/info/debug;
         // verbosity ascending). This keeps iOS consistent with Android and with the

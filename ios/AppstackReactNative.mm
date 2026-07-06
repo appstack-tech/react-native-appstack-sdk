@@ -18,7 +18,6 @@ RCT_EXPORT_MODULE()
 #pragma mark - SDK Configuration
 
 RCT_EXPORT_METHOD(configure:(NSString *)apiKey
-                 isDebug:(BOOL)isDebug
                  endpointBaseUrl:(NSString * _Nullable)endpointBaseUrl
                  logLevel:(NSInteger)logLevel
                  customerUserId:(NSString * _Nullable)customerUserId
@@ -33,7 +32,7 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
     dispatch_async(dispatch_get_main_queue(), ^{
         @try {
             // Call the Swift bridge method directly
-            [AppstackBridge configureWithApiKey:apiKey isDebug:isDebug endpointBaseUrl:endpointBaseUrl logLevel:logLevel customerUserId:customerUserId];
+            [AppstackBridge configureWithApiKey:apiKey endpointBaseUrl:endpointBaseUrl logLevel:logLevel customerUserId:customerUserId];
 
             resolve(@(YES));
         } @catch (NSException *exception) {
