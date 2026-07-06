@@ -8,40 +8,16 @@ import com.appstack.attribution.AppstackAttributionSdk
 import com.appstack.attribution.EventType
 
 @ReactModule(name = AppstackReactNativeModule.NAME)
-class AppstackReactNativeModule(reactContext: ReactApplicationContext) : 
-    ReactContextBaseJavaModule(reactContext),
-    LifecycleEventListener {
+class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
+    ReactContextBaseJavaModule(reactContext) {
 
     companion object {
         const val NAME = "AppstackReactNative"
         private const val WRAPPER_VERSION = "react-native-1.0.0"
     }
 
-    init {
-        // Register lifecycle listener to handle app background/foreground events
-        reactContext.addLifecycleEventListener(this)
-    }
-
     override fun getName(): String {
         return NAME
-    }
-
-    override fun onHostResume() {
-        // App came to foreground
-    }
-
-    override fun onHostPause() {
-        // App went to background
-    }
-
-    override fun onHostDestroy() {
-        // App destroyed
-    }
-
-    override fun onCatalystInstanceDestroy() {
-        super.onCatalystInstanceDestroy()
-        // Clean up lifecycle listener
-        reactApplicationContext.removeLifecycleEventListener(this)
     }
 
     // setProxyUrl + configureWrapper are gated behind @RequiresOptIn(InternalAppstackApi).
@@ -163,12 +139,6 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     fun enableAppleAdsAttribution(promise: Promise) {
         // Apple Ads Attribution is iOS-only, so we return false on Android
         promise.resolve(false)
-    }
-
-    @ReactMethod
-    fun flush(promise: Promise) {
-        // Events are sent immediately; flush is a no-op.
-        promise.resolve(true)
     }
 
     @ReactMethod
