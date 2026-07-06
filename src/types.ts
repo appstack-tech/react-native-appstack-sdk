@@ -84,7 +84,7 @@ export interface AppstackConfig {
   isDebug?: boolean;
 
   /**
-   * Custom endpoint base URL (optional)
+   * @deprecated Ignored by the RN wrapper (not forwarded to native). Still accepted for backward compatibility.
    */
   endpointBaseUrl?: string;
 

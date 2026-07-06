@@ -23,7 +23,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     // setProxyUrl + configureWrapper are gated behind @RequiresOptIn(InternalAppstackApi).
     @OptIn(com.appstack.attribution.InternalAppstackApi::class)
     @ReactMethod
-    fun configure(apiKey: String, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?, promise: Promise) {
+    fun configure(apiKey: String, logLevel: Int, customerUserId: String?, promise: Promise) {
         try {
             if (apiKey.isBlank()) {
                 promise.reject("INVALID_API_KEY", "API key cannot be null or empty")

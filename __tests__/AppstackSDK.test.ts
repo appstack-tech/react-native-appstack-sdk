@@ -66,8 +66,8 @@ describe('AppstackSDK', () => {
       const result = await appstackSDK.configure('my-api-key');
       expect(result).toBe(true);
       expect(mockNative.configure).toHaveBeenCalledTimes(1);
-      // isDebug is validated on the JS side but not forwarded to native.
-      expect(mockNative.configure).toHaveBeenCalledWith('my-api-key', null, 1, null);
+      // isDebug and endpointBaseUrl are validated on the JS side but not forwarded to native.
+      expect(mockNative.configure).toHaveBeenCalledWith('my-api-key', 1, null);
     });
 
     it('calls native configure with all options including customerUserId', async () => {
@@ -79,32 +79,27 @@ describe('AppstackSDK', () => {
         'user-123'
       );
       expect(result).toBe(true);
-      expect(mockNative.configure).toHaveBeenCalledWith(
-        'my-api-key',
-        'https://custom.endpoint/',
-        0,
-        'user-123'
-      );
+      expect(mockNative.configure).toHaveBeenCalledWith('my-api-key', 0, 'user-123');
     });
 
     it('passes null for optional customerUserId when not provided', async () => {
       await appstackSDK.configure('key', false, undefined, 1);
-      expect(mockNative.configure).toHaveBeenCalledWith('key', null, 1, null);
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 1, null);
     });
 
     it('passes null when customerUserId is explicitly null', async () => {
       await appstackSDK.configure('key', false, undefined, 1, null);
-      expect(mockNative.configure).toHaveBeenCalledWith('key', null, 1, null);
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 1, null);
     });
 
-    it('trims apiKey and endpointBaseUrl', async () => {
+    it('trims apiKey (endpointBaseUrl is accepted but not forwarded)', async () => {
       await appstackSDK.configure('  key  ', false, '  https://x.com  ', 1);
-      expect(mockNative.configure).toHaveBeenCalledWith('key', 'https://x.com', 1, null);
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 1, null);
     });
 
     it('trims customerUserId when provided', async () => {
       await appstackSDK.configure('key', false, undefined, 1, '  user-456  ');
-      expect(mockNative.configure).toHaveBeenCalledWith('key', null, 1, 'user-456');
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 1, 'user-456');
     });
 
     it('throws when apiKey is empty', async () => {
