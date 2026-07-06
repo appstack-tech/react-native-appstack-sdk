@@ -1,7 +1,6 @@
 package com.appstack.reactnative
 
 import android.content.Context
-import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.module.annotations.ReactModule
 // Import the SDK from the Maven dependency
@@ -15,7 +14,6 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
 
     companion object {
         const val NAME = "AppstackReactNative"
-        private const val TAG = "AppstackReactNativeModule"
         private const val WRAPPER_VERSION = "react-native-1.0.0"
     }
 
@@ -30,15 +28,14 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
 
     override fun onHostResume() {
         // App came to foreground
-        Log.d(TAG, "App resumed (foreground)")
     }
 
     override fun onHostPause() {
-        Log.d(TAG, "App paused (background)")
+        // App went to background
     }
 
     override fun onHostDestroy() {
-        Log.d(TAG, "App destroyed")
+        // App destroyed
     }
 
     override fun onCatalystInstanceDestroy() {
@@ -52,8 +49,6 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     fun configure(apiKey: String, isDebug: Boolean, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?, promise: Promise) {
         try {
-            Log.d(TAG, "Configuring Appstack SDK with API key: ${apiKey.take(8)}...")
-            
             if (apiKey.isBlank()) {
                 promise.reject("INVALID_API_KEY", "API key cannot be null or empty")
                 return
@@ -76,24 +71,11 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
 
             // Validate that SDK classes are available
             try {
-                Log.d(TAG, "Checking SDK class availability...")
-                val sdkClass = AppstackAttributionSdk::class.java
-                Log.d(TAG, "All SDK classes are available")
+                AppstackAttributionSdk::class.java
             } catch (e: Exception) {
-                Log.e(TAG, "SDK classes not available", e)
                 promise.reject("SDK_CLASSES_ERROR", "SDK classes not available: ${e.message}", e)
                 return
             }
-            
-            // Check if SDK is already initialized
-            try {
-                val isAlreadyEnabled = AppstackAttributionSdk.isEnabled()
-                Log.d(TAG, "SDK current status before init: isEnabled=$isAlreadyEnabled")
-            } catch (e: Exception) {
-                Log.d(TAG, "Could not check SDK status before init: ${e.message}")
-            }
-            
-            Log.d(TAG, "Calling AppstackAttributionSdk.configureWrapper...")
 
             // configureWrapper is the internal entry point that still accepts the RN wrapper version.
             AppstackAttributionSdk.configureWrapper(
@@ -104,10 +86,8 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
                 customerUserId = customerUserId?.takeIf { it.isNotBlank() }
             )
 
-            Log.d(TAG, "SDK configure method called successfully")
             promise.resolve(true)
         } catch (exception: Exception) {
-            Log.e(TAG, "Exception during SDK configuration", exception)
             promise.reject("CONFIGURATION_ERROR", "Failed to configure SDK: ${exception.message}", exception)
         }
     }
