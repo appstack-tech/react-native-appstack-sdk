@@ -54,10 +54,12 @@ APP_DIR="${WORK_DIR}/${APP_NAME}"
 log()  { echo "▶ $*"; }
 fail() { echo "❌ $*" >&2; exit 1; }
 
-# Distinctive values the smoke entrypoint passes to configure(). The run_*_smoke
-# assertions grep the native bridge logs for these to confirm the arguments
-# actually marshal across the JS <-> native boundary (Tier 1 value check), not
-# just that the method was called. Keep them recognizable and stable.
+# Values the smoke entrypoint passes to configure(). The bridge no longer logs
+# its arguments (device logging is delegated to the native SDK's sanitized,
+# level-gated logger), so these are not asserted against logs; the configure ->
+# sendEvent -> getAppstackId round trip — and the UUID getAppstackId returns — is
+# what proves the arguments marshaled across the boundary. Kept distinctive so
+# they stand out in captured log dumps when a run fails.
 SMOKE_API_KEY="SMOKEKEY-abc12345"
 SMOKE_LOG_LEVEL="2"
 SMOKE_USER_ID="smoke-user-42"
@@ -84,17 +86,17 @@ import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 JS_HEAD
-    printf '\n// Distinctive values injected by run.sh --smoke; the shell asserts the native\n'
-    printf '// bridge logs echo these back (Tier 1 argument-marshaling check).\n'
+    printf '\n// Values injected by run.sh --smoke and passed straight into configure().\n'
+    printf '// Not asserted against logs anymore; the round trip below is the check.\n'
     printf "const SMOKE_API_KEY = '%s';\n" "$SMOKE_API_KEY"
     printf 'const SMOKE_LOG_LEVEL = %s;\n' "$SMOKE_LOG_LEVEL"
     printf "const SMOKE_USER_ID = '%s';\n" "$SMOKE_USER_ID"
     cat <<'JS_BODY'
 
 // Smoke entrypoint injected by integration-tests/run.sh --smoke.
-// Exercises the JS -> bridge -> native round trip with known argument values and
-// logs a sentinel CI greps for. A fake API key is fine: we assert the bridge
-// received our values and resolved, not that the backend accepts them.
+// Exercises the JS -> bridge -> native round trip and logs a sentinel CI greps
+// for. A fake API key is fine: we assert the round trip resolves and
+// getAppstackId returns a real UUID, not that the backend accepts the key.
 export default function App() {
   const [status, setStatus] = useState('APPSTACK_SMOKE_RUNNING');
   useEffect(() => {
@@ -154,7 +156,6 @@ run_android_smoke() {
     || fail "Failed to launch $pkg"
 
   local ok_js="APPSTACK_SMOKE_OK"
-  local ok_native="SDK configure method called successfully"  # supplemental only
   local fail_js="APPSTACK_SMOKE_FAIL"
 
   log "Waiting for SDK round-trip sentinel in logcat (up to 90s)..."
@@ -178,18 +179,6 @@ run_android_smoke() {
     if grep -qF "$ok_js" <<<"$dump"; then
       log "Smoke sentinel found (JS round-trip complete):"
       grep -F "$ok_js" <<<"$dump" | head -1 | sed 's/^/    /'
-      if grep -qF "$ok_native" <<<"$dump"; then
-        grep -F "$ok_native" <<<"$dump" | head -1 | sed 's/^/    (native) /'
-      fi
-      # Tier 1 value check: the Android bridge logs only the apiKey prefix
-      # (apiKey.take(8)), so assert that marshaled across the boundary.
-      local key_prefix="${SMOKE_API_KEY:0:8}"
-      if grep -qF "API key: ${key_prefix}" <<<"$dump"; then
-        log "Arg check OK: native bridge received apiKey prefix '${key_prefix}'"
-      else
-        grep -F "Configuring Appstack SDK" <<<"$dump" | head -3 >&2 || true
-        fail "Value check FAILED: apiKey did not reach native as '${key_prefix}...'"
-      fi
       return 0
     fi
     sleep 2
@@ -200,11 +189,11 @@ run_android_smoke() {
 }
 
 # Install the .app on a booted simulator, launch it, and poll the unified log for
-# the sentinel. Success REQUIRES the JS sentinel APPSTACK_SMOKE_OK (emitted only
-# after the full configure -> sendEvent -> getAppstackId round trip); the RCT
-# bridge's native "configure method called successfully via bridge" NSLog is
-# supplemental output only, since it fires on configure alone and would otherwise
-# let the check pass early.
+# the sentinel. Success REQUIRES the JS sentinel APPSTACK_SMOKE_OK, emitted only
+# after the full configure -> sendEvent -> getAppstackId round trip. The bridge
+# itself no longer logs (device logging is delegated to the native SDK's
+# sanitized, level-gated logger), so the JS sentinel is the sole signal — and the
+# getAppstackId UUID it carries is native-backed proof the SDK initialized.
 run_ios_smoke() {
   local app_path="$1" bundle_id="$2"
   [[ -d "$app_path" ]] || fail ".app not found at $app_path"
@@ -223,11 +212,11 @@ run_ios_smoke() {
   log "Installing app on simulator: $(basename "$app_path")"
   xcrun simctl install "$udid" "$app_path" || fail "simctl install failed"
 
-  # Capture the unified log (NSLog + any os_log-routed JS output) in the
-  # background, filtered to our bridge/sentinel to keep it cheap.
+  # Capture the unified log (JS console output routed to os_log) in the
+  # background, filtered to our sentinel to keep it cheap.
   local capture; capture="$(mktemp "${TMPDIR:-/tmp}/appstack-ios-smoke.XXXXXX")"
   xcrun simctl spawn "$udid" log stream --level debug --style syslog \
-    --predicate 'eventMessage CONTAINS "AppstackReactNative" OR eventMessage CONTAINS "APPSTACK_SMOKE"' \
+    --predicate 'eventMessage CONTAINS "APPSTACK_SMOKE"' \
     > "$capture" 2>/dev/null &
   local log_pid=$!
   sleep 1
@@ -237,7 +226,6 @@ run_ios_smoke() {
     || { kill "$log_pid" 2>/dev/null || true; fail "simctl launch failed"; }
 
   local ok_js="APPSTACK_SMOKE_OK"
-  local ok_native="configure method called successfully via bridge"  # supplemental only
   local fail_js="APPSTACK_SMOKE_FAIL"
 
   log "Waiting for SDK round-trip sentinel in the simulator log (up to 90s)..."
@@ -262,22 +250,6 @@ run_ios_smoke() {
   if [[ "$found" == true ]]; then
     log "Smoke sentinel found (JS round-trip complete):"
     grep -F "$ok_js" "$capture" | head -1 | sed 's/^/    /'
-    if grep -qF "$ok_native" "$capture"; then
-      grep -F "$ok_native" "$capture" | head -1 | sed 's/^/    (native) /'
-    fi
-    # Tier 1 value check: the iOS bridge logs every configure arg, so assert the
-    # apiKey, logLevel, and customerUserId all marshaled across the boundary.
-    local args_ok=true
-    grep -qF "apiKey: ${SMOKE_API_KEY}" "$capture"        || args_ok=false
-    grep -qF "logLevel: ${SMOKE_LOG_LEVEL}" "$capture"     || args_ok=false
-    grep -qF "customerUserId: ${SMOKE_USER_ID}" "$capture" || args_ok=false
-    if [[ "$args_ok" == true ]]; then
-      log "Arg check OK: native bridge received apiKey/logLevel/customerUserId as sent"
-    else
-      grep -F "configure called with" "$capture" | head -3 >&2 || true
-      rm -f "$capture"
-      fail "Value check FAILED: configure args did not reach native as sent"
-    fi
     rm -f "$capture"
     return 0
   fi

@@ -2,13 +2,7 @@ import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry, NativeModules } from 'react-native';
 
 export interface Spec extends TurboModule {
-  configure(
-    apiKey: string,
-    isDebug?: boolean,
-    endpointBaseUrl?: string,
-    logLevel?: number,
-    customerUserId?: string | null
-  ): Promise<boolean>;
+  configure(apiKey: string, logLevel?: number, customerUserId?: string | null): Promise<boolean>;
   sendEvent(
     eventType: string | null,
     eventName: string | null,

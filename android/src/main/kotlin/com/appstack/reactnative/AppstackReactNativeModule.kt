@@ -1,7 +1,7 @@
 package com.appstack.reactnative
 
 import android.content.Context
-import android.util.Log
+import android.content.pm.PackageManager
 import com.facebook.react.bridge.*
 import com.facebook.react.module.annotations.ReactModule
 // Import the SDK from the Maven dependency
@@ -9,51 +9,23 @@ import com.appstack.attribution.AppstackAttributionSdk
 import com.appstack.attribution.EventType
 
 @ReactModule(name = AppstackReactNativeModule.NAME)
-class AppstackReactNativeModule(reactContext: ReactApplicationContext) : 
-    ReactContextBaseJavaModule(reactContext),
-    LifecycleEventListener {
+class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
+    ReactContextBaseJavaModule(reactContext) {
 
     companion object {
         const val NAME = "AppstackReactNative"
-        private const val TAG = "AppstackReactNativeModule"
         private const val WRAPPER_VERSION = "react-native-1.0.0"
-    }
-
-    init {
-        // Register lifecycle listener to handle app background/foreground events
-        reactContext.addLifecycleEventListener(this)
     }
 
     override fun getName(): String {
         return NAME
     }
 
-    override fun onHostResume() {
-        // App came to foreground
-        Log.d(TAG, "App resumed (foreground)")
-    }
-
-    override fun onHostPause() {
-        Log.d(TAG, "App paused (background)")
-    }
-
-    override fun onHostDestroy() {
-        Log.d(TAG, "App destroyed")
-    }
-
-    override fun onCatalystInstanceDestroy() {
-        super.onCatalystInstanceDestroy()
-        // Clean up lifecycle listener
-        reactApplicationContext.removeLifecycleEventListener(this)
-    }
-
     // setProxyUrl + configureWrapper are gated behind @RequiresOptIn(InternalAppstackApi).
     @OptIn(com.appstack.attribution.InternalAppstackApi::class)
     @ReactMethod
-    fun configure(apiKey: String, isDebug: Boolean, endpointBaseUrl: String?, logLevel: Int, customerUserId: String?, promise: Promise) {
+    fun configure(apiKey: String, logLevel: Int, customerUserId: String?, promise: Promise) {
         try {
-            Log.d(TAG, "Configuring Appstack SDK with API key: ${apiKey.take(8)}...")
-            
             if (apiKey.isBlank()) {
                 promise.reject("INVALID_API_KEY", "API key cannot be null or empty")
                 return
@@ -76,24 +48,21 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
 
             // Validate that SDK classes are available
             try {
-                Log.d(TAG, "Checking SDK class availability...")
-                val sdkClass = AppstackAttributionSdk::class.java
-                Log.d(TAG, "All SDK classes are available")
+                AppstackAttributionSdk::class.java
             } catch (e: Exception) {
-                Log.e(TAG, "SDK classes not available", e)
                 promise.reject("SDK_CLASSES_ERROR", "SDK classes not available: ${e.message}", e)
                 return
             }
-            
-            // Check if SDK is already initialized
-            try {
-                val isAlreadyEnabled = AppstackAttributionSdk.isEnabled()
-                Log.d(TAG, "SDK current status before init: isEnabled=$isAlreadyEnabled")
-            } catch (e: Exception) {
-                Log.d(TAG, "Could not check SDK status before init: ${e.message}")
+
+            // Testing-only proxy override, read from the app's manifest metadata. This is
+            // NOT exposed through the public configure() API: a proxy URL is applied only if
+            // the host app deliberately ships an APPSTACK_DEV_PROXY_URL <meta-data> entry
+            // (this repo's homepage-app does; published-package consumers do not). Routed
+            // through the SDK's internal setProxyUrl hook, before configure so the SDK's
+            // initial requests target it.
+            readDevProxyUrl()?.takeIf { it.isNotBlank() }?.let {
+                AppstackAttributionSdk.setProxyUrl(it)
             }
-            
-            Log.d(TAG, "Calling AppstackAttributionSdk.configureWrapper...")
 
             // configureWrapper is the internal entry point that still accepts the RN wrapper version.
             AppstackAttributionSdk.configureWrapper(
@@ -104,11 +73,26 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
                 customerUserId = customerUserId?.takeIf { it.isNotBlank() }
             )
 
-            Log.d(TAG, "SDK configure method called successfully")
             promise.resolve(true)
         } catch (exception: Exception) {
-            Log.e(TAG, "Exception during SDK configuration", exception)
             promise.reject("CONFIGURATION_ERROR", "Failed to configure SDK: ${exception.message}", exception)
+        }
+    }
+
+    /**
+     * Reads the repo-only APPSTACK_DEV_PROXY_URL <meta-data> value from the host app's
+     * manifest, mirroring the iOS Info.plist key of the same name. Returns null when the
+     * key is absent (the published-package case).
+     */
+    private fun readDevProxyUrl(): String? {
+        return try {
+            val appInfo = reactApplicationContext.packageManager.getApplicationInfo(
+                reactApplicationContext.packageName,
+                PackageManager.GET_META_DATA
+            )
+            appInfo.metaData?.getString("APPSTACK_DEV_PROXY_URL")
+        } catch (e: Exception) {
+            null
         }
     }
 
@@ -183,12 +167,6 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     fun enableAppleAdsAttribution(promise: Promise) {
         // Apple Ads Attribution is iOS-only, so we return false on Android
         promise.resolve(false)
-    }
-
-    @ReactMethod
-    fun flush(promise: Promise) {
-        // Events are sent immediately; flush is a no-op.
-        promise.resolve(true)
     }
 
     @ReactMethod

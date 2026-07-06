@@ -23,8 +23,8 @@ export interface AppstackSDKInterface {
   /**
    * Configure Appstack SDK with your API key and optional parameters
    * @param apiKey - Your Appstack API key obtained from the dashboard
-   * @param isDebug - Enable debug mode (optional, default false)
-   * @param endpointBaseUrl - Custom endpoint base URL (optional)
+   * @param isDebug - Deprecated and ignored; use `logLevel` instead. Still accepted for backward compatibility (optional, default false)
+   * @param endpointBaseUrl - Deprecated and ignored; not forwarded to native. Still accepted for backward compatibility (optional)
    * @param logLevel - Log level: 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR (optional, default 1)
    * @param customerUserId - Optional customer user ID to associate with the device/session
    * @returns Promise that resolves when configuration is successful
@@ -159,10 +159,11 @@ class AppstackSDK implements AppstackSDKInterface {
     }
 
     try {
+      // isDebug and endpointBaseUrl are accepted for backward compatibility but no
+      // longer forwarded to native: isDebug was dropped in favor of logLevel, and a
+      // custom endpoint is not wired through the RN wrapper.
       const result = await AppstackReactNative.configure(
         apiKey.trim(),
-        isDebug,
-        endpointBaseUrl?.trim() || null,
         logLevel,
         customerUserId != null ? customerUserId.trim() || null : null
       );
