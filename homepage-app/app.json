@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tomrlas.homepageapp"
+      "bundleIdentifier": "com.example.homepageapp",
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +17,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.tomrlas.homepageapp"
+      "package": "com.example.homepageapp"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +36,7 @@
         }
       ],
       "../plugin/build",
+      "./plugins/withAppstackDevProxy",
       "expo-web-browser",
       "expo-font"
     ],

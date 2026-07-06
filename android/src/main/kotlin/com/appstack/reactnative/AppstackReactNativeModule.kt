@@ -1,6 +1,7 @@
 package com.appstack.reactnative
 
 import android.content.Context
+import android.content.pm.PackageManager
 import com.facebook.react.bridge.*
 import com.facebook.react.module.annotations.ReactModule
 // Import the SDK from the Maven dependency
@@ -53,6 +54,16 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
                 return
             }
 
+            // Testing-only proxy override, read from the app's manifest metadata. This is
+            // NOT exposed through the public configure() API: a proxy URL is applied only if
+            // the host app deliberately ships an APPSTACK_DEV_PROXY_URL <meta-data> entry
+            // (this repo's homepage-app does; published-package consumers do not). Routed
+            // through the SDK's internal setProxyUrl hook, before configure so the SDK's
+            // initial requests target it.
+            readDevProxyUrl()?.takeIf { it.isNotBlank() }?.let {
+                AppstackAttributionSdk.setProxyUrl(it)
+            }
+
             // configureWrapper is the internal entry point that still accepts the RN wrapper version.
             AppstackAttributionSdk.configureWrapper(
                 context = context,
@@ -65,6 +76,23 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
             promise.resolve(true)
         } catch (exception: Exception) {
             promise.reject("CONFIGURATION_ERROR", "Failed to configure SDK: ${exception.message}", exception)
+        }
+    }
+
+    /**
+     * Reads the repo-only APPSTACK_DEV_PROXY_URL <meta-data> value from the host app's
+     * manifest, mirroring the iOS Info.plist key of the same name. Returns null when the
+     * key is absent (the published-package case).
+     */
+    private fun readDevProxyUrl(): String? {
+        return try {
+            val appInfo = reactApplicationContext.packageManager.getApplicationInfo(
+                reactApplicationContext.packageName,
+                PackageManager.GET_META_DATA
+            )
+            appInfo.metaData?.getString("APPSTACK_DEV_PROXY_URL")
+        } catch (e: Exception) {
+            null
         }
     }
 
