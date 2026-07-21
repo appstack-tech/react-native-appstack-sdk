@@ -10,6 +10,13 @@ permissions:
   id-token: write
   contents: read
 
+# Single source of truth for tag validation, reused by the publish and release
+# jobs so the gate stays identical. Restricted SemVer: MAJOR.MINOR.PATCH with an
+# optional, well-formed prerelease (dot-separated [0-9A-Za-z-] identifiers,
+# e.g. 2.4.0-rc1).
+env:
+  SEMVER_REGEX: '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$'
+
 jobs:
   # Stable releases must pass integration tests first; -rc tags skip them
   # so untested versions can still be published under the 'rc' dist-tag.
@@ -22,6 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [integration-tests]
     if: ${{ always() && (needs.integration-tests.result == 'success' || needs.integration-tests.result == 'skipped') }}
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
     steps:
     - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       with:
@@ -30,28 +39,113 @@ jobs:
       with:
         node-version: '18'
         registry-url: 'https://registry.npmjs.org'
-        cache: 'npm'    
-    - name: Update package.json version
+        cache: 'npm'
+    - name: Extract and validate version from tag
+      id: get_version
       run: |
-        npm version ${{ github.ref_name }} --no-git-tag-version
-        sed -i "s/private static let wrapperVersion = \"react-native-[^\"]*\"/private static let wrapperVersion = \"react-native-${{ github.ref_name }}\"/" ios/AppstackBridge.swift
-        sed -i "s/private const val WRAPPER_VERSION = \"react-native-[^\"]*\"/private const val WRAPPER_VERSION = \"react-native-${{ github.ref_name }}\"/" android/src/main/kotlin/com/appstack/reactnative/AppstackReactNativeModule.kt
-        echo "✅ Updated package.json and WRAPPER_VERSION to ${{ github.ref_name }}"
-    
+        set -euo pipefail
+        VERSION="${GITHUB_REF#refs/tags/}"
+        # Validate the tag is a simple SemVer before it flows into any script or
+        # downstream job — guards against script injection via crafted tags.
+        if ! printf '%s' "$VERSION" | grep -Eq "$SEMVER_REGEX"; then
+          echo "::error::Tag '$VERSION' is not a valid SemVer version"
+          exit 1
+        fi
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        echo "Extracted version: $VERSION"
+    - name: Update package.json version
+      env:
+        VERSION: ${{ steps.get_version.outputs.version }}
+      run: |
+        set -euo pipefail
+        npm version "$VERSION" --no-git-tag-version
+        sed -i "s/private static let wrapperVersion = \"react-native-[^\"]*\"/private static let wrapperVersion = \"react-native-$VERSION\"/" ios/AppstackBridge.swift
+        sed -i "s/private const val WRAPPER_VERSION = \"react-native-[^\"]*\"/private const val WRAPPER_VERSION = \"react-native-$VERSION\"/" android/src/main/kotlin/com/appstack/reactnative/AppstackReactNativeModule.kt
+        echo "✅ Updated package.json and WRAPPER_VERSION to $VERSION"
+
     - name: Build and test
       run: ./build.sh --ci --clean
-    
+
     - name: Create npm package
       run: npm pack
-    
+
     - name: Publish to npm
-      run: |
-        if [[ "${{ github.ref_name }}" == *-rc* ]]; then
-          npm publish --access public --tag rc
-          echo "✅ Published ${{ github.ref_name }} under the 'rc' dist-tag"
-        else
-          npm publish --access public
-          echo "✅ Published ${{ github.ref_name }} under the 'latest' dist-tag"
-        fi
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        VERSION: ${{ steps.get_version.outputs.version }}
+      run: |
+        set -euo pipefail
+        if [[ "$VERSION" == *-* ]]; then
+          npm publish --access public --tag rc
+          echo "✅ Published $VERSION under the 'rc' dist-tag"
+        else
+          npm publish --access public
+          echo "✅ Published $VERSION under the 'latest' dist-tag"
+        fi
+
+  # Create a GitHub Release so each version's changes are visible on the repo's
+  # Releases page. Notes come from the matching CHANGELOG section. Runs only
+  # after publish succeeds (needs: publish), and is the only job granted
+  # contents: write.
+  #
+  # Skipped for pre-release tags (anything with a "-", e.g. 2.4.0-rc1): those
+  # still publish to npm but do not get a GitHub Release.
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: publish
+    if: ${{ !contains(needs.publish.outputs.version, '-') }}
+    permissions:
+      contents: write   # needed to create the GitHub Release
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Consume the version as an env value, not inline interpolation.
+          VERSION: ${{ needs.publish.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          # Defense in depth: publish already validated this with the same
+          # SEMVER_REGEX; re-check before it flows into git/gh commands.
+          if ! printf '%s' "$VERSION" | grep -Eq "$SEMVER_REGEX"; then
+            echo "::error::Refusing to release invalid version '$VERSION'"
+            exit 1
+          fi
+
+          # Idempotent: skip if a release for this version already exists (e.g. a
+          # workflow re-run) instead of failing on `gh release create`.
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            echo "Release $VERSION already exists — skipping."
+            exit 0
+          fi
+
+          # Extract this version's section from the CHANGELOG: everything between
+          # "## [VERSION]" and the next "## [" header.
+          NOTES=$(awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\]" {flag=1; next}
+            flag && /^## \[/ {exit}
+            flag {print}
+          ' CHANGELOG.md)
+
+          # Trim leading/trailing blank lines (portable — no tac).
+          NOTES=$(printf '%s\n' "$NOTES" \
+            | sed '/./,$!d' \
+            | awk 'NF{last=NR} {line[NR]=$0} END{for (i=1; i<=last; i++) print line[i]}')
+
+          if [ -z "$NOTES" ]; then
+            NOTES="Release $VERSION. See CHANGELOG.md for details."
+          fi
+
+          printf '%s\n' "$NOTES" > "$RUNNER_TEMP/release_notes.md"
+          echo "----- release notes for $VERSION -----"
+          cat "$RUNNER_TEMP/release_notes.md"
+
+          # Only stable X.Y.Z tags reach this job (see the job's `if:`), so the
+          # release is always marked latest.
+          gh release create "$VERSION" \
+            --title "$VERSION" \
+            --notes-file "$RUNNER_TEMP/release_notes.md" \
+            --verify-tag \
+            --latest
