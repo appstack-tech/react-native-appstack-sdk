@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   android:
-    name: Android (Expo SDK ${{ matrix.expo-sdk }})
+    name: Android (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.architecture }} architecture)
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
@@ -19,6 +19,12 @@ jobs:
       matrix:
         # Keep in sync with the ios job's expo-sdk list below
         expo-sdk: ['54', '55', '56']
+        architecture: ['new']
+        include:
+          # Expo SDK 54 is the compatibility boundary that still supports
+          # explicitly opting out of React Native's New Architecture.
+          - expo-sdk: '54'
+            architecture: 'legacy'
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -37,10 +43,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
       - name: Run integration test
-        run: ./integration-tests/run.sh ${{ matrix.expo-sdk }}
+        run: >
+          ./integration-tests/run.sh ${{ matrix.expo-sdk }}
+          --architecture ${{ matrix.architecture }}
 
   ios:
-    name: iOS (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.frameworks }} frameworks)
+    name: iOS (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.architecture }} architecture, ${{ matrix.frameworks }} frameworks, Xcode ${{ matrix.xcode }})
     runs-on: macos-26
     timeout-minutes: 90
     strategy:
@@ -48,13 +56,24 @@ jobs:
       matrix:
         # Keep in sync with the android job's expo-sdk list above
         expo-sdk: ['54', '55', '56']
+        architecture: ['new']
         frameworks: ['default']
+        xcode: ['default']
         include:
           # Static frameworks exercise different header search paths
           # (common setup in apps using Firebase and similar pods).
           # Runs only against the latest SDK to keep the matrix lean.
           - expo-sdk: '56'
+            architecture: 'new'
             frameworks: 'static'
+            xcode: 'default'
+          # Keep the last supported legacy-architecture boundary on the exact
+          # store-era toolchain validated manually, rather than the image's
+          # rolling default Xcode.
+          - expo-sdk: '54'
+            architecture: 'legacy'
+            frameworks: 'default'
+            xcode: '26.2'
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -65,9 +84,24 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Select and verify Xcode 26.2
+        if: ${{ matrix.xcode == '26.2' }}
+        run: |
+          set -euo pipefail
+          XCODE_DEVELOPER_DIR=/Applications/Xcode_26.2.app/Contents/Developer
+          test -d "$XCODE_DEVELOPER_DIR"
+          XCODE_VERSION="$(DEVELOPER_DIR="$XCODE_DEVELOPER_DIR" xcodebuild -version | sed -n '1p')"
+          test "$XCODE_VERSION" = "Xcode 26.2"
+          echo "DEVELOPER_DIR=$XCODE_DEVELOPER_DIR" >> "$GITHUB_ENV"
+          echo "Selected $XCODE_VERSION"
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
       - name: Run integration test
         run: >
           ./integration-tests/run.sh ${{ matrix.expo-sdk }} --platform ios
+          --architecture ${{ matrix.architecture }}
           ${{ matrix.frameworks == 'static' && '--static-frameworks' || '' }}
 
   # Runtime smoke: unlike the build-only jobs above, this launches the app on an
@@ -109,7 +143,7 @@ jobs:
           arch: x86_64
           target: default
           disable-animations: true
-          script: ./integration-tests/run.sh 57 --platform android --smoke
+          script: ./integration-tests/run.sh 57 --platform android --architecture new --smoke
 
   # iOS counterpart of android-smoke: boots a simulator, launches the app, and
   # asserts the same JS -> bridge -> native round trip. Standard macOS runner.
@@ -135,7 +169,7 @@ jobs:
           xcrun simctl boot "$DEVICE_ID" || true
 
       - name: Run iOS runtime smoke
-        run: ./integration-tests/run.sh 57 --platform ios --smoke
+        run: ./integration-tests/run.sh 57 --platform ios --architecture new --smoke
 
   # Single aggregate check that summarizes the whole matrix. Point branch
   # protection at this job only — new matrix entries are then covered

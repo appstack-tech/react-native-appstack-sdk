@@ -9,8 +9,11 @@ set -euo pipefail
 # podspec header path issues) before they hit consumers.
 #
 # Usage: ./integration-tests/run.sh <expo-sdk-version> [options]
-#   <expo-sdk-version>    Expo SDK major version, e.g. 54, 55, 56
+#   <expo-sdk-version>    Expo SDK major version, e.g. 54, 55, 56, 57
 #   --platform <p>        android (default) or ios
+#   --architecture <a>    new (default) or legacy. SDK 54 writes this explicitly
+#                         to Expo config; SDK 55+ supports only new architecture.
+#                         The generated native configuration is always checked.
 #   --quick               Stop after the autolinking assertion (no full native
 #                         build). Useful for fast local iteration.
 #   --static-frameworks   iOS only: build with `useFrameworks: "static"` via
@@ -25,23 +28,47 @@ set -euo pipefail
 #                         reactivecircus/android-emulator-runner), iOS via a
 #                         booted simulator (in CI: xcrun simctl boot).
 
-SDK_VERSION="${1:?Usage: $0 <expo-sdk-version> [--platform android|ios] [--quick] [--static-frameworks]}"
+SDK_VERSION="${1:?Usage: $0 <expo-sdk-version> [--platform android|ios] [--architecture new|legacy] [--quick] [--static-frameworks] [--smoke]}"
 shift
 
 PLATFORM="android"
+ARCHITECTURE="new"
 QUICK_MODE=false
 STATIC_FRAMEWORKS=false
 SMOKE_MODE=false
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --platform) PLATFORM="${2:?--platform requires a value}"; shift 2 ;;
+    --architecture) ARCHITECTURE="${2:?--architecture requires a value}"; shift 2 ;;
     --quick) QUICK_MODE=true; shift ;;
     --static-frameworks) STATIC_FRAMEWORKS=true; shift ;;
     --smoke) SMOKE_MODE=true; shift ;;
     *) echo "Unknown option: $1" >&2; exit 2 ;;
   esac
 done
+[[ "$SDK_VERSION" =~ ^[0-9]+$ ]] || { echo "Invalid Expo SDK version: $SDK_VERSION (expected a major version)" >&2; exit 2; }
+SDK_MAJOR=$((10#$SDK_VERSION))
 [[ "$PLATFORM" == "android" || "$PLATFORM" == "ios" ]] || { echo "Invalid platform: $PLATFORM" >&2; exit 2; }
+[[ "$ARCHITECTURE" == "new" || "$ARCHITECTURE" == "legacy" ]] || {
+  echo "Invalid architecture: $ARCHITECTURE (expected new or legacy)" >&2
+  exit 2
+}
+if (( SDK_MAJOR >= 55 )) && [[ "$ARCHITECTURE" == "legacy" ]]; then
+  echo "Expo SDK ${SDK_VERSION} does not support the legacy architecture; use Expo SDK 54 or earlier" >&2
+  exit 2
+fi
+if [[ "$ARCHITECTURE" == "new" ]]; then
+  NEW_ARCH_ENABLED=true
+else
+  NEW_ARCH_ENABLED=false
+fi
+if (( SDK_MAJOR <= 54 )); then
+  WRITE_NEW_ARCH_CONFIG=true
+else
+  # Expo removed newArchEnabled from its documented app-config schema in SDK 55.
+  # New Architecture is mandatory there, so let Expo generate its native defaults.
+  WRITE_NEW_ARCH_CONFIG=false
+fi
 if [[ "$SMOKE_MODE" == true && "$QUICK_MODE" == true ]]; then
   echo "--smoke cannot be combined with --quick (smoke needs a full runnable build)" >&2; exit 2
 fi
@@ -259,7 +286,7 @@ run_ios_smoke() {
   fail "Timed out waiting for SDK smoke sentinel (no round-trip confirmation)"
 }
 
-log "Expo SDK ${SDK_VERSION} / ${PLATFORM} integration test (workdir: ${WORK_DIR})"
+log "Expo SDK ${SDK_VERSION} / ${PLATFORM} / ${ARCHITECTURE} architecture integration test (workdir: ${WORK_DIR})"
 
 # 1. Pack the SDK (prepack hook builds lib/ via bob)
 cd "$ROOT_DIR"
@@ -298,9 +325,17 @@ if [[ "$SMOKE_MODE" == true ]]; then
   cp "$ROOT_DIR/homepage-app/plugins/withAppstackDevProxy.js" \
     "$APP_DIR/withAppstackDevProxy.js"
 fi
-STATIC_FRAMEWORKS="$STATIC_FRAMEWORKS" SMOKE_MODE="$SMOKE_MODE" node -e "
+STATIC_FRAMEWORKS="$STATIC_FRAMEWORKS" SMOKE_MODE="$SMOKE_MODE" \
+  NEW_ARCH_ENABLED="$NEW_ARCH_ENABLED" WRITE_NEW_ARCH_CONFIG="$WRITE_NEW_ARCH_CONFIG" node -e "
   const fs = require('fs');
   const j = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+  if (process.env.WRITE_NEW_ARCH_CONFIG === 'true') {
+    j.expo.newArchEnabled = process.env.NEW_ARCH_ENABLED === 'true';
+  } else {
+    // SDK 55+ always uses New Architecture and no longer documents this field.
+    // Delete stale values when reusing a generated test app between runs.
+    delete j.expo.newArchEnabled;
+  }
   j.expo.android = { ...(j.expo.android || {}), package: 'com.appstack.e2e' };
   j.expo.ios = { ...(j.expo.ios || {}), bundleIdentifier: 'com.appstack.e2e' };
   // Normalize repo-owned plugins so reused app dirs do not leak settings from
@@ -326,6 +361,17 @@ rm -rf "$PLATFORM"
 CI=1 npx expo prebuild --platform "$PLATFORM" --no-install
 
 if [[ "$PLATFORM" == "android" ]]; then
+  ACTUAL_NEW_ARCH="$(sed -n 's/^newArchEnabled=//p' android/gradle.properties | tail -1)"
+  if (( SDK_MAJOR >= 55 )); then
+    [[ -z "$ACTUAL_NEW_ARCH" || "$ACTUAL_NEW_ARCH" == "true" ]] \
+      || fail "Android generated an invalid mandatory-architecture setting: newArchEnabled=${ACTUAL_NEW_ARCH}"
+    log "Android architecture confirmed: new architecture is mandatory in Expo SDK ${SDK_VERSION} (newArchEnabled=${ACTUAL_NEW_ARCH:-<omitted>})"
+  else
+    [[ "$ACTUAL_NEW_ARCH" == "$NEW_ARCH_ENABLED" ]] \
+      || fail "Android architecture mismatch: requested ${ARCHITECTURE}, generated newArchEnabled=${ACTUAL_NEW_ARCH:-<missing>}"
+    log "Android architecture confirmed: ${ARCHITECTURE} (newArchEnabled=${ACTUAL_NEW_ARCH})"
+  fi
+
   # 5a. Generate PackageList.java and assert our package is linked correctly
   cd android
   log "Generating autolinking PackageList..."
@@ -364,6 +410,20 @@ if [[ "$PLATFORM" == "android" ]]; then
     ./gradlew --no-daemon :app:assembleDebug
   fi
 else
+  ACTUAL_NEW_ARCH="$(node -e '
+    const p = require("./ios/Podfile.properties.json");
+    if (p.newArchEnabled !== undefined) process.stdout.write(String(p.newArchEnabled));
+  ')"
+  if (( SDK_MAJOR >= 55 )); then
+    [[ -z "$ACTUAL_NEW_ARCH" || "$ACTUAL_NEW_ARCH" == "true" ]] \
+      || fail "iOS generated an invalid mandatory-architecture setting: newArchEnabled=${ACTUAL_NEW_ARCH}"
+    log "iOS architecture confirmed: new architecture is mandatory in Expo SDK ${SDK_VERSION} (newArchEnabled=${ACTUAL_NEW_ARCH:-<omitted>})"
+  else
+    [[ "$ACTUAL_NEW_ARCH" == "$NEW_ARCH_ENABLED" ]] \
+      || fail "iOS architecture mismatch: requested ${ARCHITECTURE}, generated newArchEnabled=${ACTUAL_NEW_ARCH:-<missing>}"
+    log "iOS architecture confirmed: ${ARCHITECTURE} (newArchEnabled=${ACTUAL_NEW_ARCH})"
+  fi
+
   # 5b. Install pods and assert the SDK pod was autolinked
   cd ios
   log "Installing pods..."
@@ -416,4 +476,4 @@ else
   fi
 fi
 
-log "✅ Expo SDK ${SDK_VERSION} / ${PLATFORM} integration test passed"
+log "✅ Expo SDK ${SDK_VERSION} / ${PLATFORM} / ${ARCHITECTURE} architecture integration test passed"
