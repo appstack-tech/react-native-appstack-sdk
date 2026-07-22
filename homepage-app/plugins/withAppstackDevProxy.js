@@ -9,10 +9,10 @@ const {
 // the SDK bridge's internal setProxyUrl hook (see AppstackBridge.swift /
 // AppstackReactNativeModule.kt, which read APPSTACK_DEV_PROXY_URL).
 //
-// It is NOT part of the published react-native-appstack-sdk package: only the
-// homepage-app's app.json references this plugin, so integrators' apps never ship
-// the key and always hit production. This mirrors the Flutter sample_app's
-// Info.plist / AndroidManifest APPSTACK_DEV_PROXY_URL hook.
+// It is NOT part of the published react-native-appstack-sdk package. Only
+// repository-owned demo/test hosts use or copy this plugin, so consumer apps do
+// not ship the key. This mirrors the Flutter sample_app's Info.plist /
+// AndroidManifest APPSTACK_DEV_PROXY_URL hook.
 const KEY = 'APPSTACK_DEV_PROXY_URL';
 const IOS_DEV_PROXY = 'https://api.event.dev.appstack.tech';
 const ANDROID_DEV_PROXY = 'https://api.event.dev.appstack.tech/android/';

@@ -57,7 +57,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
             // Testing-only proxy override, read from the app's manifest metadata. This is
             // NOT exposed through the public configure() API: a proxy URL is applied only if
             // the host app deliberately ships an APPSTACK_DEV_PROXY_URL <meta-data> entry
-            // (this repo's homepage-app does; published-package consumers do not). Routed
+            // (this repo's demo/test hosts do; published-package consumers do not). Routed
             // through the SDK's internal setProxyUrl hook, before configure so the SDK's
             // initial requests target it.
             readDevProxyUrl()?.takeIf { it.isNotBlank() }?.let {

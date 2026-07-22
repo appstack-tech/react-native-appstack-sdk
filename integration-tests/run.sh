@@ -291,18 +291,30 @@ npm install --no-audit --no-fund "$TARBALL"
 if [[ "$STATIC_FRAMEWORKS" == true ]]; then
   npm install --no-audit --no-fund expo-build-properties
 fi
-STATIC_FRAMEWORKS="$STATIC_FRAMEWORKS" node -e "
+if [[ "$SMOKE_MODE" == true ]]; then
+  # Interim safety guard until the hermetic loopback recorder is introduced:
+  # repository smoke hosts must explicitly carry the repo-only native proxy
+  # configuration so a fake-key run cannot fall back to production endpoints.
+  cp "$ROOT_DIR/homepage-app/plugins/withAppstackDevProxy.js" \
+    "$APP_DIR/withAppstackDevProxy.js"
+fi
+STATIC_FRAMEWORKS="$STATIC_FRAMEWORKS" SMOKE_MODE="$SMOKE_MODE" node -e "
   const fs = require('fs');
   const j = JSON.parse(fs.readFileSync('app.json', 'utf8'));
   j.expo.android = { ...(j.expo.android || {}), package: 'com.appstack.e2e' };
   j.expo.ios = { ...(j.expo.ios || {}), bundleIdentifier: 'com.appstack.e2e' };
-  // Normalize the expo-build-properties plugin so reused app dirs don't leak
-  // a previous run's framework setting.
+  // Normalize repo-owned plugins so reused app dirs do not leak settings from
+  // a previous run.
   const plugins = (j.expo.plugins || []).filter(
-    (p) => (Array.isArray(p) ? p[0] : p) !== 'expo-build-properties'
+    (p) => !['expo-build-properties', './withAppstackDevProxy'].includes(
+      Array.isArray(p) ? p[0] : p
+    )
   );
   if (process.env.STATIC_FRAMEWORKS === 'true') {
     plugins.push(['expo-build-properties', { ios: { useFrameworks: 'static' } }]);
+  }
+  if (process.env.SMOKE_MODE === 'true') {
+    plugins.push('./withAppstackDevProxy');
   }
   j.expo.plugins = plugins;
   fs.writeFileSync('app.json', JSON.stringify(j, null, 2));

@@ -31,9 +31,9 @@ public class AppstackBridge: NSObject {
         // Testing-only proxy override, read from the app's Info.plist. This is NOT
         // exposed through the public configure() API: a proxy URL is applied only if
         // the host app deliberately ships an APPSTACK_DEV_PROXY_URL key (this repo's
-        // homepage-app does; published-package consumers do not). Routed through the
-        // SDK's @_spi setProxyUrl(_:) hook and applied before configure so the SDK's
-        // initial requests target it.
+        // demo/test hosts do; published-package consumers do not). Routed through
+        // the SDK's @_spi setProxyUrl(_:) hook and applied before configure so the
+        // SDK's initial requests target it.
         if let devProxyUrl = (Bundle.main.object(forInfoDictionaryKey: "APPSTACK_DEV_PROXY_URL") as? String)
             .flatMap({ $0.isEmpty ? nil : $0 }) {
             AppstackAttributionSdk.shared.setProxyUrl(devProxyUrl)
