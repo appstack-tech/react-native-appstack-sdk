@@ -1,8 +1,8 @@
 name: Tests
 
-# Thin wrapper so all integration test checks display namespaced under a
-# single "tests /" group in the PR checks panel. The actual jobs live in
-# integration-tests.yml (also called by build.yml before stable publishes).
+# Thin wrapper so focused PR checks display namespaced under a single "tests /"
+# group. Manual runs default to the full compatibility matrix. The actual jobs
+# live in integration-tests.yml (also called before RC and stable publishes).
 
 on:
   pull_request:
@@ -11,13 +11,27 @@ on:
       - 'android/**'
       - 'ios/**'
       - 'src/**'
+      - '__tests__/**'
       - 'react-native.config.js'
       - '*.podspec'
       - 'package.json'
+      - 'package-lock.json'
+      - 'build.sh'
+      - '.eslintrc.js'
+      - 'babel.config.js'
+      - 'jest.config.js'
+      - 'tsconfig*.json'
       - 'integration-tests/**'
+      - '.github/workflows/build.yml'
       - '.github/workflows/integration-tests.yml'
       - '.github/workflows/tests.yml'
   workflow_dispatch:
+    inputs:
+      run-compatibility-matrix:
+        description: Run older SDK, legacy architecture, and static-framework build checks
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: read
@@ -30,3 +44,7 @@ concurrency:
 jobs:
   tests:
     uses: ./.github/workflows/integration-tests.yml
+    with:
+      # Pull requests use focused checks. A manual run can opt into or out of
+      # the full compatibility matrix and defaults to running it.
+      run-compatibility-matrix: ${{ github.event_name == 'workflow_dispatch' && inputs.run-compatibility-matrix }}
