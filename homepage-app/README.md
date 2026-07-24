@@ -5,7 +5,8 @@ This is a demo React Native app showcasing the Appstack Attribution SDK integrat
 ## Features
 
 This demo app demonstrates:
-- ✅ **Full SDK Configuration** - All available parameters including debug mode, custom endpoints, and log levels
+- ✅ **Environment-based Configuration** - Local API-key configuration and log levels without committed credentials
+- ✅ **Repository-only Dev Routing** - Native traffic from this demo is routed to Appstack's development endpoint
 - ✅ **Basic Configuration** - Backward-compatible simple setup
 - ✅ **Event Tracking** - Standard events, custom events, and revenue tracking
 - ✅ **Error Handling** - Comprehensive error handling and user feedback
@@ -19,7 +20,17 @@ This demo app demonstrates:
    npm install
    ```
 
-2. Start the app
+2. Create a local environment file and provide a development API key
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Edit `.env.local` and replace the placeholder. Expo embeds
+   `EXPO_PUBLIC_*` values in the application bundle, so do not treat this value
+   as a private secret or commit a real key.
+
+3. Start the app
 
    ```bash
    npx expo start
@@ -36,26 +47,36 @@ You can start developing by editing the files inside the **app** directory. This
 
 ## Appstack SDK Usage
 
-### Configuration Options
+### Configuration
 
-The SDK supports multiple configuration approaches:
+The demo reads its key from `EXPO_PUBLIC_APPSTACK_API_KEY` and refuses to
+initialize when it is missing:
 
-#### Full Configuration (Recommended for Development)
 ```typescript
 import AppstackSDK from 'react-native-appstack-sdk';
 
+const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY?.trim();
+if (!apiKey) {
+  throw new Error('Missing EXPO_PUBLIC_APPSTACK_API_KEY');
+}
+
 await AppstackSDK.configure(
-  'your-api-key',
-  true, // isDebug - enable debug mode
-  'https://api.event.dev.appstack.tech/android/', // endpointBaseUrl - custom endpoint
+  apiKey,
+  false, // Deprecated compatibility argument; ignored
+  undefined, // Deprecated endpoint argument; ignored
   0 // logLevel - 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
 );
 ```
 
-#### Basic Configuration (Production)
+The development endpoint is selected by the repository-only
+`withAppstackDevProxy` Expo config plugin. `configure()` does not expose or
+forward a custom endpoint, and applications consuming the published package do
+not receive this demo plugin.
+
+#### Basic Configuration
+
 ```typescript
-// Backward compatible - uses default values
-await AppstackSDK.configure('your-api-key');
+await AppstackSDK.configure(apiKey);
 ```
 
 #### Parameter Details
@@ -63,9 +84,10 @@ await AppstackSDK.configure('your-api-key');
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `apiKey` | `string` | **Required** | Your Appstack API key from the dashboard |
-| `isDebug` | `boolean` | `false` | Enable debug mode for detailed logging |
-| `endpointBaseUrl` | `string?` | Platform default | Custom API endpoint URL |
+| `isDebug` | `boolean` | `false` | Deprecated compatibility argument; accepted but ignored |
+| `endpointBaseUrl` | `string?` | `undefined` | Deprecated compatibility argument; accepted but not forwarded to native code |
 | `logLevel` | `number` | `1` (INFO) | Log level: 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR |
+| `customerUserId` | `string?` | `undefined` | Optional customer user identifier |
 
 ### Event Tracking
 
@@ -138,7 +160,7 @@ This app demonstrates all SDK capabilities:
 
 ## Development Tips
 
-1. **Use Debug Mode** - Enable `isDebug: true` during development for detailed logs
+1. **Use DEBUG Logging Deliberately** - Pass log level `0` during local development when detailed logs are needed
 2. **Test Both Platforms** - Verify functionality on both iOS and Android
 3. **Handle Errors** - Always wrap SDK calls in try-catch blocks
 4. **Validate Revenue** - Ensure revenue values are valid numbers

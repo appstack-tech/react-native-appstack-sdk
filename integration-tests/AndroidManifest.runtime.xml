@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+  <application
+      android:networkSecurityConfig="@xml/appstack_runtime_validation_network_security_config"
+      android:usesCleartextTraffic="true"
+      tools:replace="android:usesCleartextTraffic">
+    <meta-data
+        android:name="APPSTACK_DEV_PROXY_URL"
+        android:value="__APPSTACK_RUNTIME_PROXY_URL__" />
+  </application>
+</manifest>
