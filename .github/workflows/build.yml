@@ -18,17 +18,18 @@ env:
   SEMVER_REGEX: '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$'
 
 jobs:
-  # Stable releases must pass integration tests first; -rc tags skip them
-  # so untested versions can still be published under the 'rc' dist-tag.
-  integration-tests:
-    if: ${{ !contains(github.ref_name, '-rc') }}
+  # RC releases run the package and latest-SDK runtime checks. Stable releases
+  # additionally run the complete compatibility build matrix.
+  release-checks:
+    name: ${{ contains(github.ref_name, '-rc') && 'RC checks' || 'Stable checks' }}
     uses: ./.github/workflows/integration-tests.yml
+    with:
+      run-compatibility-matrix: ${{ !contains(github.ref_name, '-rc') }}
 
   # Build and publish on version tags
   publish:
     runs-on: ubuntu-latest
-    needs: [integration-tests]
-    if: ${{ always() && (needs.integration-tests.result == 'success' || needs.integration-tests.result == 'skipped') }}
+    needs: [release-checks]
     outputs:
       version: ${{ steps.get_version.outputs.version }}
     steps:

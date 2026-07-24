@@ -1,17 +1,42 @@
 name: Integration Tests
 
-# Only callable: PRs trigger this via tests.yml (which displays all jobs
-# under a single "tests /" group), and build.yml calls it before stable
-# publishes. Concurrency/cancellation is handled by the callers.
+# Only callable: tests.yml uses focused checks for PRs and configurable checks
+# for manual runs, while build.yml uses focused checks for RC tags and full
+# checks for stable tags. Concurrency/cancellation is handled by the callers.
 on:
   workflow_call:
+    inputs:
+      run-compatibility-matrix:
+        description: Run the older-SDK, legacy-architecture, and static-framework build matrix
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: read
 
 jobs:
+  package:
+    name: Build checks / JavaScript package
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Lint, typecheck, test, and build package
+        run: ./build.sh --ci --clean
+
   android:
-    name: Android (Expo SDK ${{ matrix.expo-sdk }})
+    name: Build checks / Android (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.architecture }} architecture)
+    needs: package
+    if: ${{ inputs.run-compatibility-matrix }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
@@ -19,6 +44,12 @@ jobs:
       matrix:
         # Keep in sync with the ios job's expo-sdk list below
         expo-sdk: ['54', '55', '56']
+        architecture: ['new']
+        include:
+          # Expo SDK 54 is the compatibility boundary that still supports
+          # explicitly opting out of React Native's New Architecture.
+          - expo-sdk: '54'
+            architecture: 'legacy'
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -37,10 +68,14 @@ jobs:
       - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
       - name: Run integration test
-        run: ./integration-tests/run.sh ${{ matrix.expo-sdk }}
+        run: >
+          ./integration-tests/run.sh ${{ matrix.expo-sdk }}
+          --architecture ${{ matrix.architecture }}
 
   ios:
-    name: iOS (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.frameworks }} frameworks)
+    name: Build checks / iOS (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.architecture }} architecture, ${{ matrix.frameworks }} frameworks, Xcode ${{ matrix.xcode }})
+    needs: package
+    if: ${{ inputs.run-compatibility-matrix }}
     runs-on: macos-26
     timeout-minutes: 90
     strategy:
@@ -48,13 +83,24 @@ jobs:
       matrix:
         # Keep in sync with the android job's expo-sdk list above
         expo-sdk: ['54', '55', '56']
+        architecture: ['new']
         frameworks: ['default']
+        xcode: ['default']
         include:
           # Static frameworks exercise different header search paths
           # (common setup in apps using Firebase and similar pods).
           # Runs only against the latest SDK to keep the matrix lean.
           - expo-sdk: '56'
+            architecture: 'new'
             frameworks: 'static'
+            xcode: 'default'
+          # Keep the last supported legacy-architecture boundary on the exact
+          # store-era toolchain validated manually, rather than the image's
+          # rolling default Xcode.
+          - expo-sdk: '54'
+            architecture: 'legacy'
+            frameworks: 'default'
+            xcode: '26.2'
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -65,18 +111,33 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Select and verify Xcode 26.2
+        if: ${{ matrix.xcode == '26.2' }}
+        run: |
+          set -euo pipefail
+          XCODE_DEVELOPER_DIR=/Applications/Xcode_26.2.app/Contents/Developer
+          test -d "$XCODE_DEVELOPER_DIR"
+          XCODE_VERSION="$(DEVELOPER_DIR="$XCODE_DEVELOPER_DIR" xcodebuild -version | sed -n '1p')"
+          test "$XCODE_VERSION" = "Xcode 26.2"
+          echo "DEVELOPER_DIR=$XCODE_DEVELOPER_DIR" >> "$GITHUB_ENV"
+          echo "Selected $XCODE_VERSION"
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
       - name: Run integration test
         run: >
           ./integration-tests/run.sh ${{ matrix.expo-sdk }} --platform ios
+          --architecture ${{ matrix.architecture }}
           ${{ matrix.frameworks == 'static' && '--static-frameworks' || '' }}
 
-  # Runtime smoke: unlike the build-only jobs above, this launches the app on an
-  # emulator and asserts the JS -> bridge -> native SDK round trip actually works
-  # (catches bridge-registration / crash-on-init bugs a compile can't). Gated to
-  # the latest Expo SDK only to keep the matrix lean. Emulator needs KVM, which
-  # the standard (free) ubuntu-latest runner provides.
+  # Runtime checks launch the app against a loopback-only recording backend and
+  # validate the public JS API, bridge, real native SDK, and emitted requests.
+  # They use the latest Expo SDK only to keep the matrix lean. The Android
+  # emulator needs KVM, which the standard (free) ubuntu-latest runner provides.
   android-smoke:
-    name: Android runtime smoke (Expo SDK 57)
+    name: Runtime checks / Android (Expo SDK 57)
+    needs: package
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -102,19 +163,19 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run Android runtime smoke
+      - name: Run Android runtime check
         uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2.34.0
         with:
           api-level: 30
           arch: x86_64
           target: default
           disable-animations: true
-          script: ./integration-tests/run.sh 57 --platform android --smoke
+          script: ./integration-tests/run.sh 57 --platform android --architecture new --smoke
 
-  # iOS counterpart of android-smoke: boots a simulator, launches the app, and
-  # asserts the same JS -> bridge -> native round trip. Standard macOS runner.
+  # iOS counterpart: boots a simulator and validates the same hermetic contract.
   ios-smoke:
-    name: iOS runtime smoke (Expo SDK 57)
+    name: Runtime checks / iOS (Expo SDK 57)
+    needs: package
     runs-on: macos-26
     timeout-minutes: 90
     steps:
@@ -134,8 +195,8 @@ jobs:
           echo "Booting $DEVICE_ID"
           xcrun simctl boot "$DEVICE_ID" || true
 
-      - name: Run iOS runtime smoke
-        run: ./integration-tests/run.sh 57 --platform ios --smoke
+      - name: Run iOS runtime check
+        run: ./integration-tests/run.sh 57 --platform ios --architecture new --smoke
 
   # Single aggregate check that summarizes the whole matrix. Point branch
   # protection at this job only — new matrix entries are then covered
@@ -143,13 +204,28 @@ jobs:
   tests:
     name: Integration tests
     runs-on: ubuntu-latest
-    needs: [android, ios, android-smoke, ios-smoke]
+    needs: [package, android, ios, android-smoke, ios-smoke]
     if: ${{ always() }}
     steps:
-      - name: Check matrix results
+      - name: Check required results
         run: |
-          if [[ "${{ needs.android.result }}" != "success" || "${{ needs.ios.result }}" != "success" || "${{ needs['android-smoke'].result }}" != "success" || "${{ needs['ios-smoke'].result }}" != "success" ]]; then
-            echo "❌ Android: ${{ needs.android.result }}, iOS: ${{ needs.ios.result }}, Android smoke: ${{ needs['android-smoke'].result }}, iOS smoke: ${{ needs['ios-smoke'].result }}"
+          set -euo pipefail
+
+          if [[ "${{ needs.package.result }}" != "success" || "${{ needs['android-smoke'].result }}" != "success" || "${{ needs['ios-smoke'].result }}" != "success" ]]; then
+            echo "❌ Package: ${{ needs.package.result }}, Android runtime: ${{ needs['android-smoke'].result }}, iOS runtime: ${{ needs['ios-smoke'].result }}"
             exit 1
           fi
-          echo "✅ All integration tests passed"
+
+          if [[ "${{ inputs.run-compatibility-matrix }}" == "true" ]]; then
+            if [[ "${{ needs.android.result }}" != "success" || "${{ needs.ios.result }}" != "success" ]]; then
+              echo "❌ Android compatibility: ${{ needs.android.result }}, iOS compatibility: ${{ needs.ios.result }}"
+              exit 1
+            fi
+            echo "✅ Full checks passed"
+          else
+            if [[ "${{ needs.android.result }}" != "skipped" || "${{ needs.ios.result }}" != "skipped" ]]; then
+              echo "❌ Compatibility jobs should be skipped for focused checks: Android=${{ needs.android.result }}, iOS=${{ needs.ios.result }}"
+              exit 1
+            fi
+            echo "✅ Focused checks passed"
+          fi

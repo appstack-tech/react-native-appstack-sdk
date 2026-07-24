@@ -30,12 +30,11 @@ export default function HomeScreen() {
       console.log('AppstackReactNative module:', NativeModules.AppstackReactNative);
       console.log('Is AppstackReactNative available:', !!NativeModules.AppstackReactNative);
 
-      // Read API key from environment
-      // const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY;
-      //let apiKey = 'EXPO_PUBLIC_APPSTACK_API_KEY';
-      let apiKey = "q40jebdl91tgelzcrp5pbnbh"
+      // This demo reads its API key from local environment configuration. Never
+      // commit a real key to the sample application.
+      const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY?.trim();
 
-      if (!apiKey || apiKey.trim() === '') {
+      if (!apiKey) {
         const msg = 'Missing EXPO_PUBLIC_APPSTACK_API_KEY. Set it in your env (e.g. eas.json env or .env) to initialize the SDK.';
         console.warn(msg);
         setSdkError(msg);
@@ -47,7 +46,7 @@ export default function HomeScreen() {
       // (ios/homepageapp/Info.plist + android/app/src/main/AndroidManifest.xml), not through
       // configure() — isDebug and endpointBaseUrl are deprecated no-ops in the wrapper.
       await AppstackSDK.configure(
-        apiKey.trim(),
+        apiKey,
         true, // isDebug - deprecated/ignored
         undefined, // endpointBaseUrl - deprecated/ignored (see APPSTACK_DEV_PROXY_URL)
         0 // logLevel - 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
@@ -163,14 +162,18 @@ export default function HomeScreen() {
   const reinitializeWithBasicConfig = async () => {
     try {
       console.log('Reinitializing with basic configuration...');
-      
-      let apiKey = 'your-appstack-api-key';
-      if (Platform.OS === 'ios') {
-        apiKey = 'your-appstack-api-key';
+
+      const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY?.trim();
+      if (!apiKey) {
+        const msg = 'Missing EXPO_PUBLIC_APPSTACK_API_KEY. Set it before configuring the SDK.';
+        setSdkError(msg);
+        setIsSDKInitialized(false);
+        Alert.alert('SDK configuration missing', msg);
+        return;
       }
 
       // Basic configuration (backward compatible)
-      await AppstackSDK.configure(apiKey.trim());
+      await AppstackSDK.configure(apiKey);
       
       setIsSDKInitialized(true);
       setSdkError(null);
@@ -218,7 +221,7 @@ export default function HomeScreen() {
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Configuration Options</ThemedText>
         <ThemedText style={styles.infoText}>
-          Current: Full configuration with debug mode, custom endpoint, and DEBUG log level
+          Current: Environment-provided API key, repo-only dev routing, and DEBUG log level
         </ThemedText>
         <TouchableOpacity style={styles.secondaryButton} onPress={reinitializeWithBasicConfig}>
           <ThemedText style={styles.buttonText}>Test Basic Configuration</ThemedText>
