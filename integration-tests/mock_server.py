@@ -2,9 +2,11 @@
 """Loopback-only recording backend for hermetic native SDK runtime checks."""
 
 import argparse
+import faulthandler
 import json
 import signal
 import ssl
+import sys
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -168,7 +170,17 @@ def main() -> None:
         def log_message(self, _format: str, *_args) -> None:
             return
 
-    http_server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    print("constructing loopback HTTP server", file=sys.stderr, flush=True)
+    faulthandler.dump_traceback_later(5, repeat=False, file=sys.stderr)
+    try:
+        http_server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    finally:
+        faulthandler.cancel_dump_traceback_later()
+    print(
+        f"loopback HTTP server bound to port {http_server.server_port}",
+        file=sys.stderr,
+        flush=True,
+    )
     tls_server = None
     tls_thread = None
     if all(tls_arguments):
