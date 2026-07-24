@@ -131,11 +131,10 @@ jobs:
           --architecture ${{ matrix.architecture }}
           ${{ matrix.frameworks == 'static' && '--static-frameworks' || '' }}
 
-  # Runtime smoke: unlike the build-only jobs above, this launches the app on an
-  # emulator and asserts the JS -> bridge -> native SDK round trip actually works
-  # (catches bridge-registration / crash-on-init bugs a compile can't). Gated to
-  # the latest Expo SDK only to keep the matrix lean. Emulator needs KVM, which
-  # the standard (free) ubuntu-latest runner provides.
+  # Runtime checks launch the app against a loopback-only recording backend and
+  # validate the public JS API, bridge, real native SDK, and emitted requests.
+  # They use the latest Expo SDK only to keep the matrix lean. The Android
+  # emulator needs KVM, which the standard (free) ubuntu-latest runner provides.
   android-smoke:
     name: Runtime checks / Android (Expo SDK 57)
     needs: package
@@ -164,7 +163,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run Android runtime smoke
+      - name: Run Android runtime check
         uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2.34.0
         with:
           api-level: 30
@@ -173,8 +172,7 @@ jobs:
           disable-animations: true
           script: ./integration-tests/run.sh 57 --platform android --architecture new --smoke
 
-  # iOS counterpart of android-smoke: boots a simulator, launches the app, and
-  # asserts the same JS -> bridge -> native round trip. Standard macOS runner.
+  # iOS counterpart: boots a simulator and validates the same hermetic contract.
   ios-smoke:
     name: Runtime checks / iOS (Expo SDK 57)
     needs: package
@@ -197,7 +195,7 @@ jobs:
           echo "Booting $DEVICE_ID"
           xcrun simctl boot "$DEVICE_ID" || true
 
-      - name: Run iOS runtime smoke
+      - name: Run iOS runtime check
         run: ./integration-tests/run.sh 57 --platform ios --architecture new --smoke
 
   # Single aggregate check that summarizes the whole matrix. Point branch
