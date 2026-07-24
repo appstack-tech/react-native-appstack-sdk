@@ -2,11 +2,10 @@
 """Loopback-only recording backend for hermetic native SDK runtime checks."""
 
 import argparse
-import faulthandler
 import json
 import signal
+import socketserver
 import ssl
-import sys
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -24,6 +23,16 @@ SENSITIVE_NAMES = {
     "apikey",
     "token",
 }
+
+
+class LoopbackThreadingHTTPServer(ThreadingHTTPServer):
+    """HTTP server that does not depend on reverse DNS during loopback binding."""
+
+    def server_bind(self) -> None:
+        socketserver.TCPServer.server_bind(self)
+        host, port = self.server_address[:2]
+        self.server_name = host
+        self.server_port = port
 
 
 def is_sensitive(name: str) -> bool:
@@ -170,21 +179,11 @@ def main() -> None:
         def log_message(self, _format: str, *_args) -> None:
             return
 
-    print("constructing loopback HTTP server", file=sys.stderr, flush=True)
-    faulthandler.dump_traceback_later(5, repeat=False, file=sys.stderr)
-    try:
-        http_server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
-    finally:
-        faulthandler.cancel_dump_traceback_later()
-    print(
-        f"loopback HTTP server bound to port {http_server.server_port}",
-        file=sys.stderr,
-        flush=True,
-    )
+    http_server = LoopbackThreadingHTTPServer(("127.0.0.1", 0), Handler)
     tls_server = None
     tls_thread = None
     if all(tls_arguments):
-        tls_server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        tls_server = LoopbackThreadingHTTPServer(("127.0.0.1", 0), Handler)
         tls_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         tls_context.load_cert_chain(args.tls_cert, args.tls_key)
         tls_server.socket = tls_context.wrap_socket(tls_server.socket, server_side=True)
