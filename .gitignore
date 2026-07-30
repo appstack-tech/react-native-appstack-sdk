@@ -45,6 +45,7 @@ ios/build/
 *.ipa
 *.dSYM.zip
 *.dSYM
+ios/.xcframework-update.*
 
 # Android
 android/build/
