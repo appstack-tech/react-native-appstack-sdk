@@ -6,7 +6,7 @@ set -euo pipefail
 #
 # To bump the version, edit VERSION below and re-run this script.
 
-VERSION="4.4.0"
+VERSION="4.4.1-rc1"
 
 REPO="appstack-tech/ios-appstack-sdk"
 ASSET_NAME="AppstackSDK.xcframework.zip"
