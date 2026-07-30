@@ -75,13 +75,27 @@ android {
 
 }
 
-repositories {
-    // Put mavenLocal() first to prioritize local dependencies
-    google()
-    mavenCentral()
-    maven {
-        url "https://central.sonatype.com/repository/maven-snapshots/"
-        mavenContent { snapshotsOnly() }
+// Transitive dependencies are resolved with the consuming app's repositories,
+// not this library project's repositories. Configure every root project so Expo
+// and bare React Native apps route Appstack snapshots directly to Sonatype.
+rootProject.allprojects {
+    repositories {
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = 'appstackSnapshots'
+                    url = uri('https://central.sonatype.com/repository/maven-snapshots/')
+                    mavenContent { snapshotsOnly() }
+                }
+            }
+            filter {
+                includeVersionByRegex(
+                    'tech\\.appstack\\.android-sdk',
+                    'appstack-android-sdk',
+                    '.*-SNAPSHOT'
+                )
+            }
+        }
     }
 }
 
@@ -162,5 +176,3 @@ tasks.configureEach { task ->
         task.finalizedBy 'realign16KBLibraries'
     }
 }
-
-
