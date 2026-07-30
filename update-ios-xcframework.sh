@@ -128,7 +128,10 @@ fi
 if ! mv "$NEW_XCFRAMEWORK" "$DEST_DIR"; then
   echo "Failed to install new xcframework; restoring previous version" >&2
   if [[ -e "$BACKUP_DIR" ]]; then
-    mv "$BACKUP_DIR" "$DEST_DIR"
+    if ! mv "$BACKUP_DIR" "$DEST_DIR"; then
+      echo "Failed to restore backup from ${BACKUP_DIR}; leaving it in place for manual recovery." >&2
+      trap - EXIT
+    fi
   fi
   exit 1
 fi
