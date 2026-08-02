@@ -156,6 +156,138 @@ describe('AppstackSDK', () => {
     });
   });
 
+  describe('configure (options object)', () => {
+    it('calls native configure with logLevel and customerUserId from the options object', async () => {
+      const result = await appstackSDK.configure('my-api-key', {
+        logLevel: 0,
+        customerUserId: 'user-123',
+      });
+      expect(result).toBe(true);
+      expect(mockNative.configure).toHaveBeenCalledTimes(1);
+      expect(mockNative.configure).toHaveBeenCalledWith('my-api-key', 0, 'user-123');
+    });
+
+    it('defaults logLevel to 1 and customerUserId to null for an empty options object', async () => {
+      await appstackSDK.configure('key', {});
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 1, null);
+    });
+
+    it('accepts logLevel without customerUserId', async () => {
+      await appstackSDK.configure('key', { logLevel: 3 });
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 3, null);
+    });
+
+    it('accepts customerUserId without logLevel', async () => {
+      await appstackSDK.configure('key', { customerUserId: 'user-456' });
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 1, 'user-456');
+    });
+
+    it('passes null when customerUserId is explicitly null', async () => {
+      await appstackSDK.configure('key', { logLevel: 2, customerUserId: null });
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 2, null);
+    });
+
+    it('trims apiKey and customerUserId', async () => {
+      await appstackSDK.configure('  key  ', { customerUserId: '  user-789  ' });
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 1, 'user-789');
+    });
+
+    it('does not warn about deprecated parameters', async () => {
+      await appstackSDK.configure('key', { logLevel: 0, customerUserId: 'user-123' });
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    it('throws when apiKey is empty', async () => {
+      await expect(appstackSDK.configure('   ', { logLevel: 0 })).rejects.toThrow(
+        'API key must be a non-empty string'
+      );
+      expect(mockNative.configure).not.toHaveBeenCalled();
+    });
+
+    it('throws when logLevel is out of range', async () => {
+      await expect(appstackSDK.configure('key', { logLevel: -1 })).rejects.toThrow(
+        'logLevel must be a number between 0 and 3'
+      );
+      await expect(appstackSDK.configure('key', { logLevel: 4 })).rejects.toThrow(
+        'logLevel must be a number between 0 and 3'
+      );
+      expect(mockNative.configure).not.toHaveBeenCalled();
+    });
+
+    it('throws when logLevel is not a number', async () => {
+      await expect(appstackSDK.configure('key', { logLevel: '0' as any })).rejects.toThrow(
+        'logLevel must be a number between 0 and 3'
+      );
+      expect(mockNative.configure).not.toHaveBeenCalled();
+    });
+
+    it('throws when customerUserId is an empty string', async () => {
+      await expect(appstackSDK.configure('key', { customerUserId: '' })).rejects.toThrow(
+        'customerUserId must be a non-empty string, null, or undefined'
+      );
+      await expect(appstackSDK.configure('key', { customerUserId: '   ' })).rejects.toThrow(
+        'customerUserId must be a non-empty string, null, or undefined'
+      );
+      expect(mockNative.configure).not.toHaveBeenCalled();
+    });
+
+    it('rethrows native errors', async () => {
+      mockNative.configure.mockRejectedValue(new Error('Native error'));
+      await expect(appstackSDK.configure('key', { logLevel: 0 })).rejects.toThrow('Native error');
+    });
+  });
+
+  describe('configure (deprecated parameters never reach native)', () => {
+    // The native module signature is configure(apiKey, logLevel, customerUserId) — see
+    // src/NativeAppstackReactNative.ts. Neither deprecated parameter may leak into it.
+    it('drops isDebug and endpointBaseUrl from the legacy positional form', async () => {
+      const result = await appstackSDK.configure(
+        'my-api-key',
+        true,
+        'https://custom.endpoint/',
+        0,
+        'user-123'
+      );
+      expect(result).toBe(true);
+      expect(mockNative.configure).toHaveBeenCalledTimes(1);
+      const args = mockNative.configure.mock.calls[0];
+      expect(args).toEqual(['my-api-key', 0, 'user-123']);
+      expect(args).not.toContain(true);
+      expect(args).not.toContain('https://custom.endpoint/');
+    });
+
+    it('ignores isDebug and endpointBaseUrl keys smuggled into the options object', async () => {
+      await appstackSDK.configure('my-api-key', {
+        logLevel: 0,
+        customerUserId: 'user-123',
+        isDebug: true,
+        endpointBaseUrl: 'https://custom.endpoint/',
+      } as any);
+      const args = mockNative.configure.mock.calls[0];
+      expect(args).toEqual(['my-api-key', 0, 'user-123']);
+      expect(args).not.toContain(true);
+      expect(args).not.toContain('https://custom.endpoint/');
+    });
+
+    it('warns when isDebug is passed positionally', async () => {
+      await appstackSDK.configure('key', true);
+      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('isDebug'));
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 1, null);
+    });
+
+    it('warns when endpointBaseUrl is passed positionally', async () => {
+      await appstackSDK.configure('key', false, 'https://custom.endpoint/');
+      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('endpointBaseUrl'));
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 1, null);
+    });
+
+    it('does not warn when the legacy form omits both deprecated parameters', async () => {
+      await appstackSDK.configure('key', false, undefined, 0, 'user-123');
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(mockNative.configure).toHaveBeenCalledWith('key', 0, 'user-123');
+    });
+  });
+
   describe('sendEvent', () => {
     it('sends event with eventType only', async () => {
       const result = await appstackSDK.sendEvent(EventType.PURCHASE);

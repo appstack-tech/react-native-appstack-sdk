@@ -77,9 +77,16 @@ const App = () => {
 
 Initializes the SDK with your API key. Must be called before any other SDK methods.
 
+```javascript
+configure(apiKey, options?)
+```
+
 Parameters:
 
 - `apiKey` - Your platform-specific API key from the Appstack dashboard
+- `options` - Optional configuration object:
+  - `logLevel` - `0=DEBUG`, `1=INFO`, `2=WARN`, `3=ERROR` (default `1`)
+  - `customerUserId` - Optional customer user identifier to associate with the device/session
 
 Returns: A promise that resolves to `true` if configuration was successful
 
@@ -90,6 +97,26 @@ const success = await AppstackSDK.configure('your-api-key-here');
 if (!success) {
   console.error('SDK configuration failed');
 }
+
+// With options
+await AppstackSDK.configure('your-api-key-here', {
+  logLevel: 0, // verbose logging
+  customerUserId: 'user_123',
+});
+```
+
+**Deprecated positional signature**
+
+Earlier versions took `isDebug` and `endpointBaseUrl` as the second and third
+positional arguments. Both are ignored — they are not forwarded to the native
+SDKs — but the signature still works so existing integrations keep compiling:
+
+```javascript
+// Still supported, logs a deprecation warning
+await AppstackSDK.configure('your-api-key-here', false, undefined, 0, 'user_123');
+
+// Preferred
+await AppstackSDK.configure('your-api-key-here', { logLevel: 0, customerUserId: 'user_123' });
 ```
 
 ### 4. Sending events
@@ -281,7 +308,7 @@ const apiKey = "ak_live_1234567890abcdef"; // DON'T DO THIS
 ### **Technical limitations**
 
 - `enableAppleAdsAttribution()` only works on iOS and will do nothing on Android
-- For now, iOS endpoint configuration cannot be customized (will be patched in future release)
+- The event endpoint is not configurable on either platform, by design. The deprecated `endpointBaseUrl` argument is accepted only for backward compatibility and is never forwarded to the native SDKs
 - Event name standardization is done for Android, but not for iOS yet
 
 ## **Troubleshooting**

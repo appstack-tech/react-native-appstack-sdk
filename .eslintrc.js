@@ -5,6 +5,18 @@ module.exports = {
   rules: {
     'prettier/prettier': 'warn',
   },
+  overrides: [
+    {
+      // TypeScript method overloads (e.g. AppstackSDK.configure) trip the base
+      // rule, which does not understand overload signatures. The TS-aware
+      // variant handles them correctly.
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        'no-dupe-class-members': 'off',
+        '@typescript-eslint/no-dupe-class-members': 'error',
+      },
+    },
+  ],
   ignorePatterns: [
     'lib/',
     'node_modules/',
