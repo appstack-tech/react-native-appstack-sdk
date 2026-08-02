@@ -65,9 +65,9 @@ await AppstackSDK.configure(apiKey, {
 > **Deprecated:** the older positional form
 > `configure(apiKey, isDebug, endpointBaseUrl, logLevel, customerUserId)` still
 > works, but `isDebug` and `endpointBaseUrl` are ignored and never forwarded to
-> the native SDKs. Passing either one logs a deprecation warning — use the
-> options object instead so you no longer have to skip them with
-> `undefined, undefined`.
+> the native SDKs. Passing `isDebug: true`, or any `endpointBaseUrl`, logs a
+> deprecation warning — use the options object instead so you no longer have to
+> skip them with `undefined, undefined`.
 
 ## EAC recommendations
 

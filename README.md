@@ -109,10 +109,12 @@ await AppstackSDK.configure('your-api-key-here', {
 
 Earlier versions took `isDebug` and `endpointBaseUrl` as the second and third
 positional arguments. Both are ignored — they are not forwarded to the native
-SDKs — but the signature still works so existing integrations keep compiling:
+SDKs — but the signature still works so existing integrations keep compiling.
+Passing `isDebug: true`, or any `endpointBaseUrl`, logs a deprecation warning;
+their no-op values (`false` and `undefined`) are silent:
 
 ```javascript
-// Still supported, logs a deprecation warning
+// Still supported; both deprecated arguments are ignored
 await AppstackSDK.configure('your-api-key-here', false, undefined, 0, 'user_123');
 
 // Preferred

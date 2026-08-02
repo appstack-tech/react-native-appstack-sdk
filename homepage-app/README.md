@@ -84,8 +84,8 @@ await AppstackSDK.configure(apiKey, { logLevel: 0, customerUserId: 'user_123' })
 The deprecated positional form
 `configure(apiKey, isDebug?, endpointBaseUrl?, logLevel?, customerUserId?)` is
 still accepted for backward compatibility. `isDebug` and `endpointBaseUrl` are
-ignored — they are never forwarded to native code — and passing either logs a
-deprecation warning.
+ignored — they are never forwarded to native code — and passing `isDebug: true`,
+or any `endpointBaseUrl`, logs a deprecation warning.
 
 ### Event Tracking
 

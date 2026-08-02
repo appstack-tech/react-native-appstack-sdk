@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `configure(apiKey, { logLevel, customerUserId })` — an options-object form that removes the need to skip the two deprecated positional parameters. Previously, setting `logLevel` or `customerUserId` meant writing `configure(key, undefined, undefined, 0, 'user_123')`; it is now `configure(key, { logLevel: 0, customerUserId: 'user_123' })`. This matches the named-parameter shape the Flutter plugin already exposes.
 
 ### Changed
-- Passing the deprecated `isDebug` or `endpointBaseUrl` positional arguments now logs a `console.warn` pointing at the options object. Both remain accepted and continue to be ignored — neither has ever been forwarded to the native SDKs.
+- Passing `isDebug: true`, or any `endpointBaseUrl`, positionally now logs a `console.warn` pointing at the options object; their no-op values (`false` and `undefined`) stay silent. Both arguments remain accepted and continue to be ignored — neither has ever been forwarded to the native SDKs.
 
 ### Compatibility
 - The positional signature `configure(apiKey, isDebug?, endpointBaseUrl?, logLevel?, customerUserId?)` is unchanged and still type-checks; the two forms are TypeScript overloads and are distinguished at runtime by whether the second argument is an object. All existing validation and error messages are preserved.

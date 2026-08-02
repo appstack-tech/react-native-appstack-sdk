@@ -213,7 +213,14 @@ class AppstackSDK implements AppstackSDKInterface {
       resolvedLogLevel = 1;
     }
 
-    if (typeof resolvedLogLevel !== 'number' || resolvedLogLevel < 0 || resolvedLogLevel > 3) {
+    // Number.isFinite also rejects NaN, which would otherwise pass: typeof NaN is
+    // 'number' and both NaN < 0 and NaN > 3 are false.
+    if (
+      typeof resolvedLogLevel !== 'number' ||
+      !Number.isFinite(resolvedLogLevel) ||
+      resolvedLogLevel < 0 ||
+      resolvedLogLevel > 3
+    ) {
       throw new Error('logLevel must be a number between 0 and 3');
     }
 

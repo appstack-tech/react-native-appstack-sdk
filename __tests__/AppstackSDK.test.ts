@@ -140,6 +140,13 @@ describe('AppstackSDK', () => {
       expect(mockNative.configure).not.toHaveBeenCalled();
     });
 
+    it('throws when logLevel is NaN', async () => {
+      await expect(appstackSDK.configure('key', false, undefined, NaN)).rejects.toThrow(
+        'logLevel must be a number between 0 and 3'
+      );
+      expect(mockNative.configure).not.toHaveBeenCalled();
+    });
+
     it('throws when customerUserId is empty string', async () => {
       await expect(appstackSDK.configure('key', false, undefined, 1, '')).rejects.toThrow(
         'customerUserId must be a non-empty string, null, or undefined'
@@ -216,6 +223,18 @@ describe('AppstackSDK', () => {
 
     it('throws when logLevel is not a number', async () => {
       await expect(appstackSDK.configure('key', { logLevel: '0' as any })).rejects.toThrow(
+        'logLevel must be a number between 0 and 3'
+      );
+      expect(mockNative.configure).not.toHaveBeenCalled();
+    });
+
+    it('throws when logLevel is NaN', async () => {
+      // typeof NaN === 'number' and both NaN < 0 and NaN > 3 are false, so a plain
+      // range check lets it through to native.
+      await expect(appstackSDK.configure('key', { logLevel: NaN })).rejects.toThrow(
+        'logLevel must be a number between 0 and 3'
+      );
+      await expect(appstackSDK.configure('key', { logLevel: Number('nope') })).rejects.toThrow(
         'logLevel must be a number between 0 and 3'
       );
       expect(mockNative.configure).not.toHaveBeenCalled();
