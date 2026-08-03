@@ -47,6 +47,12 @@ public class AppstackBridge: NSObject {
         )
     }
     
+    /// Sets — or clears — the customer user id after configure(). Forwarded verbatim:
+    /// unlike the configure path, nil/blank is an explicit clear here.
+    @objc public static func setCustomerUserId(_ customerUserId: String?) {
+        AppstackAttributionSdk.shared.setCustomerUserId(customerUserId)
+    }
+
     @objc public static func sendEvent(_ eventType: String?, eventName: String?, parameters: NSDictionary?) {
         // Determine the EventType enum to use
         let finalEventType: EventType

@@ -40,6 +40,20 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
     });
 }
 
+// A nil/blank customerUserId is an explicit clear here, so it is forwarded as-is.
+RCT_EXPORT_METHOD(setCustomerUserId:(NSString * _Nullable)customerUserId
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [AppstackBridge setCustomerUserId:customerUserId];
+
+        resolve(nil);
+    } @catch (NSException *exception) {
+        reject(@"SET_CUSTOMER_USER_ID_ERROR", exception.reason, nil);
+    }
+}
+
 #pragma mark - Event Tracking
 
 RCT_EXPORT_METHOD(sendEvent:(NSString *)eventType

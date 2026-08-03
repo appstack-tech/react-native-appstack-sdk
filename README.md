@@ -186,6 +186,26 @@ To improve matching quality on Meta, send events including the following paramet
 3. `phone_number`
 4. `date_of_birth` (recommended format: `YYYY-MM-DD`).
 
+### 5. Customer user ID
+
+The customer user ID is your own identifier for the signed-in user. Appstack attaches it to events so server-to-server events — which identify the user by this ID rather than by the install — can be joined back to the install that produced them.
+
+If you already know the ID at startup, pass it to `configure`. More often a login reveals it afterwards, so set it whenever it becomes known:
+
+```javascript
+// On login
+await AppstackSDK.setCustomerUserId('user-123');
+
+// On logout — otherwise the previous user's ID stays attached to later events
+await AppstackSDK.setCustomerUserId(null);
+```
+
+- `null`, `undefined` and an empty string all clear the stored ID. (In `configure`, an empty string is rejected instead: `configure` never clears.)
+- Callable at any time, before or after `configure`, as often as you like — the last call wins.
+- Applies to every event sent from here on, including ones already buffered natively. Events already sent are not backfilled and do not need to be: Appstack maps the ID to the install using any event that carries it.
+- The call itself sends nothing. Make sure at least one event follows, or no mapping is ever formed.
+- Calling `configure` again to change the ID does not work — a second `configure` is a no-op and its `customerUserId` is ignored.
+
 ## **Advanced usage**
 
 ### **Environment-based configuration**

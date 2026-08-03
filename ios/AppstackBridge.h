@@ -15,7 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
                    logLevel:(NSInteger)logLevel
              customerUserId:(NSString * _Nullable)customerUserId;
 
-+ (void)sendEvent:(NSString * _Nullable)eventType 
++ (void)setCustomerUserId:(NSString * _Nullable)customerUserId;
+
++ (void)sendEvent:(NSString * _Nullable)eventType
         eventName:(NSString * _Nullable)eventName 
        parameters:(NSDictionary * _Nullable)parameters;
 

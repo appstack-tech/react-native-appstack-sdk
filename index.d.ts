@@ -16,6 +16,7 @@ declare module 'react-native-appstack-sdk' {
       logLevel?: number,
       customerUserId?: string | null
     ): Promise<boolean>;
+    setCustomerUserId(customerUserId?: string | null): Promise<void>;
     sendEvent(
       eventType?: EventType | string,
       eventName?: string,
@@ -87,6 +88,7 @@ declare module 'react-native-appstack-sdk' {
       logLevel?: number,
       customerUserId?: string | null
     ): Promise<boolean>;
+    setCustomerUserId(customerUserId?: string | null): Promise<void>;
     sendEvent(
       eventType?: EventType | string,
       eventName?: string,
