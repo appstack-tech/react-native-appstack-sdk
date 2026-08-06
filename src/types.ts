@@ -10,7 +10,12 @@
  */
 export enum EventType {
   // MARK: - Lifecycle
-  /** User installs the app (tracked automatically by the SDK). */
+  /**
+   * User installs the app (tracked automatically by the SDK).
+   *
+   * Sending this by hand is a no-op: the SDKs ignore manual `INSTALL` events so
+   * they cannot double-count the automatic one.
+   */
   INSTALL = 'INSTALL',
 
   // MARK: - Authentication & account
