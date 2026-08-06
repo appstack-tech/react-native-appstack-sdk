@@ -75,26 +75,53 @@ android {
 
 }
 
-// Transitive dependencies are resolved with the consuming app's repositories,
-// not this library project's repositories. Configure every root project so Expo
-// and bare React Native apps route Appstack snapshots directly to Sonatype.
-rootProject.allprojects {
-    repositories {
-        exclusiveContent {
-            forRepository {
-                maven {
-                    name = 'appstackSnapshots'
-                    url = uri('https://central.sonatype.com/repository/maven-snapshots/')
-                    mavenContent { snapshotsOnly() }
+// The one place the native Android SDK version is declared. To test a release
+// candidate, point this at the RC's snapshot coordinate and everything below
+// adjusts itself. Stable releases must always ship a plain release version:
+// snapshots are mutable and expire.
+def appstackAndroidSdkVersion = '1.6.0'
+def appstackAndroidSdkIsSnapshot = appstackAndroidSdkVersion.endsWith('-SNAPSHOT')
+
+// Release candidates of the native SDK are published to the Central Portal
+// snapshot repository, which mavenCentral() does not serve. Register it only
+// while this library is pinned to a snapshot, so a released version adds
+// nothing to a host app's build.
+//
+// It has to be registered on every *root* project, not just here: transitive
+// dependencies are resolved with the consuming app's repositories, not this
+// library project's. Configuring every root project is what makes Expo and
+// bare React Native apps route Appstack snapshots to Sonatype.
+if (appstackAndroidSdkIsSnapshot) {
+    rootProject.allprojects {
+        repositories {
+            exclusiveContent {
+                forRepository {
+                    maven {
+                        name = 'appstackSnapshots'
+                        url = uri('https://central.sonatype.com/repository/maven-snapshots/')
+                        mavenContent { snapshotsOnly() }
+                    }
+                }
+                // Only Appstack snapshots come from here. Every other
+                // dependency — and every stable Appstack release — keeps
+                // resolving through the app's own repositories.
+                filter {
+                    includeVersionByRegex(
+                        'tech\\.appstack\\.android-sdk',
+                        'appstack-android-sdk',
+                        '.*-SNAPSHOT'
+                    )
                 }
             }
-            filter {
-                includeVersionByRegex(
-                    'tech\\.appstack\\.android-sdk',
-                    'appstack-android-sdk',
-                    '.*-SNAPSHOT'
-                )
-            }
+        }
+
+        // A snapshot coordinate is mutable: re-pushing an RC replaces the
+        // artifact in place. Gradle caches changing modules for 24 hours by
+        // default, so a rebuild with a warm dependency cache can silently keep
+        // testing the previous artifact — including CI, which restores a
+        // persisted Gradle cache. Always re-check while on an RC.
+        configurations.configureEach {
+            resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
         }
     }
 }
@@ -102,7 +129,7 @@ rootProject.allprojects {
 dependencies {
     compileOnly 'com.facebook.react:react-native:+'
 
-    implementation 'tech.appstack.android-sdk:appstack-android-sdk:1.5.0'
+    implementation "tech.appstack.android-sdk:appstack-android-sdk:$appstackAndroidSdkVersion"
 
     implementation 'androidx.annotation:annotation:1.7.1'
 

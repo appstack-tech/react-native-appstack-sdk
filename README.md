@@ -151,7 +151,7 @@ await AppstackSDK.sendEvent(
 
 It is recommended to use standard events for a smoother experience.
 
-- `INSTALL` - App installation (tracked automatically)
+- `INSTALL` - App installation (tracked automatically; sending it manually is ignored)
 - `LOGIN`, `SIGN_UP`, `REGISTER` - Authentication
 - `PURCHASE`, `ADD_TO_CART`, `ADD_TO_WISHLIST`, `INITIATE_CHECKOUT`, `START_TRIAL`, `SUBSCRIBE` - Monetization
 - `LEVEL_START`, `LEVEL_COMPLETE` - Game progression

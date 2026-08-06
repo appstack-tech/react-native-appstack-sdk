@@ -5,7 +5,7 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.5.0] - 2026-08-02
+## [2.6.0] - 2026-08-06
 
 ### Added
 - `configure(apiKey, { logLevel, customerUserId })` — an options-object form that removes the need to skip the two deprecated positional parameters. Previously, setting `logLevel` or `customerUserId` meant writing `configure(key, undefined, undefined, 0, 'user_123')`; it is now `configure(key, { logLevel: 0, customerUserId: 'user_123' })`. This matches the named-parameter shape the Flutter plugin already exposes.
@@ -15,6 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Compatibility
 - The positional signature `configure(apiKey, isDebug?, endpointBaseUrl?, logLevel?, customerUserId?)` is unchanged and still type-checks; the two forms are TypeScript overloads and are distinguished at runtime by whether the second argument is an object. All existing validation and error messages are preserved.
+
+## [2.5.0] - 2026-08-06
+
+### Changed
+- **iOS:** Updated `AppstackSDK.xcframework` to `4.4.1`. Attribution matching now includes additional network context to improve match diagnostics.
+- **Android:** Updated the native Appstack Android SDK dependency to `1.6.0`. Attribution matching now includes additional device and network context to improve match accuracy, and install attribution resolves more reliably on first launch. No additional app permissions are required.
+
+### Fixed
+- **iOS & Android:** `sendEvent` now ignores `INSTALL`, which the SDKs already track automatically. Sending it by hand previously double-counted installs; such calls are now discarded.
 
 ## [2.4.0] - 2026-07-21
 
