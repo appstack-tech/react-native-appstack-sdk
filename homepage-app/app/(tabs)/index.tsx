@@ -44,13 +44,11 @@ export default function HomeScreen() {
 
       // The dev endpoint is applied natively via the APPSTACK_DEV_PROXY_URL manifest key
       // (ios/homepageapp/Info.plist + android/app/src/main/AndroidManifest.xml), not through
-      // configure() — isDebug and endpointBaseUrl are deprecated no-ops in the wrapper.
-      await AppstackSDK.configure(
-        apiKey,
-        true, // isDebug - deprecated/ignored
-        undefined, // endpointBaseUrl - deprecated/ignored (see APPSTACK_DEV_PROXY_URL)
-        0 // logLevel - 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
-      );
+      // configure() — the deprecated isDebug/endpointBaseUrl arguments are no-ops in the
+      // wrapper and are gone from the options-object form.
+      await AppstackSDK.configure(apiKey, {
+        logLevel: 0, // 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
+      });
       setIsSDKInitialized(true);
       setSdkError(null);
 

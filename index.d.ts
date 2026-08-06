@@ -1,5 +1,14 @@
 declare module 'react-native-appstack-sdk' {
+  export interface AppstackConfigureOptions {
+    /** Log level: 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR (optional, default 1) */
+    logLevel?: number;
+    /** Optional customer user ID to associate with the device/session */
+    customerUserId?: string | null;
+  }
+
   export interface AppstackSDKInterface {
+    configure(apiKey: string, options?: AppstackConfigureOptions): Promise<boolean>;
+    /** @deprecated Use `configure(apiKey, { logLevel, customerUserId })` instead */
     configure(
       apiKey: string,
       isDebug?: boolean,
@@ -69,6 +78,8 @@ declare module 'react-native-appstack-sdk' {
 
   export class AppstackSDK implements AppstackSDKInterface {
     static getInstance(): AppstackSDK;
+    configure(apiKey: string, options?: AppstackConfigureOptions): Promise<boolean>;
+    /** @deprecated Use `configure(apiKey, { logLevel, customerUserId })` instead */
     configure(
       apiKey: string,
       isDebug?: boolean,

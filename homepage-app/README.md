@@ -6,7 +6,6 @@ This is a demo React Native app showcasing the Appstack Attribution SDK integrat
 
 This demo app demonstrates:
 - ✅ **Environment-based Configuration** - Local API-key configuration and log levels without committed credentials
-- ✅ **Repository-only Dev Routing** - Native traffic from this demo is routed to Appstack's development endpoint
 - ✅ **Basic Configuration** - Backward-compatible simple setup
 - ✅ **Event Tracking** - Standard events, custom events, and revenue tracking
 - ✅ **Error Handling** - Comprehensive error handling and user feedback
@@ -60,23 +59,18 @@ if (!apiKey) {
   throw new Error('Missing EXPO_PUBLIC_APPSTACK_API_KEY');
 }
 
-await AppstackSDK.configure(
-  apiKey,
-  false, // Deprecated compatibility argument; ignored
-  undefined, // Deprecated endpoint argument; ignored
-  0 // logLevel - 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
-);
+await AppstackSDK.configure(apiKey, {
+  logLevel: 0, // 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
+});
 ```
-
-The development endpoint is selected by the repository-only
-`withAppstackDevProxy` Expo config plugin. `configure()` does not expose or
-forward a custom endpoint, and applications consuming the published package do
-not receive this demo plugin.
 
 #### Basic Configuration
 
 ```typescript
 await AppstackSDK.configure(apiKey);
+
+// With options
+await AppstackSDK.configure(apiKey, { logLevel: 0, customerUserId: 'user_123' });
 ```
 
 #### Parameter Details
@@ -84,10 +78,14 @@ await AppstackSDK.configure(apiKey);
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `apiKey` | `string` | **Required** | Your Appstack API key from the dashboard |
-| `isDebug` | `boolean` | `false` | Deprecated compatibility argument; accepted but ignored |
-| `endpointBaseUrl` | `string?` | `undefined` | Deprecated compatibility argument; accepted but not forwarded to native code |
-| `logLevel` | `number` | `1` (INFO) | Log level: 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR |
-| `customerUserId` | `string?` | `undefined` | Optional customer user identifier |
+| `options.logLevel` | `number` | `1` (INFO) | Log level: 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR |
+| `options.customerUserId` | `string \| null` | `undefined` | Optional customer user identifier |
+
+The deprecated positional form
+`configure(apiKey, isDebug?, endpointBaseUrl?, logLevel?, customerUserId?)` is
+still accepted for backward compatibility. `isDebug` and `endpointBaseUrl` are
+ignored — they are never forwarded to native code — and passing `isDebug: true`,
+or any `endpointBaseUrl`, logs a deprecation warning.
 
 ### Event Tracking
 

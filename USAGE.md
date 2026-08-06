@@ -51,6 +51,24 @@ const App = () => {
 };
 ```
 
+## Configuration options
+
+`configure()` takes your API key plus an optional options object:
+
+```typescript
+await AppstackSDK.configure(apiKey, {
+  logLevel: 0, // 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR (default 1)
+  customerUserId: 'user_123', // optional, associates the device/session with your user id
+});
+```
+
+> **Deprecated:** the older positional form
+> `configure(apiKey, isDebug, endpointBaseUrl, logLevel, customerUserId)` still
+> works, but `isDebug` and `endpointBaseUrl` are ignored and never forwarded to
+> the native SDKs. Passing `isDebug: true`, or any `endpointBaseUrl`, logs a
+> deprecation warning — use the options object instead so you no longer have to
+> skip them with `undefined, undefined`.
+
 ## EAC recommendations
 
 ### Revenue events (all ad networks)
