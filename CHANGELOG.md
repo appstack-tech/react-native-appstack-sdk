@@ -5,6 +5,15 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-08-06
+
+### Changed
+- **iOS:** Updated `AppstackSDK.xcframework` to `4.4.1`. Attribution matching now includes additional network context to improve match diagnostics.
+- **Android:** Updated the native Appstack Android SDK dependency to `1.6.0`. Attribution matching now includes additional device and network context to improve match accuracy, and install attribution resolves more reliably on first launch. No additional app permissions are required.
+
+### Fixed
+- **iOS & Android:** `sendEvent` now ignores `INSTALL`, which the SDKs already track automatically. Sending it by hand previously double-counted installs; such calls are now discarded.
+
 ## [2.4.0] - 2026-07-21
 
 ### Changed
