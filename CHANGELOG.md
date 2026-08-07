@@ -5,6 +5,19 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `AppstackSDK.setCustomerUserId(customerUserId)` — sets or clears the customer user ID after `configure()`, bridging the native iOS/Android setter of the same name. Use it when a login reveals the ID; calling `configure` a second time does not work, as a repeat `configure` is a no-op and ignores its `customerUserId`. Clear it on logout so the previous user's ID stops being attached to later events. `null`, `undefined` and `''` all clear the stored ID — unlike `configure`, which rejects an empty string because it never clears. Safe to call at any time; last write wins.
+
+### Changed
+- **Android:** Pinned the native SDK to `1.7.0-SNAPSHOT` (was `1.6.0`). The `setCustomerUserId` setter landed after the 1.6.0 release, so it is only reachable from the release candidate. The snapshot coordinate re-enables the `appstackSnapshots` repository and the `cacheChangingModulesFor 0` resolution strategy on consuming projects.
+- **iOS:** Re-vendored `AppstackSDK.xcframework` at `4.5.0-rc0` (was `4.4.1`), for the same reason — `setCustomerUserId(_:)` is not present in 4.4.1.
+
+> **Not releasable as a stable version.** Both native pins are pre-release: the
+> Android coordinate is a mutable, expiring snapshot. Before cutting a stable
+> wrapper release, repin to Android `1.7.0` and iOS `4.5.0` once those ship.
+
 ## [2.6.0] - 2026-08-06
 
 ### Added

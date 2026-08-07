@@ -80,6 +80,24 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     }
 
     /**
+     * Sets — or clears — the customer user id after configure(). Forwarded verbatim,
+     * without the configure path's `takeIf { it.isNotBlank() }`: null/blank is a clear here.
+     */
+    @ReactMethod
+    fun setCustomerUserId(customerUserId: String?, promise: Promise) {
+        try {
+            AppstackAttributionSdk.setCustomerUserId(customerUserId)
+            promise.resolve(null)
+        } catch (exception: Exception) {
+            promise.reject(
+                "SET_CUSTOMER_USER_ID_ERROR",
+                "Failed to set customer user ID: ${exception.message}",
+                exception
+            )
+        }
+    }
+
+    /**
      * Reads the repo-only APPSTACK_DEV_PROXY_URL <meta-data> value from the host app's
      * manifest, mirroring the iOS Info.plist key of the same name. Returns null when the
      * key is absent (the published-package case).

@@ -3,6 +3,7 @@ import { TurboModuleRegistry, NativeModules } from 'react-native';
 
 export interface Spec extends TurboModule {
   configure(apiKey: string, logLevel?: number, customerUserId?: string | null): Promise<boolean>;
+  setCustomerUserId(customerUserId: string | null): Promise<void>;
   sendEvent(
     eventType: string | null,
     eventName: string | null,

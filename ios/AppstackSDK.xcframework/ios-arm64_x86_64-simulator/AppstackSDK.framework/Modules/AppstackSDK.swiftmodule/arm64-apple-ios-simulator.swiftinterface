@@ -26,6 +26,7 @@ import os
   @available(*, deprecated, renamed: "configure(apiKey:logLevel:customerUserId:)", message: "endpointBaseUrl is no longer used; drop it from your configure() call. This overload will be removed in the next major version.")
   public func configure(apiKey appstackApiKey: Swift.String, endpointBaseUrl: Swift.String?, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil)
   public func configure(apiKey appstackApiKey: Swift.String, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil)
+  public func setCustomerUserId(_ customerUserId: Swift.String?)
   public func sendEvent(event: AppstackSDK.EventType, name: Swift.String? = nil, parameters: [Swift.String : Any]? = nil)
   public func getAppstackId() -> Swift.String?
   public func isSdkDisabled() -> Swift.Bool

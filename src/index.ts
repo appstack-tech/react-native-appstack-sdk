@@ -56,6 +56,14 @@ export interface AppstackSDKInterface {
   ): Promise<boolean>;
 
   /**
+   * Set — or clear — the customer user ID after configure(), e.g. once a login reveals it.
+   * A repeat configure() is a no-op, so it cannot be used to change the ID.
+   * @param customerUserId - Your identifier for the signed-in user; `null`/`undefined`/`''` clears it (do this on logout)
+   * @returns Promise that resolves once native has stored (or cleared) the ID
+   */
+  setCustomerUserId(customerUserId?: string | null): Promise<void>;
+
+  /**
    * Send an event with optional parameters
    * @param eventName - Event name (must match those configured in Appstack dashboard) - for backward compatibility
    * @param eventType - Event type from EventType enum (preferred method)
@@ -110,6 +118,10 @@ export interface AppstackSDKInterface {
  *   logLevel: 0, // 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
  *   customerUserId: 'user-123', // optional
  * });
+ *
+ * // Set the customer user ID later (e.g. on login), or clear it on logout
+ * await AppstackSDK.setCustomerUserId('user-123');
+ * await AppstackSDK.setCustomerUserId(null);
  *
  * // Send events
  * await AppstackSDK.sendEvent('PURCHASE'); // Without parameters
@@ -244,6 +256,30 @@ class AppstackSDK implements AppstackSDKInterface {
       return result;
     } catch (error) {
       console.error('Failed to configure Appstack SDK:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Set — or clear — the customer user ID after the SDK has been configured
+   */
+  async setCustomerUserId(customerUserId?: string | null): Promise<void> {
+    if (
+      customerUserId !== undefined &&
+      customerUserId !== null &&
+      typeof customerUserId !== 'string'
+    ) {
+      throw new Error('customerUserId must be a string, null, or undefined');
+    }
+
+    // Not configure()'s validation: a blank value here is a legitimate clear, so
+    // null/undefined/'' normalize to an explicit null the native setter reads as such.
+    const normalized = typeof customerUserId === 'string' ? customerUserId.trim() || null : null;
+
+    try {
+      await AppstackReactNative.setCustomerUserId(normalized);
+    } catch (error) {
+      console.error('Failed to set Appstack customer user ID:', error);
       throw error;
     }
   }

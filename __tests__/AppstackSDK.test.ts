@@ -17,6 +17,7 @@ afterAll(() => {
 jest.mock('react-native', () => {
   const mockNative = {
     configure: jest.fn().mockResolvedValue(true),
+    setCustomerUserId: jest.fn().mockResolvedValue(undefined),
     sendEvent: jest.fn().mockResolvedValue(true),
     enableAppleAdsAttribution: jest.fn().mockResolvedValue(true),
     getAppstackId: jest.fn().mockResolvedValue('test-appstack-id'),
@@ -44,6 +45,7 @@ const mockNative = NativeModules.AppstackReactNative;
 beforeEach(() => {
   jest.clearAllMocks();
   mockNative.configure.mockResolvedValue(true);
+  mockNative.setCustomerUserId.mockResolvedValue(undefined);
   mockNative.sendEvent.mockResolvedValue(true);
   mockNative.enableAppleAdsAttribution.mockResolvedValue(true);
   mockNative.getAppstackId.mockResolvedValue('test-appstack-id');
@@ -304,6 +306,55 @@ describe('AppstackSDK', () => {
       await appstackSDK.configure('key', false, undefined, 0, 'user-123');
       expect(console.warn).not.toHaveBeenCalled();
       expect(mockNative.configure).toHaveBeenCalledWith('key', 0, 'user-123');
+    });
+  });
+
+  describe('setCustomerUserId', () => {
+    it('forwards a trimmed id to native', async () => {
+      await appstackSDK.setCustomerUserId('  user-123  ');
+      expect(mockNative.setCustomerUserId).toHaveBeenCalledTimes(1);
+      expect(mockNative.setCustomerUserId).toHaveBeenCalledWith('user-123');
+    });
+
+    it('passes null through to the native clear path', async () => {
+      await appstackSDK.setCustomerUserId(null);
+      expect(mockNative.setCustomerUserId).toHaveBeenCalledWith(null);
+    });
+
+    it('normalizes undefined and a missing argument to an explicit null', async () => {
+      await appstackSDK.setCustomerUserId(undefined);
+      await appstackSDK.setCustomerUserId();
+      expect(mockNative.setCustomerUserId).toHaveBeenNthCalledWith(1, null);
+      expect(mockNative.setCustomerUserId).toHaveBeenNthCalledWith(2, null);
+    });
+
+    // A blank id must NOT be rejected here: it is a legitimate clear.
+    it('clears instead of throwing for an empty or whitespace id', async () => {
+      await appstackSDK.setCustomerUserId('');
+      await appstackSDK.setCustomerUserId('   ');
+      expect(mockNative.setCustomerUserId).toHaveBeenCalledTimes(2);
+      expect(mockNative.setCustomerUserId).toHaveBeenNthCalledWith(1, null);
+      expect(mockNative.setCustomerUserId).toHaveBeenNthCalledWith(2, null);
+    });
+
+    it('throws without calling native when the id is not a string', async () => {
+      await expect(appstackSDK.setCustomerUserId(123 as any)).rejects.toThrow(
+        'customerUserId must be a string, null, or undefined'
+      );
+      expect(mockNative.setCustomerUserId).not.toHaveBeenCalled();
+    });
+
+    it('rethrows native errors', async () => {
+      mockNative.setCustomerUserId.mockRejectedValue(new Error('Native error'));
+      await expect(appstackSDK.setCustomerUserId('user-123')).rejects.toThrow('Native error');
+    });
+
+    it('leaves configure validation untouched', async () => {
+      await expect(appstackSDK.configure('key', false, undefined, 1, '')).rejects.toThrow(
+        'customerUserId must be a non-empty string, null, or undefined'
+      );
+      await appstackSDK.setCustomerUserId('');
+      expect(mockNative.setCustomerUserId).toHaveBeenCalledWith(null);
     });
   });
 
