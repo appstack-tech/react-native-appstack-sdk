@@ -5,9 +5,10 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.7.0] - 2026-08-11
+## [2.6.0] - 2026-08-11
 
 ### Added
+- `configure(apiKey, { logLevel, customerUserId })` — an options-object form that removes the need to skip the two deprecated positional parameters. Previously, setting `logLevel` or `customerUserId` meant writing `configure(key, undefined, undefined, 0, 'user_123')`; it is now `configure(key, { logLevel: 0, customerUserId: 'user_123' })`. This matches the named-parameter shape the Flutter plugin already exposes.
 - `AppstackSDK.setCustomerUserId(customerUserId)` — sets or clears the customer user ID after `configure()`. Use it when a login reveals the ID: calling `configure` a second time does not work, because a repeat `configure` is a no-op and ignores its `customerUserId`. Clear it on logout so the previous user's ID stops being attached to later events. `null`, `undefined` and `''` all clear the stored ID — unlike `configure`, which rejects an empty string because it never clears. Safe to call at any time; last write wins.
 - **iOS:** `getAttributionParams()` now always resolves with an `appstack_match_status` key describing how attribution was resolved: `matched`, `matched_no_params`, `organic`, `skipped`, `failed` or `not_configured`. Only `failed` is worth re-reading later; the rest are settled answers. Android does not report this key yet, so check for it rather than assuming both platforms return it.
 
@@ -15,19 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **iOS:** Updated `AppstackSDK.xcframework` to `4.5.0`, which adds the native setter behind `setCustomerUserId` along with the attribution match status.
 - **Android:** Updated the native Appstack Android SDK dependency to `1.7.0`, which adds the native setter behind `setCustomerUserId`.
 - **iOS:** An empty result from `getAttributionParams()` no longer means "not attributed" — read `appstack_match_status` instead.
+- Passing `isDebug: true`, or any `endpointBaseUrl`, positionally now logs a `console.warn` pointing at the options object; their no-op values (`false` and `undefined`) stay silent. Both arguments remain accepted and continue to be ignored — neither has ever been forwarded to the native SDKs.
 
 ### Fixed
 - **iOS:** `deleteUserData()` now also clears the stored customer user ID.
 - **iOS:** A blank customer user ID is treated as absent instead of being sent as an empty string.
 - **iOS:** A `setCustomerUserId` call made immediately after `configure()` is no longer overwritten by the value passed to `configure()`.
-
-## [2.6.0] - 2026-08-06
-
-### Added
-- `configure(apiKey, { logLevel, customerUserId })` — an options-object form that removes the need to skip the two deprecated positional parameters. Previously, setting `logLevel` or `customerUserId` meant writing `configure(key, undefined, undefined, 0, 'user_123')`; it is now `configure(key, { logLevel: 0, customerUserId: 'user_123' })`. This matches the named-parameter shape the Flutter plugin already exposes.
-
-### Changed
-- Passing `isDebug: true`, or any `endpointBaseUrl`, positionally now logs a `console.warn` pointing at the options object; their no-op values (`false` and `undefined`) stay silent. Both arguments remain accepted and continue to be ignored — neither has ever been forwarded to the native SDKs.
 
 ### Compatibility
 - The positional signature `configure(apiKey, isDebug?, endpointBaseUrl?, logLevel?, customerUserId?)` is unchanged and still type-checks; the two forms are TypeScript overloads and are distinguished at runtime by whether the second argument is an object. All existing validation and error messages are preserved.
