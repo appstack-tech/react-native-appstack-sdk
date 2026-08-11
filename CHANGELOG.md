@@ -10,13 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `AppstackSDK.setCustomerUserId(customerUserId)` — sets or clears the customer user ID after `configure()`, bridging the native iOS/Android setter of the same name. Use it when a login reveals the ID; calling `configure` a second time does not work, as a repeat `configure` is a no-op and ignores its `customerUserId`. Clear it on logout so the previous user's ID stops being attached to later events. `null`, `undefined` and `''` all clear the stored ID — unlike `configure`, which rejects an empty string because it never clears. Safe to call at any time; last write wins.
 
-### Changed
-- **Android:** Pinned the native SDK to `1.7.0-SNAPSHOT` (was `1.6.0`). The `setCustomerUserId` setter landed after the 1.6.0 release, so it is only reachable from the release candidate. The snapshot coordinate re-enables the `appstackSnapshots` repository and the `cacheChangingModulesFor 0` resolution strategy on consuming projects.
-- **iOS:** Re-vendored `AppstackSDK.xcframework` at `4.5.0-rc0` (was `4.4.1`), for the same reason — `setCustomerUserId(_:)` is not present in 4.4.1.
+- **iOS:** `getAttributionParams()` now always resolves with an `appstack_match_status` key describing how attribution was resolved: `matched`, `matched_no_params`, `organic`, `skipped`, `failed` or `not_configured`. Only `failed` is worth re-reading later; the rest are settled answers. Prefer it over treating an empty result as "not attributed". The Android SDK does not yet report this key, so read it defensively rather than assuming it is present on both platforms.
 
-> **Not releasable as a stable version.** Both native pins are pre-release: the
-> Android coordinate is a mutable, expiring snapshot. Before cutting a stable
-> wrapper release, repin to Android `1.7.0` and iOS `4.5.0` once those ship.
+### Changed
+- **Android:** Pinned the native SDK to `1.7.0` (was `1.6.0`). The `setCustomerUserId` setter landed after the 1.6.0 release. Because this is a plain release version, `appstackAndroidSdkIsSnapshot` is false, so neither the `appstackSnapshots` repository nor the `cacheChangingModulesFor 0` resolution strategy is registered on consuming projects.
+- **iOS:** Re-vendored `AppstackSDK.xcframework` at `4.5.0` (was `4.4.1`), for the same reason — `setCustomerUserId(_:)` is not present in 4.4.1.
+- **iOS:** `getAttributionParams()` no longer returns `nil` natively; where the result was previously `nil` or empty, it now carries the status key explaining why. The bridge already coalesced `nil` to `{}`, so the promise still resolves with an object either way — but code using an empty result to mean "not attributed" should switch to `appstack_match_status`.
+
+### Fixed
+- **iOS:** `deleteUserData()` now also clears the stored customer user ID.
+- **iOS:** A blank customer user ID is treated as absent instead of being sent as an empty string.
+- **iOS:** A `setCustomerUserId` call made immediately after `configure()` is no longer overwritten by the value passed to `configure()`.
 
 ## [2.6.0] - 2026-08-06
 
