@@ -8,14 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- `AppstackSDK.setCustomerUserId(customerUserId)` — sets or clears the customer user ID after `configure()`, bridging the native iOS/Android setter of the same name. Use it when a login reveals the ID; calling `configure` a second time does not work, as a repeat `configure` is a no-op and ignores its `customerUserId`. Clear it on logout so the previous user's ID stops being attached to later events. `null`, `undefined` and `''` all clear the stored ID — unlike `configure`, which rejects an empty string because it never clears. Safe to call at any time; last write wins.
-
-- **iOS:** `getAttributionParams()` now always resolves with an `appstack_match_status` key describing how attribution was resolved: `matched`, `matched_no_params`, `organic`, `skipped`, `failed` or `not_configured`. Only `failed` is worth re-reading later; the rest are settled answers. Prefer it over treating an empty result as "not attributed". The Android SDK does not yet report this key, so read it defensively rather than assuming it is present on both platforms.
+- `AppstackSDK.setCustomerUserId(customerUserId)` — sets or clears the customer user ID after `configure()`. Use it when a login reveals the ID: calling `configure` a second time does not work, because a repeat `configure` is a no-op and ignores its `customerUserId`. Clear it on logout so the previous user's ID stops being attached to later events. `null`, `undefined` and `''` all clear the stored ID — unlike `configure`, which rejects an empty string because it never clears. Safe to call at any time; last write wins.
+- **iOS:** `getAttributionParams()` now always resolves with an `appstack_match_status` key describing how attribution was resolved: `matched`, `matched_no_params`, `organic`, `skipped`, `failed` or `not_configured`. Only `failed` is worth re-reading later; the rest are settled answers. Android does not report this key yet, so check for it rather than assuming both platforms return it.
 
 ### Changed
-- **Android:** Pinned the native SDK to `1.7.0` (was `1.6.0`). The `setCustomerUserId` setter landed after the 1.6.0 release. Because this is a plain release version, `appstackAndroidSdkIsSnapshot` is false, so neither the `appstackSnapshots` repository nor the `cacheChangingModulesFor 0` resolution strategy is registered on consuming projects.
-- **iOS:** Re-vendored `AppstackSDK.xcframework` at `4.5.0` (was `4.4.1`), for the same reason — `setCustomerUserId(_:)` is not present in 4.4.1.
-- **iOS:** `getAttributionParams()` no longer returns `nil` natively; where the result was previously `nil` or empty, it now carries the status key explaining why. The bridge already coalesced `nil` to `{}`, so the promise still resolves with an object either way — but code using an empty result to mean "not attributed" should switch to `appstack_match_status`.
+- **iOS:** Updated `AppstackSDK.xcframework` to `4.5.0`, which adds the native setter behind `setCustomerUserId` along with the attribution match status.
+- **Android:** Updated the native Appstack Android SDK dependency to `1.7.0`, which adds the native setter behind `setCustomerUserId`.
+- **iOS:** An empty result from `getAttributionParams()` no longer means "not attributed" — read `appstack_match_status` instead.
 
 ### Fixed
 - **iOS:** `deleteUserData()` now also clears the stored customer user ID.
