@@ -31,6 +31,7 @@ import os
   public func getAppstackId() -> Swift.String?
   public func isSdkDisabled() -> Swift.Bool
   public func getAttributionParams() async -> [Swift.String : Any]?
+  public static let attributionMatchStatusKey: Swift.String
   public func deleteUserData() async throws
   @objc deinit
 }
