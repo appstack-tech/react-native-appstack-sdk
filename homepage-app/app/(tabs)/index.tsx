@@ -23,12 +23,14 @@ export default function HomeScreen() {
     try {
       console.log('Initializing Appstack SDK...');
       
-      // Debug: Check what's available in NativeModules
+      // Debug: check the native module resolved. The SDK is a TurboModule, so look it
+      // up through TurboModuleRegistry rather than NativeModules — the latter is the
+      // legacy-architecture path and is not the SDK's own lookup mechanism.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { NativeModules } = require('react-native');
-      console.log('Available native modules:', Object.keys(NativeModules));
-      console.log('AppstackReactNative module:', NativeModules.AppstackReactNative);
-      console.log('Is AppstackReactNative available:', !!NativeModules.AppstackReactNative);
+      const { TurboModuleRegistry } = require('react-native');
+      const nativeModule = TurboModuleRegistry.get('AppstackReactNative');
+      console.log('AppstackReactNative module:', nativeModule);
+      console.log('Is AppstackReactNative available:', !!nativeModule);
 
       // This demo reads its API key from local environment configuration. Never
       // commit a real key to the sample application.

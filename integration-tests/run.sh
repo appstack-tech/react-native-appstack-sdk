@@ -690,6 +690,20 @@ if [[ "$PLATFORM" == "android" ]]; then
   log "PackageList.java looks correct:"
   grep -n "AppstackReactNativePackage" "$PKG_LIST" | sed 's/^/    /'
 
+  # On the new architecture the app's generated autolinking C++ calls
+  # RNAppstackSdkSpec_ModuleProvider, whose symbol comes from the codegen-generated jni
+  # directory. If the SDK is not registered as a codegen library, the module silently
+  # falls back to the legacy interop layer instead of being a real TurboModule.
+  if [[ "$ARCHITECTURE" == "new" ]]; then
+    log "Generating autolinking new-architecture files..."
+    ./gradlew --no-daemon :app:generateAutolinkingNewArchitectureFiles
+    AUTOLINK_CPP="$(find app/build/generated/autolinking -name 'autolinking.cpp' 2>/dev/null | head -1)"
+    [[ -n "$AUTOLINK_CPP" ]] || fail "autolinking.cpp was not generated under app/build/generated/autolinking"
+    grep -q "RNAppstackSdkSpec_ModuleProvider" "$AUTOLINK_CPP" \
+      || fail "RNAppstackSdkSpec_ModuleProvider missing from ${AUTOLINK_CPP} — the SDK is not registered as a codegen library"
+    log "TurboModule provider registered in autolinking.cpp"
+  fi
+
   if [[ "$QUICK_MODE" == true ]]; then
     log "✅ Quick mode: skipping full Android build"
     exit 0
@@ -755,6 +769,25 @@ else
     || fail "react-native-appstack-sdk missing from Podfile.lock — SDK was not autolinked"
   log "Podfile.lock looks correct:"
   grep -n "react-native-appstack-sdk" Podfile.lock | head -5 | sed 's/^/    /'
+
+  # React Native's codegen pod is `ReactCodegen`. `React-Codegen` is an unrelated
+  # third-party pod on the public CocoaPods trunk; the podspec used to depend on it by
+  # mistake, which both broke TurboModule codegen and pulled an untrusted dependency.
+  if grep -qE "^\s+- React-Codegen" Podfile.lock; then
+    grep -n "React-Codegen" Podfile.lock >&2
+    fail "Podfile.lock depends on React-Codegen (an unrelated trunk pod); the correct pod is ReactCodegen"
+  fi
+
+  # The generated TurboModule spec header is what ios/AppstackReactNative.h imports on
+  # the new architecture. `pod install` runs codegen, so this is verifiable without a build.
+  if [[ "$ARCHITECTURE" == "new" ]]; then
+    SPEC_HEADER="build/generated/ios/RNAppstackSdkSpec/RNAppstackSdkSpec.h"
+    [[ -f "$SPEC_HEADER" ]] \
+      || fail "Codegen did not produce ${SPEC_HEADER} — check codegenConfig in package.json"
+    grep -q "NativeAppstackReactNativeSpec" "$SPEC_HEADER" \
+      || fail "NativeAppstackReactNativeSpec protocol missing from ${SPEC_HEADER}"
+    log "Codegen spec header generated: ${SPEC_HEADER}"
+  fi
 
   if [[ "$QUICK_MODE" == true ]]; then
     log "✅ Quick mode: skipping full iOS build"

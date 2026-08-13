@@ -60,8 +60,18 @@ jobs:
       run: |
         set -euo pipefail
         npm version "$VERSION" --no-git-tag-version
-        sed -i "s/private static let wrapperVersion = \"react-native-[^\"]*\"/private static let wrapperVersion = \"react-native-$VERSION\"/" ios/AppstackBridge.swift
-        sed -i "s/private const val WRAPPER_VERSION = \"react-native-[^\"]*\"/private const val WRAPPER_VERSION = \"react-native-$VERSION\"/" android/src/main/kotlin/com/appstack/reactnative/AppstackReactNativeModule.kt
+        SWIFT_WRAPPER_FILE="ios/AppstackBridge.swift"
+        # The Kotlin wrapper version lives in the shared implementation class, which both
+        # the legacy and new architecture module classes delegate to.
+        KOTLIN_WRAPPER_FILE="android/src/main/kotlin/com/appstack/reactnative/AppstackReactNativeModuleImpl.kt"
+        sed -i "s/private static let wrapperVersion = \"react-native-[^\"]*\"/private static let wrapperVersion = \"react-native-$VERSION\"/" "$SWIFT_WRAPPER_FILE"
+        sed -i "s/private const val WRAPPER_VERSION = \"react-native-[^\"]*\"/private const val WRAPPER_VERSION = \"react-native-$VERSION\"/" "$KOTLIN_WRAPPER_FILE"
+        # Fail loudly if either substitution did not take effect. A silent no-op here
+        # ships a stale wrapper version, which only the runtime smoke tests would catch.
+        grep -q "wrapperVersion = \"react-native-$VERSION\"" "$SWIFT_WRAPPER_FILE" \
+          || { echo "::error::Failed to stamp wrapper version in $SWIFT_WRAPPER_FILE"; exit 1; }
+        grep -q "WRAPPER_VERSION = \"react-native-$VERSION\"" "$KOTLIN_WRAPPER_FILE" \
+          || { echo "::error::Failed to stamp WRAPPER_VERSION in $KOTLIN_WRAPPER_FILE"; exit 1; }
         echo "✅ Updated package.json and WRAPPER_VERSION to $VERSION"
 
     - name: Build and test
