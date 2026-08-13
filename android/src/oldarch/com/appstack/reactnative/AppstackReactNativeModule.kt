@@ -30,6 +30,11 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
+    fun setCustomerUserId(customerUserId: String?, promise: Promise) {
+        impl.setCustomerUserId(customerUserId, promise)
+    }
+
+    @ReactMethod
     fun sendEvent(eventType: String?, eventName: String?, parameters: ReadableMap?, promise: Promise) {
         impl.sendEvent(eventType, eventName, parameters, promise)
     }

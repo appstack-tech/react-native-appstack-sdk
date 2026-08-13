@@ -30,6 +30,10 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
         impl.configure(apiKey, logLevel, customerUserId, promise)
     }
 
+    override fun setCustomerUserId(customerUserId: String?, promise: Promise) {
+        impl.setCustomerUserId(customerUserId, promise)
+    }
+
     override fun sendEvent(eventType: String?, eventName: String?, parameters: ReadableMap?, promise: Promise) {
         impl.sendEvent(eventType, eventName, parameters, promise)
     }

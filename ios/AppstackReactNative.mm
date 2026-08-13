@@ -43,8 +43,8 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
 
 // A nil/blank customerUserId is an explicit clear here, so it is forwarded as-is.
 RCT_EXPORT_METHOD(setCustomerUserId:(NSString * _Nullable)customerUserId
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+                 resolve:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject)
 {
     @try {
         [AppstackBridge setCustomerUserId:customerUserId];
