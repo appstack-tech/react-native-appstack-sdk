@@ -779,14 +779,27 @@ else
   fi
 
   # The generated TurboModule spec header is what ios/AppstackReactNative.h imports on
-  # the new architecture. `pod install` runs codegen, so this is verifiable without a build.
+  # the new architecture. Where it appears depends on the Expo SDK: up to SDK 56 codegen
+  # runs during `pod install`, while SDK 57 defers it to an Xcode build phase. So this is
+  # only an opportunistic check; assert_ios_codegen_spec after the build is the hard gate.
+  find_ios_codegen_spec() { find build -name 'RNAppstackSdkSpec.h' 2>/dev/null | head -1; }
+
+  assert_ios_codegen_spec() {
+    local header
+    header="$(find_ios_codegen_spec)"
+    [[ -n "$header" ]] \
+      || fail "Codegen did not produce RNAppstackSdkSpec.h — check codegenConfig in package.json"
+    grep -q "NativeAppstackReactNativeSpec" "$header" \
+      || fail "NativeAppstackReactNativeSpec protocol missing from ${header}"
+    log "Codegen spec header verified: ${header}"
+  }
+
   if [[ "$ARCHITECTURE" == "new" ]]; then
-    SPEC_HEADER="build/generated/ios/RNAppstackSdkSpec/RNAppstackSdkSpec.h"
-    [[ -f "$SPEC_HEADER" ]] \
-      || fail "Codegen did not produce ${SPEC_HEADER} — check codegenConfig in package.json"
-    grep -q "NativeAppstackReactNativeSpec" "$SPEC_HEADER" \
-      || fail "NativeAppstackReactNativeSpec protocol missing from ${SPEC_HEADER}"
-    log "Codegen spec header generated: ${SPEC_HEADER}"
+    if [[ -n "$(find_ios_codegen_spec)" ]]; then
+      assert_ios_codegen_spec
+    else
+      log "Codegen spec header not present yet (this Expo SDK runs codegen as an Xcode build phase); verifying after the build"
+    fi
   fi
 
   if [[ "$QUICK_MODE" == true ]]; then
@@ -835,6 +848,13 @@ else
       CODE_SIGNING_ALLOWED=NO \
       COMPILER_INDEX_STORE_ENABLE=NO \
       build
+  fi
+
+  # Hard gate: by this point codegen has run on every supported Expo SDK, whether at
+  # `pod install` or as a build phase. A missing spec header here means the module was
+  # built without its generated protocol and is not a real TurboModule.
+  if [[ "$ARCHITECTURE" == "new" ]]; then
+    assert_ios_codegen_spec
   fi
 fi
 
