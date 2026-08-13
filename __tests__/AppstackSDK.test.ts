@@ -28,6 +28,13 @@ jest.mock('react-native', () => {
     NativeModules: {
       AppstackReactNative: mockNative,
     },
+    // src/index.ts resolves the native module through the codegen spec, which
+    // uses TurboModuleRegistry. Return the same object so the assertions below
+    // can keep reading it off NativeModules.
+    TurboModuleRegistry: {
+      get: () => mockNative,
+      getEnforcing: () => mockNative,
+    },
     Platform: {
       OS: 'ios',
       select: function (obj: Record<string, string>) {
