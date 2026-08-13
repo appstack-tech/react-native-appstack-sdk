@@ -8,9 +8,13 @@ module.exports = {
         // expands the class name to the FQCN from packageImportPath itself, so a
         // fully-qualified instance gets the package prefix duplicated.
         packageInstance: 'new AppstackReactNativePackage()',
-        // Disable CMake autolinking - native build is handled by build.gradle externalNativeBuild
-        // This prevents autolinking from trying to include codegen before it's generated
-        cmakeListsPath: null,
+        // cmakeListsPath is intentionally omitted. The default,
+        // android/build/generated/source/codegen/jni/CMakeLists.txt, is exactly what
+        // codegen produces and what the app's generated autolinking CMake
+        // add_subdirectory()s. It used to be set to null in an attempt to disable
+        // codegen autolinking, which never worked: null is falsy, so the resolver fell
+        // through to this same default. The actual gate was the absence of
+        // codegenConfig.name in package.json.
       },
       ios: {
         // iOS configuration is handled by the podspec

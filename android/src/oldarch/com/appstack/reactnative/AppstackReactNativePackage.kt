@@ -6,8 +6,11 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.uimanager.ViewManager
 
 /**
- * React Native package for Appstack SDK integration.
- * This package provides the bridge between React Native and the native Android SDK.
+ * React Native package for Appstack SDK integration, legacy architecture.
+ *
+ * Uses the plain ReactPackage interface rather than BaseReactPackage so the
+ * declared peer range (react-native >= 0.72.0) stays honest: BaseReactPackage was
+ * only introduced later. The new-architecture counterpart lives in src/newarch.
  */
 class AppstackReactNativePackage : ReactPackage {
 

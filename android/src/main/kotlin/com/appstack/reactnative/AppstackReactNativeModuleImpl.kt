@@ -1,30 +1,36 @@
 package com.appstack.reactnative
 
-import android.content.Context
 import android.content.pm.PackageManager
 import com.facebook.react.bridge.*
-import com.facebook.react.module.annotations.ReactModule
 // Import the SDK from the Maven dependency
 import com.appstack.attribution.AppstackAttributionSdk
 import com.appstack.attribution.EventType
 
-@ReactModule(name = AppstackReactNativeModule.NAME)
-class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
-    ReactContextBaseJavaModule(reactContext) {
+/**
+ * All Appstack bridge logic, shared by both architectures.
+ *
+ * The React Native base class differs per architecture (see src/oldarch and
+ * src/newarch): on the legacy architecture the module extends
+ * ReactContextBaseJavaModule and declares @ReactMethod, while on the new
+ * architecture it extends the codegen-generated NativeAppstackReactNativeSpec and
+ * overrides its abstract methods. Both are thin adapters that delegate here, so
+ * this file stays the single source of truth for behaviour.
+ *
+ * Method signatures mirror the codegen spec, which is why logLevel is a Double:
+ * a required `number` parameter is generated as a primitive `double`.
+ */
+class AppstackReactNativeModuleImpl(
+    private val reactApplicationContext: ReactApplicationContext
+) {
 
     companion object {
         const val NAME = "AppstackReactNative"
         private const val WRAPPER_VERSION = "react-native-1.0.0"
     }
 
-    override fun getName(): String {
-        return NAME
-    }
-
     // setProxyUrl + configureWrapper are gated behind @RequiresOptIn(InternalAppstackApi).
     @OptIn(com.appstack.attribution.InternalAppstackApi::class)
-    @ReactMethod
-    fun configure(apiKey: String, logLevel: Int, customerUserId: String?, promise: Promise) {
+    fun configure(apiKey: String, logLevel: Double, customerUserId: String?, promise: Promise) {
         try {
             if (apiKey.isBlank()) {
                 promise.reject("INVALID_API_KEY", "API key cannot be null or empty")
@@ -32,13 +38,9 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
             }
 
             val context = reactApplicationContext
-            if (context == null) {
-                promise.reject("CONTEXT_ERROR", "React application context is null")
-                return
-            }
 
-            // Convert Int logLevel to LogLevel enum
-            val logLevelEnum = when (logLevel) {
+            // Convert the logLevel number to the LogLevel enum
+            val logLevelEnum = when (logLevel.toInt()) {
                 0 -> com.appstack.attribution.LogLevel.DEBUG
                 1 -> com.appstack.attribution.LogLevel.INFO
                 2 -> com.appstack.attribution.LogLevel.WARN
@@ -114,7 +116,6 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    @ReactMethod
     fun sendEvent(eventType: String?, eventName: String?, parameters: ReadableMap?, promise: Promise) {
         try {
             // At least one of eventName or eventType should be provided
@@ -126,7 +127,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
             // Determine the EventType enum to use
             val finalEventType: EventType
             val finalEventName: String?
-            
+
             if (!eventType.isNullOrBlank()) {
                 // Use provided event_type parameter
                 finalEventType = try {
@@ -134,7 +135,7 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
                 } catch (e: IllegalArgumentException) {
                     EventType.CUSTOM
                 }
-                
+
                 // For CUSTOM event type, eventName is required
                 // For non-CUSTOM event types, name should be null (SDK will use the event type)
                 finalEventName = if (finalEventType == EventType.CUSTOM) {
@@ -174,20 +175,23 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
                 name = finalEventName,
                 parameters = parametersMap
             )
-            
+
             promise.resolve(true)
         } catch (exception: Exception) {
             promise.reject("EVENT_SEND_ERROR", "Failed to send event (eventType: '$eventType', eventName: '$eventName'): ${exception.message}", exception)
         }
     }
 
-    @ReactMethod
     fun enableAppleAdsAttribution(promise: Promise) {
         // Apple Ads Attribution is iOS-only, so we return false on Android
         promise.resolve(false)
     }
 
-    @ReactMethod
+    fun disableASAAttributionTracking(promise: Promise) {
+        // Apple Search Ads attribution is iOS-only, so we return false on Android
+        promise.resolve(false)
+    }
+
     fun clearData(promise: Promise) {
         try {
             AppstackAttributionSdk.clearData()
@@ -197,7 +201,6 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    @ReactMethod
     fun isEnabled(promise: Promise) {
         try {
             val enabled = AppstackAttributionSdk.isEnabled()
@@ -207,7 +210,6 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    @ReactMethod
     fun getAppstackId(promise: Promise) {
         try {
             val appstackId = AppstackAttributionSdk.getAppstackId()
@@ -217,7 +219,6 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    @ReactMethod
     fun isSdkDisabled(promise: Promise) {
         try {
             val disabled = AppstackAttributionSdk.isSdkDisabled()
@@ -227,18 +228,17 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    @ReactMethod
     fun getAttributionParams(promise: Promise) {
         try {
             val params = AppstackAttributionSdk.getAttributionParams(rawReferrer = null)
-            
+
             // Convert Map<String, Any> to WritableMap using Arguments factory
             val writableMap = Arguments.createMap()
-            
+
             params.forEach { (key, value) ->
                 writableMap.putString(key, value)
             }
-            
+
             promise.resolve(writableMap)
         } catch (exception: Exception) {
             promise.reject("ATTRIBUTION_PARAMS_ERROR", "Failed to get attribution parameters: ${exception.message}", exception)
