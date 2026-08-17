@@ -85,7 +85,6 @@ class AppstackReactNativeModuleImpl(
      * Sets — or clears — the customer user id after configure(). Forwarded verbatim,
      * without the configure path's `takeIf { it.isNotBlank() }`: null/blank is a clear here.
      */
-    @ReactMethod
     fun setCustomerUserId(customerUserId: String?, promise: Promise) {
         try {
             AppstackAttributionSdk.setCustomerUserId(customerUserId)
