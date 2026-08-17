@@ -59,6 +59,22 @@ if [[ "$ARCHITECTURE" == "new" ]]; then
 else
   NEW_ARCH_ENABLED=false
 fi
+# Expo SDK 51 predates the top-level `expo.newArchEnabled` app-config key: it opts
+# into the New Architecture through the expo-build-properties plugin instead. Writing
+# the top-level key there is silently ignored, so prebuild would generate
+# newArchEnabled=false no matter what was requested.
+if (( SDK_MAJOR <= 51 )); then
+  ARCH_VIA_BUILD_PROPERTIES=true
+else
+  ARCH_VIA_BUILD_PROPERTIES=false
+fi
+# Expo SDK 53 and older do not pull expo-asset into the blank template, but their
+# bundling step requires it.
+if (( SDK_MAJOR <= 53 )); then
+  NEEDS_EXPO_ASSET=true
+else
+  NEEDS_EXPO_ASSET=false
+fi
 if (( SDK_MAJOR <= 54 )); then
   WRITE_NEW_ARCH_CONFIG=true
 else
@@ -585,14 +601,20 @@ cd "$APP_DIR"
 # 3. Install the packed SDK and configure app.json for non-interactive prebuild
 log "Installing SDK tarball into the app..."
 npm install --no-audit --no-fund "$TARBALL"
-if [[ "$STATIC_FRAMEWORKS" == true ]]; then
-  npm install --no-audit --no-fund expo-build-properties
+if [[ "$STATIC_FRAMEWORKS" == true || "$ARCH_VIA_BUILD_PROPERTIES" == true ]]; then
+  # `expo install` picks the release matching the app's Expo SDK; plain `npm install`
+  # would pull a version built for a newer SDK.
+  npx --yes expo install expo-build-properties
+fi
+if [[ "$NEEDS_EXPO_ASSET" == true ]]; then
+  npx --yes expo install expo-asset
 fi
 if [[ "$SMOKE_MODE" == true ]]; then
   start_runtime_backend
 fi
 STATIC_FRAMEWORKS="$STATIC_FRAMEWORKS" SMOKE_MODE="$SMOKE_MODE" \
   NEW_ARCH_ENABLED="$NEW_ARCH_ENABLED" WRITE_NEW_ARCH_CONFIG="$WRITE_NEW_ARCH_CONFIG" \
+  ARCH_VIA_BUILD_PROPERTIES="$ARCH_VIA_BUILD_PROPERTIES" \
   APPSTACK_RUNTIME_PROXY_URL="${APPSTACK_RUNTIME_PROXY_URL:-}" node -e "
   const fs = require('fs');
   const j = JSON.parse(fs.readFileSync('app.json', 'utf8'));
@@ -645,8 +667,28 @@ STATIC_FRAMEWORKS="$STATIC_FRAMEWORKS" SMOKE_MODE="$SMOKE_MODE" \
       './withAppstackDevProxy'
     ].includes(Array.isArray(p) ? p[0] : p)
   );
+  // Every concern has to share one expo-build-properties entry; listing the plugin
+  // twice is a config error.
+  const buildProps = {};
   if (process.env.STATIC_FRAMEWORKS === 'true') {
-    plugins.push(['expo-build-properties', { ios: { useFrameworks: 'static' } }]);
+    buildProps.ios = { ...(buildProps.ios || {}), useFrameworks: 'static' };
+  }
+  if (process.env.ARCH_VIA_BUILD_PROPERTIES === 'true') {
+    // Expo SDK 51 reads the architecture from here rather than expo.newArchEnabled.
+    const newArch = process.env.NEW_ARCH_ENABLED === 'true';
+    buildProps.android = { ...(buildProps.android || {}), newArchEnabled: newArch };
+    // Expo SDK 51 defaults to an iOS 13.4 deployment target, below the 15.0 this SDK
+    // requires (see s.platforms in the podspec and the README), so CocoaPods refuses to
+    // resolve the pod at all. Raising it here mirrors what an Expo 51 app must do to
+    // use this SDK; it is a real consumer requirement, not a harness workaround.
+    buildProps.ios = {
+      ...(buildProps.ios || {}),
+      newArchEnabled: newArch,
+      deploymentTarget: '15.0'
+    };
+  }
+  if (Object.keys(buildProps).length > 0) {
+    plugins.push(['expo-build-properties', buildProps]);
   }
   j.expo.plugins = plugins;
   fs.writeFileSync('app.json', JSON.stringify(j, null, 2));
@@ -676,10 +718,17 @@ if [[ "$PLATFORM" == "android" ]]; then
   # 5a. Generate PackageList.java and assert our package is linked correctly
   cd android
   log "Generating autolinking PackageList..."
-  ./gradlew --no-daemon :app:generateAutolinkingPackageList
+  # React Native 0.75+ (Expo SDK 52+) exposes a dedicated task from its Gradle plugin.
+  # React Native 0.74 (Expo SDK 51) has no such task: native_modules.gradle generates
+  # PackageList.java during preBuild instead, into a different directory.
+  if ! ./gradlew --no-daemon :app:generateAutolinkingPackageList; then
+    log "No generateAutolinkingPackageList task; falling back to preBuild (React Native 0.74 and older)"
+    ./gradlew --no-daemon :app:preBuild
+  fi
 
-  PKG_LIST="app/build/generated/autolinking/src/main/java/com/facebook/react/PackageList.java"
-  [[ -f "$PKG_LIST" ]] || fail "PackageList.java was not generated at ${PKG_LIST}"
+  PKG_LIST="$(find app/build/generated -name PackageList.java 2>/dev/null | head -1)"
+  [[ -n "$PKG_LIST" ]] || fail "PackageList.java was not generated anywhere under app/build/generated"
+  log "Using generated PackageList at ${PKG_LIST}"
 
   grep -q "AppstackReactNativePackage" "$PKG_LIST" \
     || fail "AppstackReactNativePackage missing from PackageList.java — SDK was not autolinked"
@@ -770,12 +819,15 @@ else
   log "Podfile.lock looks correct:"
   grep -n "react-native-appstack-sdk" Podfile.lock | head -5 | sed 's/^/    /'
 
-  # React Native's codegen pod is `ReactCodegen`. `React-Codegen` is an unrelated
-  # third-party pod on the public CocoaPods trunk; the podspec used to depend on it by
-  # mistake, which both broke TurboModule codegen and pulled an untrusted dependency.
-  if grep -qE "^\s+- React-Codegen" Podfile.lock; then
-    grep -n "React-Codegen" Podfile.lock >&2
-    fail "Podfile.lock depends on React-Codegen (an unrelated trunk pod); the correct pod is ReactCodegen"
+  # React Native's codegen pod is generated into the app and linked by path: it is named
+  # ReactCodegen from React Native 0.75 onward and React-Codegen before that. Both are
+  # legitimate. What is not legitimate is a React-Codegen resolved from the public
+  # CocoaPods trunk: that is an unrelated third-party package (version 0.1.0) which the
+  # podspec used to depend on by mistake, breaking TurboModule codegen and pulling an
+  # untrusted dependency. Discriminate on the source, not on the name.
+  if sed -n '/^SPEC REPOS:/,/^[A-Z][A-Z ]*:/p' Podfile.lock | grep -qE '^ +- React-?Codegen'; then
+    sed -n '/^SPEC REPOS:/,/^[A-Z][A-Z ]*:/p' Podfile.lock >&2
+    fail "React Native's codegen pod is being resolved from the CocoaPods trunk; it must come from the app's generated sources"
   fi
 
   # The generated TurboModule spec header is what ios/AppstackReactNative.h imports on
