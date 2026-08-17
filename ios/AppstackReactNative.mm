@@ -1,6 +1,10 @@
 #import "AppstackReactNative.h"
 #import "AppstackBridge.h"
 
+// Method bodies below are architecture-agnostic. The promise parameters are named
+// `resolve:` / `reject:` because that is what React Native's codegen emits for a
+// `Promise<T>` return; on the legacy architecture RCT_EXPORT_METHOD derives the JS
+// method name from the first selector component only, so the names are free.
 @implementation AppstackReactNative
 
 RCT_EXPORT_MODULE()
@@ -10,18 +14,13 @@ RCT_EXPORT_MODULE()
     return NO;
 }
 
-- (NSArray<NSString *> *)supportedEvents
-{
-    return @[];
-}
-
 #pragma mark - SDK Configuration
 
 RCT_EXPORT_METHOD(configure:(NSString *)apiKey
-                 logLevel:(NSInteger)logLevel
+                 logLevel:(double)logLevel
                  customerUserId:(NSString * _Nullable)customerUserId
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+                 resolve:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject)
 {
     if (!apiKey || [apiKey length] == 0) {
         reject(@"INVALID_API_KEY", @"API key cannot be null or empty", nil);
@@ -30,8 +29,10 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
 
     dispatch_async(dispatch_get_main_queue(), ^{
         @try {
-            // Call the Swift bridge method directly
-            [AppstackBridge configureWithApiKey:apiKey logLevel:logLevel customerUserId:customerUserId];
+            // The codegen spec types logLevel as `double`; AppstackBridge takes NSInteger.
+            [AppstackBridge configureWithApiKey:apiKey
+                                      logLevel:(NSInteger)logLevel
+                                customerUserId:customerUserId];
 
             resolve(@(YES));
         } @catch (NSException *exception) {
@@ -42,8 +43,8 @@ RCT_EXPORT_METHOD(configure:(NSString *)apiKey
 
 // A nil/blank customerUserId is an explicit clear here, so it is forwarded as-is.
 RCT_EXPORT_METHOD(setCustomerUserId:(NSString * _Nullable)customerUserId
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+                 resolve:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject)
 {
     @try {
         [AppstackBridge setCustomerUserId:customerUserId];
@@ -56,11 +57,11 @@ RCT_EXPORT_METHOD(setCustomerUserId:(NSString * _Nullable)customerUserId
 
 #pragma mark - Event Tracking
 
-RCT_EXPORT_METHOD(sendEvent:(NSString *)eventType
-                 eventName:(NSString *)eventName
-                 parameters:(id _Nullable)parameters
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(sendEvent:(NSString * _Nullable)eventType
+                 eventName:(NSString * _Nullable)eventName
+                 parameters:(NSDictionary * _Nullable)parameters
+                 resolve:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject)
 {
     // At least one of eventName or eventType should be provided
     if ((!eventName || [eventName length] == 0) && (!eventType || [eventType length] == 0)) {
@@ -80,9 +81,9 @@ RCT_EXPORT_METHOD(sendEvent:(NSString *)eventType
         // Convert parameters: handle NSNull by converting to nil.
         // Non-dictionary parameters are ignored.
         NSDictionary *parametersDict = nil;
-        if (parameters != nil && parameters != [NSNull null]) {
+        if (parameters != nil && (id)parameters != [NSNull null]) {
             if ([parameters isKindOfClass:[NSDictionary class]]) {
-                parametersDict = (NSDictionary *)parameters;
+                parametersDict = parameters;
             }
         }
 
@@ -98,7 +99,7 @@ RCT_EXPORT_METHOD(sendEvent:(NSString *)eventType
 #pragma mark - Apple Search Ads Attribution
 
 RCT_EXPORT_METHOD(enableAppleAdsAttribution:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+                 reject:(RCTPromiseRejectBlock)reject)
 {
     if (@available(iOS 15.0, *)) {
         @try {
@@ -117,7 +118,7 @@ RCT_EXPORT_METHOD(enableAppleAdsAttribution:(RCTPromiseResolveBlock)resolve
 #pragma mark - Additional SDK Methods
 
 RCT_EXPORT_METHOD(disableASAAttributionTracking:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+                 reject:(RCTPromiseRejectBlock)reject)
 {
     if (@available(iOS 15.0, *)) {
         @try {
@@ -133,8 +134,31 @@ RCT_EXPORT_METHOD(disableASAAttributionTracking:(RCTPromiseResolveBlock)resolve
     }
 }
 
+RCT_EXPORT_METHOD(clearData:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject)
+{
+    // Not wired on iOS: the native framework exposes an async `deleteUserData()`,
+    // which needs a completion-handler shim in AppstackBridge. Resolves false to
+    // signal "unsupported on this platform", the same convention Android uses for
+    // enableAppleAdsAttribution.
+    resolve(@(NO));
+}
+
+RCT_EXPORT_METHOD(isEnabled:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        // iOS exposes the inverse of this: the SDK is enabled unless it is disabled.
+        BOOL isDisabled = [AppstackBridge isSdkDisabled];
+
+        resolve(@(!isDisabled));
+    } @catch (NSException *exception) {
+        reject(@"STATUS_ERROR", exception.reason, nil);
+    }
+}
+
 RCT_EXPORT_METHOD(getAppstackId:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+                 reject:(RCTPromiseRejectBlock)reject)
 {
     @try {
         // Call the Swift bridge method directly
@@ -147,7 +171,7 @@ RCT_EXPORT_METHOD(getAppstackId:(RCTPromiseResolveBlock)resolve
 }
 
 RCT_EXPORT_METHOD(isSdkDisabled:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+                 reject:(RCTPromiseRejectBlock)reject)
 {
     @try {
         // Call the Swift bridge method directly
@@ -160,7 +184,7 @@ RCT_EXPORT_METHOD(isSdkDisabled:(RCTPromiseResolveBlock)resolve
 }
 
 RCT_EXPORT_METHOD(getAttributionParams:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+                 reject:(RCTPromiseRejectBlock)reject)
 {
     @try {
         [AppstackBridge getAttributionParamsWithCompletion:^(NSDictionary * _Nullable params, NSError * _Nullable error) {
@@ -178,5 +202,15 @@ RCT_EXPORT_METHOD(getAttributionParams:(RCTPromiseResolveBlock)resolve
         reject(@"ATTRIBUTION_PARAMS_ERROR", exception.reason, nil);
     }
 }
+
+#pragma mark - TurboModule
+
+#ifdef RCT_NEW_ARCH_ENABLED
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params
+{
+    return std::make_shared<facebook::react::NativeAppstackReactNativeSpecJSI>(params);
+}
+#endif
 
 @end

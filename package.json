@@ -81,6 +81,14 @@
     "react": "*",
     "react-native": ">=0.72.0"
   },
+  "codegenConfig": {
+    "name": "RNAppstackSdkSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.appstack.reactnative"
+    }
+  },
   "engines": {
     "node": ">= 16.0.0"
   },

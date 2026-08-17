@@ -1,4 +1,5 @@
-import { NativeModules, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import NativeAppstackReactNative from './NativeAppstackReactNative';
 import { EventType } from './types';
 
 // Lazy evaluation of LINKING_ERROR to avoid calling Platform.select during module initialization
@@ -11,8 +12,10 @@ const getLinkingError = () => {
   );
 };
 
-const AppstackReactNative = NativeModules.AppstackReactNative
-  ? NativeModules.AppstackReactNative
+// Resolved through TurboModuleRegistry so the same call site works on the new
+// architecture (real TurboModule) and the legacy one (NativeModules entry).
+const AppstackReactNative = NativeAppstackReactNative
+  ? (NativeAppstackReactNative as any)
   : (new Proxy({} as any, {
       get() {
         throw new Error(getLinkingError());

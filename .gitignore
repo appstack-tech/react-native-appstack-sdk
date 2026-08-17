@@ -47,6 +47,10 @@ ios/build/
 *.dSYM.zip
 *.dSYM
 ios/.xcframework-update.*
+# Unwrapped framework slices: the vendored SDK belongs in ios/AppstackSDK.xcframework
+# only. A stray copy directly under ios/ used to be committed and shipped.
+ios/ios-arm64*/
+/ios/Info.plist
 
 # Android
 android/build/

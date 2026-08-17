@@ -1,12 +1,55 @@
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
+// React Native codegen. Applied to this library project, it registers
+// generateCodegenSchemaFromJavaScript + generateCodegenArtifactsFromSchema, hooks them
+// to preBuild, and adds build/generated/source/codegen/java to the main source set.
+// Configuration is read from this package's package.json `codegenConfig` block
+// (name/type/jsSrcsDir/android.javaPackageName), so no `react { }` block is needed here.
+//
+// Applied unconditionally rather than gated on newArchEnabled, so that
+// build/generated/source/codegen/jni/CMakeLists.txt always exists for the
+// add_subdirectory() that the app's generated autolinking CMake emits. The cost is one
+// codegen invocation on legacy-architecture builds.
+apply plugin: 'com.facebook.react'
 
 group = 'com.appstack.reactnative'
 version = '1.0.0'
 
+// Mirrors com.facebook.react.utils.ProjectUtils.isNewArchEnabled from the React Native
+// Gradle plugin, so this library can never disagree with the app about which
+// architecture is active.
+def isNewArchitectureEnabled() {
+    if (project.hasProperty('newArchEnabled')) {
+        return project.property('newArchEnabled').toString().toBoolean()
+    }
+    if (project.hasProperty('react.newArchEnabled')) {
+        return project.property('react.newArchEnabled').toString().toBoolean()
+    }
+    return false
+}
+
+def IS_NEW_ARCHITECTURE_ENABLED = isNewArchitectureEnabled()
+
 android {
     namespace 'com.appstack.reactnative'
     compileSdkVersion 35
+
+    // Architecture-specific React Native adapter classes. All behaviour lives in
+    // src/main (AppstackReactNativeModuleImpl); these directories hold only the thin
+    // module + package classes that differ between architectures. On the new
+    // architecture the module extends the codegen-generated
+    // NativeAppstackReactNativeSpec, which does not exist on the legacy one.
+    sourceSets {
+        main {
+            java {
+                if (IS_NEW_ARCHITECTURE_ENABLED) {
+                    srcDirs += ['src/newarch']
+                } else {
+                    srcDirs += ['src/oldarch']
+                }
+            }
+        }
+    }
 
     defaultConfig {
         minSdkVersion 21
