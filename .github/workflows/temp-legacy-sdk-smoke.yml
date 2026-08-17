@@ -1,15 +1,14 @@
 # TEMPORARY — DELETE BEFORE MERGING THIS PR.
 #
-# One-off validation of Expo SDK 51-53, the versions below the integration
-# harness's usual floor. Expo 54-57 are already covered by the permanent Tests
-# workflow and by an earlier full-matrix run.
+# Narrowed to the single combination still unproven after the first Expo 51-53 run.
 #
-# Coverage: new and legacy architecture on Expo SDK 51, 52 and 53 (legacy is still
-# available at these versions; Expo removed it in SDK 55). 12 jobs.
-#
-# Triggered on push rather than workflow_dispatch: GitHub only exposes
-# workflow_dispatch for workflows already present on the default branch, and this
-# file is never meant to land there.
+# That run covered 12 jobs and passed 9. The three failures were:
+#   - iOS 51 (both architectures): React Native 0.74's post_install clamps every pod to
+#     IPHONEOS_DEPLOYMENT_TARGET 13.4, below the iOS 15.0 the vendored framework needs,
+#     so AppstackBridge.swift cannot compile. A genuine, pre-existing incompatibility;
+#     Expo 51 iOS is not supported and there is nothing here to re-test.
+#   - Android 51 new: the harness asserted on generateAutolinkingNewArchitectureFiles,
+#     a task React Native 0.74 does not have. Fixed; this run verifies that fix.
 name: TEMP legacy SDK smoke
 
 on:
@@ -24,14 +23,9 @@ concurrency:
 
 jobs:
   android:
-    name: TEMP smoke / Android (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.architecture }})
+    name: TEMP smoke / Android (Expo SDK 51, new)
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        expo-sdk: ['51', '52', '53']
-        architecture: ['new', 'legacy']
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -62,47 +56,4 @@ jobs:
           arch: x86_64
           target: default
           disable-animations: true
-          script: ./integration-tests/run.sh ${{ matrix.expo-sdk }} --platform android --architecture ${{ matrix.architecture }} --smoke
-
-  ios:
-    name: TEMP smoke / iOS (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.architecture }})
-    runs-on: macos-26
-    timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        expo-sdk: ['51', '52', '53']
-        architecture: ['new', 'legacy']
-    steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          persist-credentials: false
-
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      # Every SDK here is 53 or older. Newer Xcode fails to compile Pods/fmt with
-      # consteval errors on these React Native versions — reproduced locally on Expo
-      # 53 with Xcode 26.6, and the reason the permanent workflow pins 26.2 for its
-      # Expo 54 legacy job. Unrelated to this SDK's own code.
-      - name: Select and verify Xcode 26.2
-        run: |
-          set -euo pipefail
-          XCODE_DEVELOPER_DIR=/Applications/Xcode_26.2.app/Contents/Developer
-          test -d "$XCODE_DEVELOPER_DIR"
-          XCODE_VERSION="$(DEVELOPER_DIR="$XCODE_DEVELOPER_DIR" xcodebuild -version | sed -n '1p')"
-          test "$XCODE_VERSION" = "Xcode 26.2"
-          echo "DEVELOPER_DIR=$XCODE_DEVELOPER_DIR" >> "$GITHUB_ENV"
-          echo "Selected $XCODE_VERSION"
-
-      - name: Boot an iOS simulator
-        run: |
-          DEVICE_ID=$(xcrun simctl list devices available -j \
-            | python3 -c "import sys,json;d=json.load(sys.stdin)['devices'];print(next(x['udid'] for v in d.values() for x in v if 'iPhone' in x['name']))")
-          echo "Booting $DEVICE_ID"
-          xcrun simctl boot "$DEVICE_ID" || true
-
-      - name: Run iOS runtime check
-        run: ./integration-tests/run.sh ${{ matrix.expo-sdk }} --platform ios --architecture ${{ matrix.architecture }} --smoke
+          script: ./integration-tests/run.sh 51 --platform android --architecture new --smoke

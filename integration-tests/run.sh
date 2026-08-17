@@ -745,12 +745,18 @@ if [[ "$PLATFORM" == "android" ]]; then
   # falls back to the legacy interop layer instead of being a real TurboModule.
   if [[ "$ARCHITECTURE" == "new" ]]; then
     log "Generating autolinking new-architecture files..."
-    ./gradlew --no-daemon :app:generateAutolinkingNewArchitectureFiles
-    AUTOLINK_CPP="$(find app/build/generated/autolinking -name 'autolinking.cpp' 2>/dev/null | head -1)"
-    [[ -n "$AUTOLINK_CPP" ]] || fail "autolinking.cpp was not generated under app/build/generated/autolinking"
-    grep -q "RNAppstackSdkSpec_ModuleProvider" "$AUTOLINK_CPP" \
-      || fail "RNAppstackSdkSpec_ModuleProvider missing from ${AUTOLINK_CPP} — the SDK is not registered as a codegen library"
-    log "TurboModule provider registered in autolinking.cpp"
+    # React Native 0.74 (Expo SDK 51) has no C++ autolinking generation: the task does
+    # not exist and no autolinking.cpp is produced, so there is nothing to assert on.
+    # Java TurboModules are still resolved there through the package's module list.
+    if ./gradlew --no-daemon :app:generateAutolinkingNewArchitectureFiles; then
+      AUTOLINK_CPP="$(find app/build/generated/autolinking -name 'autolinking.cpp' 2>/dev/null | head -1)"
+      [[ -n "$AUTOLINK_CPP" ]] || fail "autolinking.cpp was not generated under app/build/generated/autolinking"
+      grep -q "RNAppstackSdkSpec_ModuleProvider" "$AUTOLINK_CPP" \
+        || fail "RNAppstackSdkSpec_ModuleProvider missing from ${AUTOLINK_CPP} — the SDK is not registered as a codegen library"
+      log "TurboModule provider registered in autolinking.cpp"
+    else
+      log "No generateAutolinkingNewArchitectureFiles task (React Native 0.74 and older); skipping the C++ provider assertion"
+    fi
   fi
 
   if [[ "$QUICK_MODE" == true ]]; then
