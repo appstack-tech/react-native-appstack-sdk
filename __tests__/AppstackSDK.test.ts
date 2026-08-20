@@ -635,6 +635,53 @@ describe('AppstackSDK', () => {
   });
 });
 
+// The on-device probe in integration-tests/run.sh drives the public API and
+// integration-tests/validate_runtime.py asserts on what it reports. Those run only
+// on an emulator/simulator in CI (~20 min), so this mirrors the same contract here:
+// an API change that breaks the probe fails in milliseconds instead of at the gate.
+// Keep in sync with both files.
+describe('integration-test runtime contract', () => {
+  it('matches what validate_runtime.py requires', async () => {
+    let eventsAccepted = 0;
+    await appstackSDK.sendEvent('runtime_validation_custom', {
+      string: 'bridge-value',
+      number: 42,
+      decimal: 9.75,
+      boolean: true,
+      unicode: 'café 🚀',
+      array: ['one', 2, false],
+      nested: { enabled: true, items: ['nested', 3, false] },
+    });
+    eventsAccepted += 1;
+    await appstackSDK.sendEvent(EventType.LOGIN, { state: 'ready', sequence: 2 });
+    eventsAccepted += 1;
+
+    let validationError = '';
+    try {
+      await (appstackSDK.sendEvent as (...args: unknown[]) => Promise<void>)();
+    } catch (error) {
+      validationError = error instanceof Error ? error.message : String(error);
+    }
+
+    let legacyCallRejected = false;
+    try {
+      await (appstackSDK.sendEvent as (...args: unknown[]) => Promise<void>)('PURCHASE', null, {
+        revenue: 1.5,
+      });
+    } catch (error) {
+      legacyCallRejected = /removed in 3\.0/.test(
+        error instanceof Error ? error.message : String(error)
+      );
+    }
+
+    await appstackSDK.sendEvent('runtime_validation_bare');
+
+    expect(eventsAccepted).toBe(2);
+    expect(validationError.startsWith('event must be a non-empty string')).toBe(true);
+    expect(legacyCallRejected).toBe(true);
+  });
+});
+
 describe('EventType', () => {
   it('exports expected event types', () => {
     expect(EventType.INSTALL).toBe('INSTALL');

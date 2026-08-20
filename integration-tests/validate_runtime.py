@@ -54,8 +54,16 @@ def main() -> None:
     )
     require(result.get("eventsAccepted") == 2, "wrapper did not accept both events")
     require(
-        result.get("validationError") == "Either eventName or eventType must be provided",
+        result.get("validationError", "").startswith("event must be a non-empty string"),
         "wrapper did not return the expected meaningful validation error",
+    )
+    require(
+        result.get("legacyCallRejected") is True,
+        "wrapper did not reject the removed 3-argument sendEvent call",
+    )
+    require(
+        result.get("bareCustomAccepted") is True,
+        "wrapper did not accept a bare unrecognised event as a custom event",
     )
     require(not result.get("errors"), f"runtime errors: {result.get('errors')}")
 
