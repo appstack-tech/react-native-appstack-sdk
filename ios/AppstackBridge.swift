@@ -98,11 +98,15 @@ public class AppstackBridge: NSObject {
     }
     
     @objc public static func enableAppleAdsAttribution() {
-        AppstackASAAttribution.shared.enableAppleAdsAttribution()
+        if #available(iOS 15.0, *) {
+            AppstackASAAttribution.shared.enableAppleAdsAttribution()
+        }
     }
     
     @objc public static func disableASAAttributionTracking() {
-        AppstackASAAttribution.shared.disableASAAttributionTracking()
+        if #available(iOS 15.0, *) {
+            AppstackASAAttribution.shared.disableASAAttributionTracking()
+        }
     }
     
     @objc public static func getAppstackId() -> String {
