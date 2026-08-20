@@ -39,24 +39,7 @@ export interface AppstackSDKInterface {
    * @param options - Optional configuration: `logLevel` and `customerUserId`
    * @returns Promise that resolves when configuration is successful
    */
-  configure(apiKey: string, options?: AppstackConfigureOptions): Promise<boolean>;
-  /**
-   * Configure Appstack SDK using the legacy positional signature
-   * @param apiKey - Your Appstack API key obtained from the dashboard
-   * @param isDebug - Deprecated and ignored; use `logLevel` instead. Still accepted for backward compatibility (optional, default false)
-   * @param endpointBaseUrl - Deprecated and ignored; not forwarded to native. Still accepted for backward compatibility (optional)
-   * @param logLevel - Log level: 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR (optional, default 1)
-   * @param customerUserId - Optional customer user ID to associate with the device/session
-   * @returns Promise that resolves when configuration is successful
-   * @deprecated Use `configure(apiKey, { logLevel, customerUserId })` instead
-   */
-  configure(
-    apiKey: string,
-    isDebug?: boolean,
-    endpointBaseUrl?: string,
-    logLevel?: number,
-    customerUserId?: string | null
-  ): Promise<boolean>;
+  configure(apiKey: string, options?: AppstackConfigureOptions | null): Promise<boolean>;
 
   /**
    * Set — or clear — the customer user ID after configure(), e.g. once a login reveals it.
@@ -156,107 +139,66 @@ class AppstackSDK implements AppstackSDKInterface {
    * @param apiKey - Your Appstack API key obtained from the dashboard
    * @param options - Optional configuration: `logLevel` and `customerUserId`
    */
-  configure(apiKey: string, options?: AppstackConfigureOptions): Promise<boolean>;
-  /**
-   * Configure Appstack SDK using the legacy positional signature
-   * @deprecated Use `configure(apiKey, { logLevel, customerUserId })` instead
-   */
-  configure(
-    apiKey: string,
-    isDebug?: boolean,
-    endpointBaseUrl?: string,
-    logLevel?: number,
-    customerUserId?: string | null
-  ): Promise<boolean>;
+  configure(apiKey: string, options?: AppstackConfigureOptions | null): Promise<boolean>;
+  // The rest parameter exists only to detect 2.x positional calls; it is deliberately
+  // absent from the overload above so TypeScript still reports the arity error. It is
+  // NOT `arguments.length`: this method is async, and Babel's async-to-generator
+  // transform hoists the body into an inner function, so `arguments` is not reliably
+  // the caller's argument list once bundled.
   async configure(
     apiKey: string,
-    optionsOrIsDebug?: AppstackConfigureOptions | boolean,
-    endpointBaseUrl?: string,
-    logLevel?: number,
-    customerUserId?: string | null
+    options?: AppstackConfigureOptions | null,
+    ...removedPositionalArgs: unknown[]
   ): Promise<boolean> {
     if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === '') {
       throw new Error('API key must be a non-empty string');
     }
 
-    // Branch on the options-object form: configure(apiKey, { logLevel, customerUserId }).
-    // `null` is deliberately excluded so configure(key, null) keeps hitting the legacy
-    // isDebug validation below, as it did before the overload was introduced.
-    const usesOptions = typeof optionsOrIsDebug === 'object' && optionsOrIsDebug !== null;
-
-    let resolvedLogLevel: number | undefined;
-    let resolvedCustomerUserId: string | null | undefined;
-
-    if (usesOptions) {
-      const options = optionsOrIsDebug as AppstackConfigureOptions;
-      resolvedLogLevel = options.logLevel;
-      resolvedCustomerUserId = options.customerUserId;
-    } else {
-      // Default parameters only kick in for `undefined`, so mirror that explicitly.
-      const isDebug = optionsOrIsDebug === undefined ? false : optionsOrIsDebug;
-
-      if (typeof isDebug !== 'boolean') {
-        throw new Error('isDebug must be a boolean');
-      }
-
-      if (
-        endpointBaseUrl !== undefined &&
-        (typeof endpointBaseUrl !== 'string' || endpointBaseUrl.trim() === '')
-      ) {
-        throw new Error('endpointBaseUrl must be a non-empty string or undefined');
-      }
-
-      resolvedLogLevel = logLevel;
-      resolvedCustomerUserId = customerUserId;
-
-      if (isDebug) {
-        console.warn(
-          '[AppstackSDK] ⚠️  configure(apiKey, isDebug, ...) is deprecated and isDebug has no ' +
-            'effect. Use configure(apiKey, { logLevel: 0 }) for verbose logging.'
-        );
-      }
-      if (endpointBaseUrl !== undefined) {
-        console.warn(
-          '[AppstackSDK] ⚠️  configure(apiKey, isDebug, endpointBaseUrl, ...) is deprecated and ' +
-            'endpointBaseUrl has no effect; it is not forwarded to native. Use ' +
-            'configure(apiKey, { logLevel, customerUserId }) instead.'
-        );
-      }
+    // 2.x accepted configure(apiKey, isDebug, endpointBaseUrl, logLevel, customerUserId).
+    // Detect that by argument count, not by inspecting the second argument: isDebug was
+    // almost always `false` and endpointBaseUrl almost always `undefined`, so their values
+    // carry no signal. Silently ignoring the call would drop the logLevel and
+    // customerUserId that trail them, which for an attribution SDK means events going out
+    // with no customer user ID and nothing logged. `null` is tolerated as "no options".
+    if (
+      removedPositionalArgs.length > 0 ||
+      (options !== undefined && options !== null && typeof options !== 'object')
+    ) {
+      throw new Error(
+        'configure(apiKey, isDebug, endpointBaseUrl, logLevel, customerUserId) was removed in 3.0. ' +
+          'Use configure(apiKey, { logLevel, customerUserId }) instead; isDebug and ' +
+          'endpointBaseUrl are gone and were never forwarded to the native SDKs.'
+      );
     }
 
-    if (resolvedLogLevel === undefined) {
-      resolvedLogLevel = 1;
-    }
+    const logLevel = options?.logLevel === undefined ? 1 : options.logLevel;
+    const customerUserId = options?.customerUserId;
 
     // Number.isFinite also rejects NaN, which would otherwise pass: typeof NaN is
     // 'number' and both NaN < 0 and NaN > 3 are false.
     if (
-      typeof resolvedLogLevel !== 'number' ||
-      !Number.isFinite(resolvedLogLevel) ||
-      resolvedLogLevel < 0 ||
-      resolvedLogLevel > 3
+      typeof logLevel !== 'number' ||
+      !Number.isFinite(logLevel) ||
+      logLevel < 0 ||
+      logLevel > 3
     ) {
       throw new Error('logLevel must be a number between 0 and 3');
     }
 
     if (
-      resolvedCustomerUserId !== undefined &&
-      resolvedCustomerUserId !== null &&
-      (typeof resolvedCustomerUserId !== 'string' || resolvedCustomerUserId.trim() === '')
+      customerUserId !== undefined &&
+      customerUserId !== null &&
+      (typeof customerUserId !== 'string' || customerUserId.trim() === '')
     ) {
       throw new Error('customerUserId must be a non-empty string, null, or undefined');
     }
 
     try {
-      // isDebug and endpointBaseUrl are accepted for backward compatibility but no
-      // longer forwarded to native: isDebug was dropped in favor of logLevel, and a
-      // custom endpoint is not wired through the RN wrapper.
-      const result = await AppstackReactNative.configure(
+      return await AppstackReactNative.configure(
         apiKey.trim(),
-        resolvedLogLevel,
-        resolvedCustomerUserId != null ? resolvedCustomerUserId.trim() || null : null
+        logLevel,
+        customerUserId != null ? customerUserId.trim() || null : null
       );
-      return result;
     } catch (error) {
       console.error('Failed to configure Appstack SDK:', error);
       throw error;

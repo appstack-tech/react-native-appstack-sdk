@@ -7,15 +7,7 @@ declare module 'react-native-appstack-sdk' {
   }
 
   export interface AppstackSDKInterface {
-    configure(apiKey: string, options?: AppstackConfigureOptions): Promise<boolean>;
-    /** @deprecated Use `configure(apiKey, { logLevel, customerUserId })` instead */
-    configure(
-      apiKey: string,
-      isDebug?: boolean,
-      endpointBaseUrl?: string,
-      logLevel?: number,
-      customerUserId?: string | null
-    ): Promise<boolean>;
+    configure(apiKey: string, options?: AppstackConfigureOptions | null): Promise<boolean>;
     setCustomerUserId(customerUserId?: string | null): Promise<void>;
     sendEvent(
       eventType?: EventType | string,
@@ -54,8 +46,6 @@ declare module 'react-native-appstack-sdk' {
 
   export interface AppstackConfig {
     apiKey: string;
-    isDebug?: boolean;
-    endpointBaseUrl?: string;
     logLevel?: number;
     customerUserId?: string;
   }
@@ -79,15 +69,7 @@ declare module 'react-native-appstack-sdk' {
 
   export class AppstackSDK implements AppstackSDKInterface {
     static getInstance(): AppstackSDK;
-    configure(apiKey: string, options?: AppstackConfigureOptions): Promise<boolean>;
-    /** @deprecated Use `configure(apiKey, { logLevel, customerUserId })` instead */
-    configure(
-      apiKey: string,
-      isDebug?: boolean,
-      endpointBaseUrl?: string,
-      logLevel?: number,
-      customerUserId?: string | null
-    ): Promise<boolean>;
+    configure(apiKey: string, options?: AppstackConfigureOptions | null): Promise<boolean>;
     setCustomerUserId(customerUserId?: string | null): Promise<void>;
     sendEvent(
       eventType?: EventType | string,

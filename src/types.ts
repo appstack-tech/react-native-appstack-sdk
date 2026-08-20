@@ -84,16 +84,6 @@ export interface AppstackConfig {
   apiKey: string;
 
   /**
-   * @deprecated Ignored; use `logLevel` instead. Still accepted for backward compatibility.
-   */
-  isDebug?: boolean;
-
-  /**
-   * @deprecated Ignored by the RN wrapper (not forwarded to native). Still accepted for backward compatibility.
-   */
-  endpointBaseUrl?: string;
-
-  /**
    * Log level (optional, default 1 - INFO)
    * 0 = DEBUG, 1 = INFO, 2 = WARN, 3 = ERROR
    */
