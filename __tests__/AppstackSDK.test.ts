@@ -636,13 +636,16 @@ describe('AppstackSDK', () => {
 });
 
 // The on-device probe in integration-tests/run.sh drives the public API and
-// integration-tests/validate_runtime.py asserts on what it reports. Those run only
-// on an emulator/simulator in CI (~20 min), so this mirrors the same contract here:
-// an API change that breaks the probe fails in milliseconds instead of at the gate.
-// Keep in sync with both files.
+// integration-tests/validate_runtime.py asserts on what it reports and on the event
+// payloads captured at the wire. Those run only on an emulator/simulator in CI
+// (~20 min), so this mirrors the same contract here: an API change that breaks the
+// probe fails in milliseconds instead of at the gate. Keep in sync with both files.
 describe('integration-test runtime contract', () => {
   it('matches what validate_runtime.py requires', async () => {
-    let eventsAccepted = 0;
+    // The three sends the probe performs. A rejection here aborts the probe's try
+    // block and reports failure, so there is no return value worth asserting —
+    // what matters is the (type, name) pair each one hands to native, which is
+    // exactly what the validator later matches by event_name at the wire.
     await appstackSDK.sendEvent('runtime_validation_custom', {
       string: 'bridge-value',
       number: 42,
@@ -652,16 +655,36 @@ describe('integration-test runtime contract', () => {
       array: ['one', 2, false],
       nested: { enabled: true, items: ['nested', 3, false] },
     });
-    eventsAccepted += 1;
-    await appstackSDK.sendEvent(EventType.LOGIN, { state: 'ready', sequence: 2 });
-    eventsAccepted += 1;
+    expect(mockNative.sendEvent).toHaveBeenLastCalledWith(
+      'CUSTOM',
+      'runtime_validation_custom',
+      expect.objectContaining({
+        unicode: 'café 🚀',
+        nested: { enabled: true, items: ['nested', 3, false] },
+      })
+    );
 
+    await appstackSDK.sendEvent(EventType.LOGIN, { state: 'ready', sequence: 2 });
+    expect(mockNative.sendEvent).toHaveBeenLastCalledWith('LOGIN', null, {
+      state: 'ready',
+      sequence: 2,
+    });
+
+    await appstackSDK.sendEvent('runtime_validation_bare');
+    expect(mockNative.sendEvent).toHaveBeenLastCalledWith(
+      'CUSTOM',
+      'runtime_validation_bare',
+      null
+    );
+
+    // The two flags the probe still reports.
     let validationError = '';
     try {
       await (appstackSDK.sendEvent as (...args: unknown[]) => Promise<void>)();
     } catch (error) {
       validationError = error instanceof Error ? error.message : String(error);
     }
+    expect(validationError.startsWith('event must be a non-empty string')).toBe(true);
 
     let legacyCallRejected = false;
     try {
@@ -673,11 +696,6 @@ describe('integration-test runtime contract', () => {
         error instanceof Error ? error.message : String(error)
       );
     }
-
-    await appstackSDK.sendEvent('runtime_validation_bare');
-
-    expect(eventsAccepted).toBe(2);
-    expect(validationError.startsWith('event must be a non-empty string')).toBe(true);
     expect(legacyCallRejected).toBe(true);
   });
 });

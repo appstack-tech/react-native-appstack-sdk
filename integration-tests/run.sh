@@ -379,10 +379,10 @@ export default function App() {
             value.unicode === 'café 🚀'
         ).length;
 
-        // sendEvent resolves void, so "accepted" means the call completed without
-        // rejecting. A custom event is now named by its first argument; a standard
-        // event takes the EventType directly with no name slot.
-        let eventsAccepted = 0;
+        // A custom event is now named by its first argument; a standard event takes
+        // the EventType directly with no name slot. sendEvent resolves void, so there
+        // is nothing to inspect on return — a rejection would abort this whole block
+        // and report failure, and delivery is asserted at the wire below.
         await AppstackSDK.sendEvent('runtime_validation_custom', {
           string: 'bridge-value',
           number: 42,
@@ -392,9 +392,7 @@ export default function App() {
           array: ['one', 2, false],
           nested: { enabled: true, items: ['nested', 3, false] },
         });
-        eventsAccepted += 1;
         await AppstackSDK.sendEvent(EventType.LOGIN, { state: 'ready', sequence: 2 });
-        eventsAccepted += 1;
 
         let validationError = '';
         try {
@@ -416,10 +414,10 @@ export default function App() {
         }
 
         // An unrecognised type with no separate name used to succeed on iOS and
-        // reject on Android. It must now behave identically on both.
-        let bareCustomAccepted = false;
+        // reject on Android. Asserted at the wire, not by return value: that it
+        // resolved proves only that it did not reject, and the payload is what has
+        // to match across platforms.
         await AppstackSDK.sendEvent('runtime_validation_bare');
-        bareCustomAccepted = true;
 
         // Native event delivery is fire-and-forget.
         await delay(4000);
@@ -436,10 +434,8 @@ export default function App() {
           attributionValidated:
             attribution.runtime_validation === 'attributed' &&
             attribution.unicode === 'café 🚀',
-          eventsAccepted,
           validationError,
           legacyCallRejected,
-          bareCustomAccepted,
           errors: [],
         };
         await reportResult('success', result);
