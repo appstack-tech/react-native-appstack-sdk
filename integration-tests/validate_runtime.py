@@ -52,10 +52,13 @@ def main() -> None:
         result.get("attributionValidated") is True,
         "attribution payload was corrupted across the bridge",
     )
-    require(result.get("eventsAccepted") == 2, "wrapper did not accept both events")
     require(
-        result.get("validationError") == "Either eventName or eventType must be provided",
+        result.get("validationError", "").startswith("event must be a non-empty string"),
         "wrapper did not return the expected meaningful validation error",
+    )
+    require(
+        result.get("legacyCallRejected") is True,
+        "wrapper did not reject the removed 3-argument sendEvent call",
     )
     require(not result.get("errors"), f"runtime errors: {result.get('errors')}")
 
@@ -84,8 +87,23 @@ def main() -> None:
     login = next(
         (event for event in events if event.get("event_name") == "LOGIN"), None
     )
+    bare = next(
+        (
+            event
+            for event in events
+            if event.get("event_name") == "runtime_validation_bare"
+        ),
+        None,
+    )
     require(custom is not None, "custom event never reached the native wire boundary")
     require(login is not None, "standard event never reached the native wire boundary")
+    # sendEvent('runtime_validation_bare') with no parameters and no separate name.
+    # This is the call that used to succeed on iOS and fail on Android; requiring the
+    # payload proves both platforms now record it as a custom event under that name.
+    require(
+        bare is not None,
+        "bare unrecognised event never reached the native wire boundary",
+    )
     require(
         custom.get("wrapper_version") == args.expected_wrapper_version,
         "wrong wrapper version on event",

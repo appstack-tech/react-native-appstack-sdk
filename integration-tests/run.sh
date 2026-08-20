@@ -379,24 +379,20 @@ export default function App() {
             value.unicode === 'café 🚀'
         ).length;
 
-        const customAccepted = await AppstackSDK.sendEvent(
-          EventType.CUSTOM,
-          'runtime_validation_custom',
-          {
-            string: 'bridge-value',
-            number: 42,
-            decimal: 9.75,
-            boolean: true,
-            unicode: 'café 🚀',
-            array: ['one', 2, false],
-            nested: { enabled: true, items: ['nested', 3, false] },
-          }
-        );
-        const standardAccepted = await AppstackSDK.sendEvent(
-          EventType.LOGIN,
-          undefined,
-          { state: 'ready', sequence: 2 }
-        );
+        // A custom event is now named by its first argument; a standard event takes
+        // the EventType directly with no name slot. sendEvent resolves void, so there
+        // is nothing to inspect on return — a rejection would abort this whole block
+        // and report failure, and delivery is asserted at the wire below.
+        await AppstackSDK.sendEvent('runtime_validation_custom', {
+          string: 'bridge-value',
+          number: 42,
+          decimal: 9.75,
+          boolean: true,
+          unicode: 'café 🚀',
+          array: ['one', 2, false],
+          nested: { enabled: true, items: ['nested', 3, false] },
+        });
+        await AppstackSDK.sendEvent(EventType.LOGIN, { state: 'ready', sequence: 2 });
 
         let validationError = '';
         try {
@@ -405,6 +401,23 @@ export default function App() {
           validationError =
             error && error.message ? error.message : String(error);
         }
+
+        // The removed 3-argument form must reject on a real device, not just in
+        // Jest. This is the only on-device coverage of the 3.0 arity guard.
+        let legacyCallRejected = false;
+        try {
+          await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 1.5 });
+        } catch (error) {
+          legacyCallRejected = /removed in 3\.0/.test(
+            error && error.message ? error.message : String(error)
+          );
+        }
+
+        // An unrecognised type with no separate name used to succeed on iOS and
+        // reject on Android. Asserted at the wire, not by return value: that it
+        // resolved proves only that it did not reject, and the payload is what has
+        // to match across platforms.
+        await AppstackSDK.sendEvent('runtime_validation_bare');
 
         // Native event delivery is fire-and-forget.
         await delay(4000);
@@ -421,9 +434,8 @@ export default function App() {
           attributionValidated:
             attribution.runtime_validation === 'attributed' &&
             attribution.unicode === 'café 🚀',
-          eventsAccepted:
-            Number(customAccepted === true) + Number(standardAccepted === true),
           validationError,
+          legacyCallRejected,
           errors: [],
         };
         await reportResult('success', result);

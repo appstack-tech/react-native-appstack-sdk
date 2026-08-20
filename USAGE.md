@@ -22,7 +22,7 @@ cd ios && pod install  # iOS only
 ```typescript
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
-import AppstackSDK from 'react-native-appstack-sdk';
+import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 
 const App = () => {
   useEffect(() => {
@@ -42,7 +42,7 @@ const App = () => {
   }, []);
 
   const trackPurchase = () => {
-    AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
+    AppstackSDK.sendEvent(EventType.PURCHASE, { revenue: 29.99, currency: 'USD' });
   };
 
   const appstacKId = AppstackSDK.getAppstackId()
@@ -89,9 +89,9 @@ For any event that represents revenue, we recommend sending:
 - `currency` (string, e.g. `EUR`, `USD`)
 
 ```typescript
-import AppstackSDK from 'react-native-appstack-sdk';
+import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 
-await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 4.99, currency: 'EUR' });
+await AppstackSDK.sendEvent(EventType.PURCHASE, { revenue: 4.99, currency: 'EUR' });
 ```
 
 ### Meta matching (send once per installation, as early as possible)
@@ -127,11 +127,11 @@ npx react-native clean
 **Wrong revenue values:**
 ```typescript
 // ✅ Use decimal dollars in parameters
-AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
+AppstackSDK.sendEvent(EventType.PURCHASE, { revenue: 29.99, currency: 'USD' });
 
-// ✅ Convert cents to dollars  
+// ✅ Convert cents to dollars
 const cents = 2999;
-AppstackSDK.sendEvent('PURCHASE', null, { revenue: cents / 100, currency: 'USD' });
+AppstackSDK.sendEvent(EventType.PURCHASE, { revenue: cents / 100, currency: 'USD' });
 ```
 </details>
 

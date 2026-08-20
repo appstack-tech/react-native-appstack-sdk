@@ -6,14 +6,28 @@ declare module 'react-native-appstack-sdk' {
     customerUserId?: string | null;
   }
 
+  /** Any value that survives the React Native bridge intact. */
+  export type JsonValue =
+    | string
+    | number
+    | boolean
+    | null
+    | JsonValue[]
+    | { [key: string]: JsonValue };
+
+  /**
+   * Parameters accepted by `sendEvent`. Keys valued `null` or `undefined` are
+   * stripped before the call reaches native.
+   */
+  export type AppstackEventParameters = Record<string, JsonValue | undefined>;
+
   export interface AppstackSDKInterface {
     configure(apiKey: string, options?: AppstackConfigureOptions | null): Promise<boolean>;
     setCustomerUserId(customerUserId?: string | null): Promise<void>;
     sendEvent(
-      eventType?: EventType | string,
-      eventName?: string,
-      parameters?: Record<string, any>
-    ): Promise<boolean>;
+      event: EventType | string,
+      parameters?: AppstackEventParameters | null
+    ): Promise<void>;
     enableAppleAdsAttribution(): Promise<boolean>;
     getAppstackId(): Promise<string>;
     isSdkDisabled(): Promise<boolean>;
@@ -37,7 +51,6 @@ declare module 'react-native-appstack-sdk' {
     VIEW_ITEM = 'VIEW_ITEM',
     VIEW_CONTENT = 'VIEW_CONTENT',
     SHARE = 'SHARE',
-    CUSTOM = 'CUSTOM',
   }
 
   export interface AppstackEventParams {
@@ -72,10 +85,9 @@ declare module 'react-native-appstack-sdk' {
     configure(apiKey: string, options?: AppstackConfigureOptions | null): Promise<boolean>;
     setCustomerUserId(customerUserId?: string | null): Promise<void>;
     sendEvent(
-      eventType?: EventType | string,
-      eventName?: string,
-      parameters?: Record<string, any>
-    ): Promise<boolean>;
+      event: EventType | string,
+      parameters?: AppstackEventParameters | null
+    ): Promise<void>;
     enableAppleAdsAttribution(): Promise<boolean>;
     getAppstackId(): Promise<string>;
     isSdkDisabled(): Promise<boolean>;

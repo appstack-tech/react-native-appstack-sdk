@@ -52,7 +52,7 @@ The demo reads its key from `EXPO_PUBLIC_APPSTACK_API_KEY` and refuses to
 initialize when it is missing:
 
 ```typescript
-import AppstackSDK from 'react-native-appstack-sdk';
+import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 
 const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY?.trim();
 if (!apiKey) {
@@ -92,14 +92,14 @@ or any `endpointBaseUrl`, logs a deprecation warning.
 #### Standard Events
 ```typescript
 // Event without parameters
-await AppstackSDK.sendEvent('SIGN_UP');
+await AppstackSDK.sendEvent(EventType.SIGN_UP);
 
 // Event with parameters (including revenue)
-await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
+await AppstackSDK.sendEvent(EventType.PURCHASE, { revenue: 29.99, currency: 'USD' });
 
 // Event with multiple parameters
-await AppstackSDK.sendEvent('PURCHASE', null, { 
-  revenue: 29.99, 
+await AppstackSDK.sendEvent(EventType.PURCHASE, {
+  revenue: 29.99,
   currency: 'USD',
   productId: 'prod_123'
 });
@@ -107,29 +107,35 @@ await AppstackSDK.sendEvent('PURCHASE', null, {
 
 #### Custom Events
 ```typescript
-// Custom event names with parameters
-await AppstackSDK.sendEvent('CUSTOM', 'CUSTOM_EVENT_NAME', { 
-  revenue: 15.50, 
+// Pass your own name as the event; anything that is not a standard
+// EventType is sent as a custom event under that name — except the
+// literal 'CUSTOM', which throws, and the automatic-only events
+// (INSTALL, FIRST_OPEN, FIRST_OPEN_GUARDED), which are dropped.
+await AppstackSDK.sendEvent('CUSTOM_EVENT_NAME', {
+  revenue: 15.50,
   currency: 'USD',
   category: 'electronics'
 });
 ```
 
 #### Supported Event Types
-- `INSTALL` (automatic)
-- `SIGN_UP`
-- `PURCHASE`
-- `SUBSCRIPTION`
-- `AD_CLICK`
-- `LEVEL_COMPLETE`
-- Custom event names (any string)
+Standard types come from the `EventType` enum:
+- `INSTALL` (recorded automatically; a manual send is dropped)
+- `LOGIN`, `SIGN_UP`, `REGISTER`
+- `PURCHASE`, `ADD_TO_CART`, `ADD_TO_WISHLIST`, `INITIATE_CHECKOUT`, `START_TRIAL`, `SUBSCRIBE`
+- `LEVEL_START`, `LEVEL_COMPLETE`
+- `TUTORIAL_COMPLETE`, `SEARCH`, `VIEW_ITEM`, `VIEW_CONTENT`, `SHARE`
+
+Any other string is sent as a custom event under that name. Note that `SUBSCRIPTION`
+and `AD_CLICK` — listed here previously — are *not* standard types: they resolve to
+custom events, and `SUBSCRIBE` is the standard monetisation event.
 
 ### Error Handling
 
 ```typescript
 try {
   await AppstackSDK.configure('your-api-key');
-  await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
+  await AppstackSDK.sendEvent(EventType.PURCHASE, { revenue: 29.99, currency: 'USD' });
 } catch (error) {
   console.error('SDK Error:', error.message);
   // Handle error appropriately

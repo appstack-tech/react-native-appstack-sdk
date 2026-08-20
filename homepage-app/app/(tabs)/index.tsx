@@ -57,7 +57,7 @@ export default function HomeScreen() {
       console.log('Appstack SDK configured successfully');
 
       // Send a basic event to test
-      await AppstackSDK.sendEvent(EventType.CUSTOM, 'APP_OPENED');
+      await AppstackSDK.sendEvent('APP_OPENED');
       console.log('APP_OPENED event sent successfully');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -78,7 +78,7 @@ export default function HomeScreen() {
     }
 
     try {
-      await AppstackSDK.sendEvent(EventType.CUSTOM, 'TEST_BUTTON_PRESSED');
+      await AppstackSDK.sendEvent('TEST_BUTTON_PRESSED');
       Alert.alert('Success!', 'Test event sent successfully');
       console.log('TEST_BUTTON_PRESSED event sent successfully');
     } catch (error) {
@@ -94,7 +94,7 @@ export default function HomeScreen() {
     }
 
     try {
-      await AppstackSDK.sendEvent(EventType.PURCHASE, "PURCHASE", { revenue: 29.99, currency: 'USD' });
+      await AppstackSDK.sendEvent(EventType.PURCHASE, { revenue: 29.99, currency: 'USD' });
       Alert.alert('Success!', 'Revenue event sent successfully');
       console.log('PURCHASE event with revenue sent successfully');
     } catch (error) {
@@ -110,7 +110,7 @@ export default function HomeScreen() {
     }
 
     try {
-      await AppstackSDK.sendEvent(EventType.CUSTOM, 'SIGN_UP'); // No revenue parameter
+      await AppstackSDK.sendEvent(EventType.SIGN_UP); // No revenue parameter
       Alert.alert('Success!', 'Sign up event sent successfully');
       console.log('SIGN_UP event sent successfully');
     } catch (error) {
@@ -126,7 +126,7 @@ export default function HomeScreen() {
     }
 
     try {
-      await AppstackSDK.sendEvent(EventType.CUSTOM, 'CUSTOM_EVENT_NAME', { revenue: 15.50, currency: 'USD', category: 'test' });
+      await AppstackSDK.sendEvent('CUSTOM_EVENT_NAME', { revenue: 15.50, currency: 'USD', category: 'test' });
       Alert.alert('Success!', 'Custom event sent successfully');
       console.log('CUSTOM_EVENT_NAME event sent successfully');
     } catch (error) {
