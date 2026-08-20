@@ -108,7 +108,9 @@ await AppstackSDK.sendEvent(EventType.PURCHASE, {
 #### Custom Events
 ```typescript
 // Pass your own name as the event; anything that is not a standard
-// EventType is sent as a custom event under that name.
+// EventType is sent as a custom event under that name — except the
+// literal 'CUSTOM', which throws, and the automatic-only events
+// (INSTALL, FIRST_OPEN, FIRST_OPEN_GUARDED), which are dropped.
 await AppstackSDK.sendEvent('CUSTOM_EVENT_NAME', {
   revenue: 15.50,
   currency: 'USD',

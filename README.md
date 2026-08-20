@@ -150,17 +150,22 @@ await AppstackSDK.sendEvent('user_attributes', {
 ```
 
 Anything that is not a standard event type is sent as a custom event under that
-name, so there is no separate "custom" mode to opt into.
+name, so there is no separate "custom" mode to opt into. Three exceptions: an
+empty or non-string event throws, the literal `'CUSTOM'` throws (it is the
+internal category, not a name), and the automatic-only events below are dropped
+rather than turned into custom events.
 
 **Parameters**
 
 - `event` - A standard `EventType` (recommended), the string name of one, or your own name for a custom event
 - `parameters` - Optional parameters object (e.g. `{ revenue: 29.99, currency: 'USD' }`). Keys whose value is `null` or `undefined` are stripped, so both platforms receive the same map
 
-Returns: a promise that resolves once the call reaches the native SDK. It resolves
-`void` — **not** a delivery receipt. The native SDKs also drop events when the SDK
-is disabled, offline, or still buffering, and none of that is visible from
-JavaScript.
+Returns: a promise that resolves `void` — **not** a delivery receipt. For a sent
+event it resolves once the call reaches the native SDK, and the native SDKs also
+drop events when the SDK is disabled, offline, or still buffering, none of which
+is visible from JavaScript. Automatic-only events (`INSTALL`, `FIRST_OPEN`,
+`FIRST_OPEN_GUARDED`) never reach native at all: they resolve after being
+dropped, with an error logged.
 
 **Available EventType values**
 
@@ -179,11 +184,18 @@ of silently becoming a custom event.
 
 > **Migrating from 2.x:** `sendEvent(eventType, eventName, parameters)` was removed
 > in 3.0 and now throws with a message pointing at the new form. Drop the middle
-> argument: `sendEvent('PURCHASE', null, params)` becomes
-> `sendEvent(EventType.PURCHASE, params)`, and
-> `sendEvent('CUSTOM', 'user_attributes', params)` becomes
-> `sendEvent('user_attributes', params)`. `EventType.CUSTOM` was removed with it —
-> pass your event's name directly.
+> argument:
+>
+> ```js
+> sendEvent('PURCHASE', null, params)           // → sendEvent(EventType.PURCHASE, params)
+> sendEvent('CUSTOM', 'user_attributes', params) // → sendEvent('user_attributes', params)
+> sendEvent('CUSTOM', 'APP_OPENED')              // → sendEvent('APP_OPENED')
+> ```
+>
+> The two-argument `sendEvent('CUSTOM', 'my_event')` form is rejected as well, not
+> just the three-argument one: its name would otherwise bind to `parameters`.
+> `EventType.CUSTOM` was removed with the signature — pass your event's name
+> directly.
 
 **Enhanced app campaigns**
 
