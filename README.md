@@ -105,21 +105,23 @@ await AppstackSDK.configure('your-api-key-here', {
 });
 ```
 
-**Deprecated positional signature**
+**Migrating from the 2.x positional signature**
 
-Earlier versions took `isDebug` and `endpointBaseUrl` as the second and third
-positional arguments. Both are ignored — they are not forwarded to the native
-SDKs — but the signature still works so existing integrations keep compiling.
-Passing `isDebug: true`, or any `endpointBaseUrl`, logs a deprecation warning;
-their no-op values (`false` and `undefined`) are silent:
+2.x also accepted `configure(apiKey, isDebug, endpointBaseUrl, logLevel, customerUserId)`.
+That form was removed in 3.0, along with `isDebug` and `endpointBaseUrl` — neither was
+ever forwarded to the native SDKs. Move the two parameters that do something into the
+options object:
 
 ```javascript
-// Still supported; both deprecated arguments are ignored
+// 2.x — removed in 3.0, now throws
 await AppstackSDK.configure('your-api-key-here', false, undefined, 0, 'user_123');
 
-// Preferred
+// 3.0
 await AppstackSDK.configure('your-api-key-here', { logLevel: 0, customerUserId: 'user_123' });
 ```
+
+The call throws rather than ignoring the extra arguments, because silently accepting it
+would drop the `logLevel` and `customerUserId` you passed.
 
 ### 4. Sending events
 
@@ -330,7 +332,7 @@ const apiKey = "ak_live_1234567890abcdef"; // DON'T DO THIS
 ### **Technical limitations**
 
 - `enableAppleAdsAttribution()` only works on iOS and will do nothing on Android
-- The event endpoint is not configurable on either platform, by design. The deprecated `endpointBaseUrl` argument is accepted only for backward compatibility and is never forwarded to the native SDKs
+- The event endpoint is not configurable on either platform, by design (the `endpointBaseUrl` argument was removed in 3.0; it was never forwarded to the native SDKs)
 - Event name standardization is done for Android, but not for iOS yet
 
 ## **Troubleshooting**

@@ -364,10 +364,7 @@ export default function App() {
       try {
         const configured = await AppstackSDK.configure(
           'runtime-validation-local-key',
-          false,
-          undefined,
-          0,
-          'runtime-validation-user'
+          { logLevel: 0, customerUserId: 'runtime-validation-user' }
         );
         const attribution = await waitForAttribution();
         const callbackResults = await Promise.all([
