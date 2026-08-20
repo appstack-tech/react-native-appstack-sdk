@@ -153,17 +153,17 @@ describe('AppstackSDK', () => {
 
     it('throws when logLevel is out of range', async () => {
       await expect(appstackSDK.configure('key', { logLevel: -1 })).rejects.toThrow(
-        'logLevel must be a number between 0 and 3'
+        'logLevel must be one of 0, 1, 2, or 3'
       );
       await expect(appstackSDK.configure('key', { logLevel: 4 })).rejects.toThrow(
-        'logLevel must be a number between 0 and 3'
+        'logLevel must be one of 0, 1, 2, or 3'
       );
       expect(mockNative.configure).not.toHaveBeenCalled();
     });
 
     it('throws when logLevel is not a number', async () => {
       await expect(appstackSDK.configure('key', { logLevel: '0' as any })).rejects.toThrow(
-        'logLevel must be a number between 0 and 3'
+        'logLevel must be one of 0, 1, 2, or 3'
       );
       expect(mockNative.configure).not.toHaveBeenCalled();
     });
@@ -172,10 +172,37 @@ describe('AppstackSDK', () => {
       // typeof NaN === 'number' and both NaN < 0 and NaN > 3 are false, so a plain
       // range check lets it through to native.
       await expect(appstackSDK.configure('key', { logLevel: NaN })).rejects.toThrow(
-        'logLevel must be a number between 0 and 3'
+        'logLevel must be one of 0, 1, 2, or 3'
       );
       await expect(appstackSDK.configure('key', { logLevel: Number('nope') })).rejects.toThrow(
-        'logLevel must be a number between 0 and 3'
+        'logLevel must be one of 0, 1, 2, or 3'
+      );
+      expect(mockNative.configure).not.toHaveBeenCalled();
+    });
+
+    // A fraction passes typeof, Number.isFinite and the 0-3 range check, then gets
+    // silently truncated by the native casts (1.5 -> 1). Only integers are valid.
+    it.each([1.5, 0.5, 2.9, -0.5, 3.5])(
+      'throws when logLevel is the fraction %p',
+      async (level) => {
+        await expect(appstackSDK.configure('key', { logLevel: level })).rejects.toThrow(
+          'logLevel must be one of 0, 1, 2, or 3'
+        );
+        expect(mockNative.configure).not.toHaveBeenCalled();
+      }
+    );
+
+    it('still accepts every valid integer level', async () => {
+      for (const level of [0, 1, 2, 3]) {
+        jest.clearAllMocks();
+        await appstackSDK.configure('key', { logLevel: level });
+        expect(mockNative.configure).toHaveBeenCalledWith('key', level, null);
+      }
+    });
+
+    it('accepts Infinity as invalid rather than clamping it', async () => {
+      await expect(appstackSDK.configure('key', { logLevel: Infinity })).rejects.toThrow(
+        'logLevel must be one of 0, 1, 2, or 3'
       );
       expect(mockNative.configure).not.toHaveBeenCalled();
     });

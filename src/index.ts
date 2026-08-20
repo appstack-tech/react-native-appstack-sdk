@@ -174,15 +174,17 @@ class AppstackSDK implements AppstackSDKInterface {
     const logLevel = options?.logLevel === undefined ? 1 : options.logLevel;
     const customerUserId = options?.customerUserId;
 
-    // Number.isFinite also rejects NaN, which would otherwise pass: typeof NaN is
-    // 'number' and both NaN < 0 and NaN > 3 are false.
+    // Number.isInteger, not a bare range check: it rejects NaN and Infinity (typeof NaN
+    // is 'number', and both NaN < 0 and NaN > 3 are false) as well as fractions like 1.5,
+    // which would otherwise pass and be silently truncated to 1 by the native casts
+    // (NSInteger on iOS, Double.toInt() on Android). Only 0-3 are defined log levels.
     if (
       typeof logLevel !== 'number' ||
-      !Number.isFinite(logLevel) ||
+      !Number.isInteger(logLevel) ||
       logLevel < 0 ||
       logLevel > 3
     ) {
-      throw new Error('logLevel must be a number between 0 and 3');
+      throw new Error('logLevel must be one of 0, 1, 2, or 3');
     }
 
     if (
