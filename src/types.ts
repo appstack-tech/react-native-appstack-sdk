@@ -13,8 +13,10 @@ export enum EventType {
   /**
    * User installs the app (tracked automatically by the SDK).
    *
-   * Sending this by hand is a no-op: the SDKs ignore manual `INSTALL` events so
-   * they cannot double-count the automatic one.
+   * Sending this by hand is dropped by the wrapper before it reaches native: the
+   * SDKs ignore manual `INSTALL` events so they cannot double-count the automatic
+   * one. Kept in the enum because it is a real standard event type you will see in
+   * reporting — it is just not yours to send.
    */
   INSTALL = 'INSTALL',
 
@@ -57,11 +59,31 @@ export enum EventType {
   VIEW_CONTENT = 'VIEW_CONTENT',
   /** User shares content from the app. */
   SHARE = 'SHARE',
-
-  // MARK: - Catch-all
-  /** Custom application-specific event not covered above. */
-  CUSTOM = 'CUSTOM',
 }
+
+/**
+ * Any value that survives the React Native bridge intact.
+ *
+ * Event parameters are serialised to JSON on the way to the native SDKs, so
+ * anything outside this set (a `Date`, a class instance, a function, `undefined`
+ * nested inside an array) either arrives mangled or is dropped silently. Typing
+ * the parameter map against this catches that at compile time instead.
+ */
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
+/**
+ * Parameters accepted by `sendEvent`.
+ *
+ * Keys whose value is `null` or `undefined` are stripped before the call reaches
+ * native, so the two platforms always observe the same map.
+ */
+export type AppstackEventParameters = Record<string, JsonValue | undefined>;
 
 /**
  * Available parameters for Appstack events

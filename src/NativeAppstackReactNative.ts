@@ -24,6 +24,17 @@ import { TurboModuleRegistry } from 'react-native';
  * natively on one platform each and are declared here so they stay reachable on
  * both the legacy and the new architecture (new-architecture dispatch is built
  * solely from this schema, so a native method missing from it is uncallable).
+ *
+ * `sendEvent` keeps three parameters even though the public JS API takes two. The
+ * public `sendEvent(event, parameters)` resolves the pair in JavaScript and always
+ * passes an explicit, unambiguous combination: either a standard event type with a
+ * `null` name, or the `"CUSTOM"` category with a non-null name. Both native wrappers
+ * still contain fallback branches that guess when the type is unrecognised or the
+ * name is missing, and those branches used to disagree — an unknown type became a
+ * custom event on iOS but was rejected with `INVALID_EVENT_NAME` on Android. Because
+ * JS no longer emits either shape, those branches are unreachable. Preserve that
+ * invariant when changing the public API: it is what keeps the two platforms
+ * behaving identically without touching native code.
  */
 export interface Spec extends TurboModule {
   configure(apiKey: string, logLevel: number, customerUserId: string | null): Promise<boolean>;

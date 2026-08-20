@@ -128,23 +128,35 @@ class AppstackReactNativeModuleImpl(
             val finalEventName: String?
 
             if (!eventType.isNullOrBlank()) {
-                // Use provided event_type parameter
-                finalEventType = try {
+                // Use provided event_type parameter. Keep the unresolved result around:
+                // "an unrecognised type" and "an explicit CUSTOM" both end up as CUSTOM
+                // but are not the same situation.
+                val resolvedEventType = try {
                     EventType.valueOf(eventType.trim().uppercase())
                 } catch (e: IllegalArgumentException) {
-                    EventType.CUSTOM
+                    null
                 }
 
-                // For CUSTOM event type, eventName is required
-                // For non-CUSTOM event types, name should be null (SDK will use the event type)
-                finalEventName = if (finalEventType == EventType.CUSTOM) {
-                    if (eventName.isNullOrBlank()) {
-                        promise.reject("INVALID_EVENT_NAME", "eventName is required when eventType is CUSTOM")
-                        return
-                    }
-                    eventName.trim()
+                finalEventType = resolvedEventType ?: EventType.CUSTOM
+
+                if (finalEventType != EventType.CUSTOM) {
+                    // For non-CUSTOM event types, name should be null (SDK will use the event type)
+                    finalEventName = null
+                } else if (!eventName.isNullOrBlank()) {
+                    finalEventName = eventName.trim()
+                } else if (resolvedEventType == null) {
+                    // Defence in depth: treat an unrecognised event type as a custom event
+                    // named after that type, which is what iOS has always done. This branch
+                    // used to reject with INVALID_EVENT_NAME instead, so sendEvent("MY_EVENT")
+                    // succeeded on iOS and failed here — the same call, two behaviours.
+                    // The JS wrapper now resolves the (type, name) pair itself and never
+                    // sends an unrecognised type, so this is unreachable from JavaScript;
+                    // it exists so the divergence cannot come back if that invariant breaks.
+                    finalEventName = eventType.trim()
                 } else {
-                    null
+                    // An explicit CUSTOM with no name is genuinely unusable.
+                    promise.reject("INVALID_EVENT_NAME", "eventName is required when eventType is CUSTOM")
+                    return
                 }
             } else if (!eventName.isNullOrBlank()) {
                 // Fallback to legacy behavior - try to parse eventName as EventType

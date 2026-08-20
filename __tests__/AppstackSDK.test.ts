@@ -334,48 +334,222 @@ describe('AppstackSDK', () => {
   });
 
   describe('sendEvent', () => {
-    it('sends event with eventType only', async () => {
-      const result = await appstackSDK.sendEvent(EventType.PURCHASE);
-      expect(result).toBe(true);
-      expect(mockNative.sendEvent).toHaveBeenCalledWith('PURCHASE', null, null);
-    });
+    describe('standard events', () => {
+      it('sends an EventType member as a standard type with no name', async () => {
+        const result = await appstackSDK.sendEvent(EventType.PURCHASE);
+        // Promise<void>: the old `true` implied delivery, which native never promised.
+        expect(result).toBeUndefined();
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('PURCHASE', null, null);
+      });
 
-    it('sends event with eventType string', async () => {
-      await appstackSDK.sendEvent('LOGIN');
-      expect(mockNative.sendEvent).toHaveBeenCalledWith('LOGIN', null, null);
-    });
+      it('treats the equivalent string as the same standard type', async () => {
+        await appstackSDK.sendEvent('LOGIN');
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('LOGIN', null, null);
+      });
 
-    it('sends event with eventType, eventName and parameters', async () => {
-      await appstackSDK.sendEvent(EventType.PURCHASE, null, { revenue: 29.99, currency: 'USD' });
-      expect(mockNative.sendEvent).toHaveBeenCalledWith('PURCHASE', null, {
-        revenue: 29.99,
-        currency: 'USD',
+      it('resolves standard types case-insensitively and canonicalises them', async () => {
+        await appstackSDK.sendEvent('purchase');
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('PURCHASE', null, null);
+
+        await appstackSDK.sendEvent('Add_To_Cart');
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('ADD_TO_CART', null, null);
+      });
+
+      it('trims surrounding whitespace before resolving', async () => {
+        await appstackSDK.sendEvent('  SUBSCRIBE  ');
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('SUBSCRIBE', null, null);
+      });
+
+      it('forwards parameters alongside a standard type', async () => {
+        await appstackSDK.sendEvent(EventType.PURCHASE, { revenue: 29.99, currency: 'USD' });
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('PURCHASE', null, {
+          revenue: 29.99,
+          currency: 'USD',
+        });
       });
     });
 
-    it('sends CUSTOM event with eventName', async () => {
-      await appstackSDK.sendEvent(EventType.CUSTOM, 'my_custom_event');
-      expect(mockNative.sendEvent).toHaveBeenCalledWith('CUSTOM', 'my_custom_event', null);
+    describe('custom events', () => {
+      it('sends an unrecognised string as a CUSTOM event named after it', async () => {
+        await appstackSDK.sendEvent('user_attributes', { email: 'a@b.com' });
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('CUSTOM', 'user_attributes', {
+          email: 'a@b.com',
+        });
+      });
+
+      it('preserves the caller casing of a custom name', async () => {
+        await appstackSDK.sendEvent('My_Custom_Event');
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('CUSTOM', 'My_Custom_Event', null);
+      });
+
+      // The bug this API removes: iOS sent this as a custom event while Android
+      // rejected it with INVALID_EVENT_NAME. JS now resolves the pair itself, so
+      // both platforms receive the same explicit ('CUSTOM', name) arguments.
+      it('sends a bare unknown event identically on both platforms', async () => {
+        await appstackSDK.sendEvent('MY_CUSTOM_EVENT');
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('CUSTOM', 'MY_CUSTOM_EVENT', null);
+      });
+
+      it("rejects the literal 'CUSTOM' and points at the custom-name form", async () => {
+        await expect(appstackSDK.sendEvent('CUSTOM')).rejects.toThrow(
+          "'CUSTOM' is not a sendable event"
+        );
+        await expect(appstackSDK.sendEvent('custom')).rejects.toThrow(
+          "'CUSTOM' is not a sendable event"
+        );
+        expect(mockNative.sendEvent).not.toHaveBeenCalled();
+      });
     });
 
-    it('sends event with legacy eventName only', async () => {
-      await appstackSDK.sendEvent(undefined, 'SIGN_UP');
-      expect(mockNative.sendEvent).toHaveBeenCalledWith(null, 'SIGN_UP', null);
-    });
-
-    it('throws when both eventType and eventName are missing', async () => {
-      await expect(appstackSDK.sendEvent(undefined, undefined)).rejects.toThrow(
-        'Either eventName or eventType must be provided'
+    describe('automatic-only events', () => {
+      // iOS drops these natively; FIRST_OPEN* are not in Android's enum at all, so
+      // forwarding would fabricate a custom event named "FIRST_OPEN" on Android only.
+      it.each(['INSTALL', 'FIRST_OPEN', 'FIRST_OPEN_GUARDED'])(
+        'drops %s without calling native and without rejecting',
+        async (event) => {
+          await expect(appstackSDK.sendEvent(event)).resolves.toBeUndefined();
+          expect(mockNative.sendEvent).not.toHaveBeenCalled();
+          expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining('recorded automatically by the SDK')
+          );
+        }
       );
-      await expect(appstackSDK.sendEvent('', '')).rejects.toThrow(
-        'Either eventName or eventType must be provided'
-      );
-      expect(mockNative.sendEvent).not.toHaveBeenCalled();
+
+      it('drops them case-insensitively', async () => {
+        await appstackSDK.sendEvent('install');
+        await appstackSDK.sendEvent('  First_Open  ');
+        expect(mockNative.sendEvent).not.toHaveBeenCalled();
+      });
+
+      it('does not warn about them being non-standard', async () => {
+        (globalThis as Record<string, unknown>).__DEV__ = true;
+        try {
+          await appstackSDK.sendEvent('FIRST_OPEN');
+          expect(console.warn).not.toHaveBeenCalled();
+        } finally {
+          delete (globalThis as Record<string, unknown>).__DEV__;
+        }
+      });
     });
 
-    it('rethrows native errors', async () => {
-      mockNative.sendEvent.mockRejectedValue(new Error('Send failed'));
-      await expect(appstackSDK.sendEvent('PURCHASE')).rejects.toThrow('Send failed');
+    describe('parameter normalisation', () => {
+      it('strips null and undefined values so both platforms see one map', async () => {
+        await appstackSDK.sendEvent(EventType.PURCHASE, {
+          revenue: 4.99,
+          currency: null,
+          coupon: undefined,
+          quantity: 0,
+          gift: false,
+          note: '',
+        });
+        // 0, false and '' are real values and must survive; only nullish keys go.
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('PURCHASE', null, {
+          revenue: 4.99,
+          quantity: 0,
+          gift: false,
+          note: '',
+        });
+      });
+
+      it('collapses an empty or all-nullish map to null', async () => {
+        await appstackSDK.sendEvent(EventType.LOGIN, {});
+        expect(mockNative.sendEvent).toHaveBeenLastCalledWith('LOGIN', null, null);
+
+        await appstackSDK.sendEvent(EventType.LOGIN, { a: null, b: undefined });
+        expect(mockNative.sendEvent).toHaveBeenLastCalledWith('LOGIN', null, null);
+      });
+
+      it('accepts an explicit null for parameters', async () => {
+        await appstackSDK.sendEvent(EventType.LOGIN, null);
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('LOGIN', null, null);
+      });
+
+      it('keeps nested structures intact', async () => {
+        await appstackSDK.sendEvent('cart_view', { items: [{ id: 1 }], meta: { a: null } });
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('CUSTOM', 'cart_view', {
+          items: [{ id: 1 }],
+          // Stripping is shallow, matching Android's filterValues.
+          meta: { a: null },
+        });
+      });
+    });
+
+    describe('removed 3-argument signature', () => {
+      it('throws on a three-argument call', async () => {
+        await expect(
+          (appstackSDK.sendEvent as (...args: unknown[]) => Promise<void>)('PURCHASE', null, {
+            revenue: 29.99,
+          })
+        ).rejects.toThrow('sendEvent(eventType, eventName, parameters) was removed in 3.0');
+        expect(mockNative.sendEvent).not.toHaveBeenCalled();
+      });
+
+      // The previously documented way to send a custom event. Two arguments, so the
+      // arity check alone misses it: without the shape check the name would bind to
+      // `parameters` and ship an event whose payload is its own name.
+      it('throws when the second argument is a name string', async () => {
+        await expect(
+          (appstackSDK.sendEvent as (...args: unknown[]) => Promise<void>)(
+            'CUSTOM',
+            'my_custom_event'
+          )
+        ).rejects.toThrow('sendEvent(eventType, eventName, parameters) was removed in 3.0');
+        expect(mockNative.sendEvent).not.toHaveBeenCalled();
+      });
+
+      it('throws when parameters is an array', async () => {
+        await expect(
+          (appstackSDK.sendEvent as (...args: unknown[]) => Promise<void>)('PURCHASE', [1, 2])
+        ).rejects.toThrow('sendEvent(eventType, eventName, parameters) was removed in 3.0');
+        expect(mockNative.sendEvent).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('validation and errors', () => {
+      it('throws when the event is missing, blank or not a string', async () => {
+        const calls: unknown[] = [undefined, null, '', '   ', 42, {}];
+        for (const value of calls) {
+          await expect(
+            (appstackSDK.sendEvent as (...args: unknown[]) => Promise<void>)(value)
+          ).rejects.toThrow('event must be a non-empty string');
+        }
+        expect(mockNative.sendEvent).not.toHaveBeenCalled();
+      });
+
+      it('rethrows native errors', async () => {
+        mockNative.sendEvent.mockRejectedValue(new Error('Send failed'));
+        await expect(appstackSDK.sendEvent('PURCHASE')).rejects.toThrow('Send failed');
+      });
+    });
+
+    describe('development-only warning', () => {
+      afterEach(() => {
+        delete (globalThis as Record<string, unknown>).__DEV__;
+      });
+
+      it('warns that an unrecognised event is being sent as custom', async () => {
+        (globalThis as Record<string, unknown>).__DEV__ = true;
+        await appstackSDK.sendEvent('PURCAHSE');
+        expect(console.warn).toHaveBeenCalledWith(
+          expect.stringContaining("'PURCAHSE' is not a standard EventType")
+        );
+        // Advisory only: the send still happens.
+        expect(mockNative.sendEvent).toHaveBeenCalledWith('CUSTOM', 'PURCAHSE', null);
+      });
+
+      it('stays silent for standard events', async () => {
+        (globalThis as Record<string, unknown>).__DEV__ = true;
+        await appstackSDK.sendEvent(EventType.PURCHASE);
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      // Guards the `typeof __DEV__` check: a bare reference would be a ReferenceError
+      // wherever the global is not injected (plain Node, some bundlers, this suite).
+      it('does not throw or warn when __DEV__ is undefined', async () => {
+        expect(typeof (globalThis as Record<string, unknown>).__DEV__).toBe('undefined');
+        await expect(appstackSDK.sendEvent('user_attributes')).resolves.toBeUndefined();
+        expect(console.warn).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -455,8 +629,41 @@ describe('EventType', () => {
     expect(EventType.INSTALL).toBe('INSTALL');
     expect(EventType.LOGIN).toBe('LOGIN');
     expect(EventType.PURCHASE).toBe('PURCHASE');
-    expect(EventType.CUSTOM).toBe('CUSTOM');
     expect(EventType.SIGN_UP).toBe('SIGN_UP');
     expect(EventType.REGISTER).toBe('REGISTER');
+  });
+
+  // Removed in 3.0: in the two-argument API you pass a custom event's name
+  // directly, so CUSTOM had no caller-facing meaning and was a footgun —
+  // sendEvent(EventType.CUSTOM, params) resolved as "standard type CUSTOM, no
+  // name", which iOS drops and Android sends with a null event_name.
+  it('no longer exports CUSTOM', () => {
+    expect((EventType as Record<string, string>).CUSTOM).toBeUndefined();
+    expect(Object.values(EventType)).not.toContain('CUSTOM');
+  });
+
+  // The JS enum must stay aligned with Android's native enum: JS resolves the
+  // standard/custom decision now, so a member missing here silently downgrades a
+  // standard event to a custom one.
+  it('matches the 17 standard types the wrapper can resolve', () => {
+    expect(Object.values(EventType)).toEqual([
+      'INSTALL',
+      'LOGIN',
+      'SIGN_UP',
+      'REGISTER',
+      'PURCHASE',
+      'ADD_TO_CART',
+      'ADD_TO_WISHLIST',
+      'INITIATE_CHECKOUT',
+      'START_TRIAL',
+      'SUBSCRIBE',
+      'LEVEL_START',
+      'LEVEL_COMPLETE',
+      'TUTORIAL_COMPLETE',
+      'SEARCH',
+      'VIEW_ITEM',
+      'VIEW_CONTENT',
+      'SHARE',
+    ]);
   });
 });

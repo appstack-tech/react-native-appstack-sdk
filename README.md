@@ -45,7 +45,7 @@ No additional configuration is needed for Android; the SDK will work automatical
 ```javascript
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
-import AppstackSDK from 'react-native-appstack-sdk';
+import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 
 const App = () => {
   useEffect(() => {
@@ -66,7 +66,7 @@ const App = () => {
   }, []);
 
   const trackPurchase = () => {
-    AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
+    AppstackSDK.sendEvent(EventType.PURCHASE, { revenue: 29.99, currency: 'USD' });
   };
 
   // ... your app
@@ -127,46 +127,63 @@ would drop the `logLevel` and `customerUserId` you passed.
 
 Track user actions and revenue in your app:
 
+`sendEvent` takes the event and, optionally, its parameters:
+
 ```javascript
-// Track events without parameters
-await AppstackSDK.sendEvent('LOGIN');
-await AppstackSDK.sendEvent('SIGN_UP');
+import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 
-// Track events with parameters (including revenue)
-await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 29.99, currency: 'USD' });
-await AppstackSDK.sendEvent('SUBSCRIBE', null, { revenue: 9.99, plan: 'monthly' });
+// Standard events — the recommended form
+await AppstackSDK.sendEvent(EventType.LOGIN);
+await AppstackSDK.sendEvent(EventType.PURCHASE, { revenue: 29.99, currency: 'USD' });
+await AppstackSDK.sendEvent(EventType.SUBSCRIBE, { revenue: 9.99, plan: 'monthly' });
 
-// Custom events
-await AppstackSDK.sendEvent(
-  'CUSTOM',
-  'user_attributes',
-  {
-    email: "test@example.com",
-    name: "John Doe",
-    phone_number: "+33060000000",
-    date_of_birth: "2026-02-01"
-  }
-);
+// The string name of a standard event works too, case-insensitively
+await AppstackSDK.sendEvent('PURCHASE', { revenue: 29.99, currency: 'USD' });
+
+// Custom events — pass your own name as the event
+await AppstackSDK.sendEvent('user_attributes', {
+  email: 'test@example.com',
+  name: 'John Doe',
+  phone_number: '+33060000000',
+  date_of_birth: '2026-02-01',
+});
 ```
+
+Anything that is not a standard event type is sent as a custom event under that
+name, so there is no separate "custom" mode to opt into.
+
+**Parameters**
+
+- `event` - A standard `EventType` (recommended), the string name of one, or your own name for a custom event
+- `parameters` - Optional parameters object (e.g. `{ revenue: 29.99, currency: 'USD' }`). Keys whose value is `null` or `undefined` are stripped, so both platforms receive the same map
+
+Returns: a promise that resolves once the call reaches the native SDK. It resolves
+`void` — **not** a delivery receipt. The native SDKs also drop events when the SDK
+is disabled, offline, or still buffering, and none of that is visible from
+JavaScript.
 
 **Available EventType values**
 
-It is recommended to use standard events for a smoother experience.
+Standard events are strongly recommended: they carry semantics that enhanced app
+campaigns optimise against, which custom events do not.
 
-- `INSTALL` - App installation (tracked automatically; sending it manually is ignored)
+- `INSTALL` - App installation (tracked automatically; a manual send is dropped with an error logged)
 - `LOGIN`, `SIGN_UP`, `REGISTER` - Authentication
 - `PURCHASE`, `ADD_TO_CART`, `ADD_TO_WISHLIST`, `INITIATE_CHECKOUT`, `START_TRIAL`, `SUBSCRIBE` - Monetization
 - `LEVEL_START`, `LEVEL_COMPLETE` - Game progression
 - `TUTORIAL_COMPLETE`, `SEARCH`, `VIEW_ITEM`, `VIEW_CONTENT`, `SHARE` - Engagement
-- `CUSTOM` - For application-specific events
 
-Tracks custom events with optional parameters:
+In development builds, passing a string that is not one of these logs a warning
+naming the custom event it became, so a typo like `'PURCAHSE'` is visible instead
+of silently becoming a custom event.
 
-- `eventType` - Event type from EventType enum or string (e.g., 'PURCHASE', 'LOGIN')
-- `eventName` - Event name for custom events (optional)
-- `parameters` - Optional parameters object (e.g., `{ revenue: 29.99, currency: 'USD' }`)
-
-Returns: A promise that resolves to `true` if the event was sent successfully
+> **Migrating from 2.x:** `sendEvent(eventType, eventName, parameters)` was removed
+> in 3.0 and now throws with a message pointing at the new form. Drop the middle
+> argument: `sendEvent('PURCHASE', null, params)` becomes
+> `sendEvent(EventType.PURCHASE, params)`, and
+> `sendEvent('CUSTOM', 'user_attributes', params)` becomes
+> `sendEvent('user_attributes', params)`. `EventType.CUSTOM` was removed with it —
+> pass your event's name directly.
 
 **Enhanced app campaigns**
 
@@ -178,7 +195,7 @@ For any event that represents revenue, we recommend sending:
 2. `currency` (string, e.g. `EUR`, `USD`)
 
 ```javascript
-await AppstackSDK.sendEvent('PURCHASE', null, { revenue: 4.99, currency: 'EUR' });
+await AppstackSDK.sendEvent(EventType.PURCHASE, { revenue: 4.99, currency: 'EUR' });
 ```
 
 To improve matching quality on Meta, send events including the following parameters if you can fulfill them:
