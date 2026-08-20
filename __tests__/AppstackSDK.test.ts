@@ -520,6 +520,17 @@ describe('AppstackSDK', () => {
         mockNative.sendEvent.mockRejectedValue(new Error('Send failed'));
         await expect(appstackSDK.sendEvent('PURCHASE')).rejects.toThrow('Send failed');
       });
+
+      // Documented guarantee: sendEvent is async, so validation failures reject the
+      // returned promise instead of throwing synchronously. Callers who fire and
+      // forget need a .catch(); a synchronous pre-check added later would break them.
+      it('rejects rather than throwing synchronously', async () => {
+        let promise: Promise<void>;
+        expect(() => {
+          promise = appstackSDK.sendEvent('CUSTOM');
+        }).not.toThrow();
+        await expect(promise!).rejects.toThrow("'CUSTOM' is not a sendable event");
+      });
     });
 
     describe('development-only warning', () => {

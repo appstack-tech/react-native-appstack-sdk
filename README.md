@@ -151,14 +151,19 @@ await AppstackSDK.sendEvent('user_attributes', {
 
 Anything that is not a standard event type is sent as a custom event under that
 name, so there is no separate "custom" mode to opt into. Three exceptions: an
-empty or non-string event throws, the literal `'CUSTOM'` throws (it is the
+empty or non-string event rejects, the literal `'CUSTOM'` rejects (it is the
 internal category, not a name), and the automatic-only events below are dropped
 rather than turned into custom events.
+
+`sendEvent` is `async`, so an invalid call rejects the returned promise rather
+than throwing synchronously. Under `await` that surfaces as a thrown error as
+usual; if you call it fire-and-forget, attach a `.catch()` or it becomes an
+unhandled rejection.
 
 **Parameters**
 
 - `event` - A standard `EventType` (recommended), the string name of one, or your own name for a custom event
-- `parameters` - Optional parameters object (e.g. `{ revenue: 29.99, currency: 'USD' }`). Keys whose value is `null` or `undefined` are stripped, so both platforms receive the same map
+- `parameters` - Optional JSON-safe parameters object (e.g. `{ revenue: 29.99, currency: 'USD' }`). Values must be JSON-representable — a `Date`, class instance or function never survives the bridge and is a type error. Top-level keys whose value is `null` or `undefined` are stripped, so both platforms receive the same map; stripping is shallow, so a `null` nested inside an object or array is preserved. `AppstackEventParameters` and `JsonValue` are exported if you want to annotate a payload
 
 Returns: a promise that resolves `void` — **not** a delivery receipt. For a sent
 event it resolves once the call reaches the native SDK, and the native SDKs also
