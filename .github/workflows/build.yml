@@ -36,11 +36,19 @@ jobs:
     - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       with:
         persist-credentials: false
+    # Node 24 bundles npm 11.x, which trusted publishing (OIDC) requires. Node 22
+    # still bundles npm 10.9.x and cannot perform the OIDC exchange at all, so do
+    # not lower this pin to match the other workflows.
     - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
       with:
-        node-version: '18'
+        node-version: '24'
         registry-url: 'https://registry.npmjs.org'
-        cache: 'npm'
+        # No dependency cache on the release job. It saves only a few seconds on a
+        # job that runs a handful of times a month, and this is the one job holding
+        # npm publish rights. `package-manager-cache: false` also disables the
+        # auto-detect fallback, which an explicit `cache` input would otherwise
+        # take precedence over (actions/setup-node src/main.ts).
+        package-manager-cache: false
     - name: Extract and validate version from tag
       id: get_version
       run: |
@@ -80,12 +88,31 @@ jobs:
     - name: Create npm package
       run: npm pack
 
+    # Authenticates via npm trusted publishing (OIDC), backed by the workflow's
+    # `id-token: write` permission and the trusted publisher configured on the
+    # package. There is no NPM_TOKEN to rotate, expire, or have revoked. Provenance
+    # attestations are generated automatically, so no --provenance flag is needed.
     - name: Publish to npm
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         VERSION: ${{ steps.get_version.outputs.version }}
       run: |
         set -euo pipefail
+        # Trusted publishing needs npm >= 11.5.1. Fail loudly rather than silently
+        # falling back to token auth, which no longer has a token to fall back to.
+        REQUIRED_NPM="11.5.1"
+        ACTUAL_NPM="$(npm --version)"
+        if [[ "$(printf '%s\n%s\n' "$REQUIRED_NPM" "$ACTUAL_NPM" | sort -V | head -n1)" != "$REQUIRED_NPM" ]]; then
+          echo "::error::npm $ACTUAL_NPM is too old for trusted publishing (need >= $REQUIRED_NPM)"
+          exit 1
+        fi
+        # actions/setup-node writes `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`
+        # into its npmrc. With no token in the environment that expands to an empty
+        # string, which npm reads as "auth is already configured" — it then skips the
+        # OIDC exchange and publishes with empty credentials, failing with E404.
+        NPMRC="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+        if [[ -f "$NPMRC" ]]; then
+          sed -i '/_authToken/d' "$NPMRC"
+        fi
         if [[ "$VERSION" == *-* ]]; then
           npm publish --access public --tag rc
           echo "✅ Published $VERSION under the 'rc' dist-tag"
