@@ -43,7 +43,12 @@ jobs:
       with:
         node-version: '24'
         registry-url: 'https://registry.npmjs.org'
-        cache: 'npm'
+        # No dependency cache on the release job. It saves only a few seconds on a
+        # job that runs a handful of times a month, and this is the one job holding
+        # npm publish rights. `package-manager-cache: false` also disables the
+        # auto-detect fallback, which an explicit `cache` input would otherwise
+        # take precedence over (actions/setup-node src/main.ts).
+        package-manager-cache: false
     - name: Extract and validate version from tag
       id: get_version
       run: |
