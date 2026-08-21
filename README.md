@@ -168,9 +168,9 @@ unhandled rejection.
 Returns: a promise that resolves `void` — **not** a delivery receipt. For a sent
 event it resolves once the call reaches the native SDK, and the native SDKs also
 drop events when the SDK is disabled, offline, or still buffering, none of which
-is visible from JavaScript. Automatic-only events (`INSTALL`, `FIRST_OPEN`,
-`FIRST_OPEN_GUARDED`) never reach native at all: they resolve after being
-dropped, with an error logged.
+is visible from JavaScript. A manual `INSTALL` never reaches native at all: it
+is recorded automatically, so it resolves after being dropped, with an error
+logged.
 
 **Available EventType values**
 
