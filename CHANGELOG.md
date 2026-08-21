@@ -5,7 +5,7 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.0.0] - 2026-08-21
 
 ### Removed
 - **Breaking:** the positional `configure(apiKey, isDebug?, endpointBaseUrl?, logLevel?, customerUserId?)` signature, deprecated in 2.6.0, is gone. Only `configure(apiKey, { logLevel, customerUserId })` remains. `isDebug` and `endpointBaseUrl` are removed outright — neither was ever forwarded to the native SDKs, so no behaviour is lost by dropping them. A 2.x-style call now throws an error naming the replacement instead of silently ignoring the extra arguments, which would otherwise discard the `logLevel` and `customerUserId` that follow them.
