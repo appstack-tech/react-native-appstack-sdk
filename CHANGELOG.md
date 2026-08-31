@@ -5,6 +5,12 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **Android:** pinned `tech.appstack.android-sdk:appstack-android-sdk` to `1.8.0-SNAPSHOT` (was `1.7.0`). The snapshot plumbing in `android/build.gradle` activates automatically off the `-SNAPSHOT` suffix, so the Central Portal snapshot repository is registered on every root project and changing modules are no longer cached.
+- **iOS:** updated the vendored `ios/AppstackSDK.xcframework` to `4.6.0-rc1` (was `4.5.0`), via `update-ios-xcframework.sh`.
+
 ## [3.0.0] - 2026-08-21
 
 ### Changed

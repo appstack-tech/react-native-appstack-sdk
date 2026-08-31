@@ -6,6 +6,7 @@ import AdServices
 import AdSupport
 import AppTrackingTransparency
 @_exported import AppstackSDK
+import CryptoKit
 import Darwin
 import Foundation
 import Network
