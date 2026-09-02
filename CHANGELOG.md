@@ -5,6 +5,12 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **iOS:** Added experimental React Native 0.87 Swift Package Manager support. The hand-written manifest splits the Swift bridge from the Objective-C++ TurboModule, wires React Native's generated code and header products, and resolves the exact native Appstack SDK version from its public Swift package. CocoaPods support is unchanged.
+
 ## [3.0.0] - 2026-08-21
 
 ### Changed
