@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **iOS:** Updated `AppstackSDK.xcframework` to `4.6.0`, which brings the on-device parameter encryption above along with the parameter and attribution fixes below.
 - **Android:** Updated the native Appstack Android SDK dependency to `1.8.0`, which brings the on-device parameter encryption above.
+- A manual `sendEvent('ASA_ATTRIBUTION')` is now dropped rather than sent as a custom event. iOS `4.6.0` adds `ASA_ATTRIBUTION` to its native event enum and emits it automatically once AdServices token resolution completes, so it joins `INSTALL`, `FIRST_OPEN` and `FIRST_OPEN_GUARDED` in the set the wrapper refuses to forward. It is not part of the public `EventType` API on either platform.
 
 ### Fixed
 - **iOS:** A `null` nested inside a parameter no longer drops the event. Null values are omitted from the payload and nulls inside arrays are preserved, matching Android. Top-level `null` and `undefined` have been stripped in JavaScript since 3.0.0, but that stripping is shallow, so a null inside an object or array still reached native, where the event was discarded.
