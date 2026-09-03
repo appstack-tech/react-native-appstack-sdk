@@ -404,7 +404,7 @@ describe('AppstackSDK', () => {
     describe('automatic-only events', () => {
       // iOS drops these natively; FIRST_OPEN* are not in Android's enum at all, so
       // forwarding would fabricate a custom event named "FIRST_OPEN" on Android only.
-      it.each(['INSTALL', 'FIRST_OPEN', 'FIRST_OPEN_GUARDED'])(
+      it.each(['INSTALL', 'FIRST_OPEN', 'FIRST_OPEN_GUARDED', 'ASA_ATTRIBUTION'])(
         'drops %s without calling native and without rejecting',
         async (event) => {
           await expect(appstackSDK.sendEvent(event)).resolves.toBeUndefined();

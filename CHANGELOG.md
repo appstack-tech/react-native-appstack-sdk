@@ -5,6 +5,27 @@ All notable changes to the React Native Appstack SDK will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-09-03
+
+### Added
+- **Custom event parameters are encrypted on the device before they are sent.** Values such as an email address, phone number or name are encrypted in the app rather than on arrival. Parameter names that must stay readable — among them `currency`, `revenue` and campaign fields — are excluded, and that list is controlled by Appstack's backend. No JavaScript change is required and `sendEvent` call sites are unaffected.
+  - On iOS this requires iOS 17 or later; on iOS 15 and 16 values are encrypted server-side as before. On Android it works down to the SDK's minimum API level 21.
+  - Revenue is read out of the parameters before encryption, so revenue reporting is unchanged, as are purchase `transaction_details` and deeplink user data.
+  - A value that cannot be encrypted is omitted from the event, and the remaining parameters are still sent.
+  - On Android it adds no new dependency and grows the release AAR by roughly 36 KB. On iOS it is built into the vendored framework.
+- **iOS:** Events carry a diagnostic recording whether Apple Ads attribution was enabled and whether the AdServices token fetch is pending, succeeded or failed. The SDK sends this diagnostic automatically once token resolution completes, rather than on the next `sendEvent` (native `4.5.2`). It has no JavaScript API.
+- **iOS:** The vendored framework ships an Apple privacy manifest declaring its required-reason API usage (native `4.5.1`). No additions to the app's own `PrivacyInfo.xcprivacy` are required.
+
+### Changed
+- **iOS:** Updated `AppstackSDK.xcframework` to `4.6.0`, which brings the on-device parameter encryption above along with the parameter and attribution fixes below.
+- **Android:** Updated the native Appstack Android SDK dependency to `1.8.0`, which brings the on-device parameter encryption above.
+- A manual `sendEvent('ASA_ATTRIBUTION')` is now dropped rather than sent as a custom event. iOS `4.6.0` adds `ASA_ATTRIBUTION` to its native event enum and emits it automatically once AdServices token resolution completes, so it joins `INSTALL`, `FIRST_OPEN` and `FIRST_OPEN_GUARDED` in the set the wrapper refuses to forward. It is not part of the public `EventType` API on either platform.
+
+### Fixed
+- **iOS:** A `null` nested inside a parameter no longer drops the event. Null values are omitted from the payload and nulls inside arrays are preserved, matching Android. Top-level `null` and `undefined` have been stripped in JavaScript since 3.0.0, but that stripping is shallow, so a null inside an object or array still reached native, where the event was discarded.
+- **iOS:** A parameter holding a value JSON cannot represent no longer crashes the app. This covers `NaN` and infinite numbers, a `Date`, `URL`, `Set` or class instance. Such keys are dropped individually and named in an error log, and the event is sent with its remaining parameters. `NaN` and `Infinity` are typed as `number`, so they satisfy the `JsonValue` type on `parameters`.
+- **iOS:** A single `null` in the attribution match response no longer discards the response. One null query parameter could previously cost an install its attribution data, which surfaced in JavaScript as an empty `getAttributionParams()` result.
+
 ## [3.0.0] - 2026-08-21
 
 ### Changed

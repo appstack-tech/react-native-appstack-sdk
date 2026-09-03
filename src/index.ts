@@ -35,19 +35,23 @@ const CUSTOM_EVENT_CATEGORY = 'CUSTOM';
  *
  * A manual send is dropped by the wrapper rather than forwarded. iOS already
  * discards these natively, because a hand-sent `INSTALL` inflates install counts.
- * `FIRST_OPEN` and `FIRST_OPEN_GUARDED` exist only in iOS's enum, so forwarding
- * them would additionally manufacture a bogus *custom* event named "FIRST_OPEN" on
- * Android alone — the exact cross-platform divergence this API removes.
+ * `FIRST_OPEN`, `FIRST_OPEN_GUARDED` and `ASA_ATTRIBUTION` exist only in iOS's enum,
+ * so forwarding them would additionally manufacture a bogus *custom* event named
+ * "FIRST_OPEN" on Android alone — the exact cross-platform divergence this API removes.
+ *
+ * `ASA_ATTRIBUTION` was added to iOS's enum in 4.6.0 (via 4.5.2), which emits it
+ * automatically once AdServices token resolution completes.
  */
 const AUTOMATIC_ONLY_EVENTS: ReadonlySet<string> = new Set([
   'INSTALL',
   'FIRST_OPEN',
   'FIRST_OPEN_GUARDED',
+  'ASA_ATTRIBUTION',
 ]);
 
 /**
  * Every standard type resolvable in JS. This matches Android's native enum exactly;
- * iOS's two extras are both automatic-only and handled above, so nothing real is
+ * iOS's three extras are all automatic-only and handled above, so nothing real is
  * missing from this set.
  */
 const STANDARD_EVENT_TYPES: ReadonlySet<string> = new Set<string>(Object.values(EventType));
