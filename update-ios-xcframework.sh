@@ -7,7 +7,7 @@ set -euo pipefail
 # To bump the version, edit VERSION below and re-run this script. It updates the
 # vendored CocoaPods artifact and the exact SwiftPM dependency together.
 
-VERSION="4.5.0"
+VERSION="4.6.0"
 
 REPO="appstack-tech/ios-appstack-sdk"
 ASSET_NAME="AppstackSDK.xcframework.zip"

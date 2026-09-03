@@ -6,6 +6,34 @@
     "children": [
       {
         "kind": "Import",
+        "name": "CryptoKit",
+        "printedName": "CryptoKit",
+        "declKind": "Import",
+        "moduleName": "AppstackSDK"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "AppstackSDK"
+      },
+      {
+        "kind": "Import",
+        "name": "CryptoKit",
+        "printedName": "CryptoKit",
+        "declKind": "Import",
+        "moduleName": "AppstackSDK"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "AppstackSDK"
+      },
+      {
+        "kind": "Import",
         "name": "Darwin",
         "printedName": "Darwin",
         "declKind": "Import",
@@ -1172,6 +1200,46 @@
             "declKind": "EnumElement",
             "usr": "s:11AppstackSDK9EventTypeO18FIRST_OPEN_GUARDEDyA2CmF",
             "mangledName": "$s11AppstackSDK9EventTypeO18FIRST_OPEN_GUARDEDyA2CmF",
+            "moduleName": "AppstackSDK",
+            "declAttributes": [
+              "RawDocComment"
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "ASA_ATTRIBUTION",
+            "printedName": "ASA_ATTRIBUTION",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(AppstackSDK.EventType.Type) -> AppstackSDK.EventType",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "EventType",
+                    "printedName": "AppstackSDK.EventType",
+                    "usr": "s:11AppstackSDK9EventTypeO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "AppstackSDK.EventType.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "EventType",
+                        "printedName": "AppstackSDK.EventType",
+                        "usr": "s:11AppstackSDK9EventTypeO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11AppstackSDK9EventTypeO15ASA_ATTRIBUTIONyA2CmF",
+            "mangledName": "$s11AppstackSDK9EventTypeO15ASA_ATTRIBUTIONyA2CmF",
             "moduleName": "AppstackSDK",
             "declAttributes": [
               "RawDocComment"
@@ -3799,6 +3867,83 @@
   },
   "ConstValues": [
     {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/SDKParameterProtector.swift",
+      "kind": "StringLiteral",
+      "offset": 957,
+      "length": 9,
+      "value": "\"enc:v1:\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ParameterEncryptionConfig.swift",
+      "kind": "StringLiteral",
+      "offset": 533,
+      "length": 8,
+      "value": "\"key_id\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ParameterEncryptionConfig.swift",
+      "kind": "StringLiteral",
+      "offset": 567,
+      "length": 12,
+      "value": "\"public_key\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ParameterEncryptionConfig.swift",
+      "kind": "StringLiteral",
+      "offset": 609,
+      "length": 16,
+      "value": "\"plaintext_keys\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ParameterEncryptionConfig.swift",
+      "kind": "IntegerLiteral",
+      "offset": 1844,
+      "length": 1,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ParameterEncryptionConfig.swift",
+      "kind": "StringLiteral",
+      "offset": 1882,
+      "length": 48,
+      "value": "\"DHKEM_P256_HKDF_SHA256\/HKDF_SHA256\/AES_256_GCM\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ParameterEncryptionConfig.swift",
+      "kind": "StringLiteral",
+      "offset": 1962,
+      "length": 27,
+      "value": "\"appstack-sdk-parameter:v1\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ParameterEncryptionConfig.swift",
+      "kind": "IntegerLiteral",
+      "offset": 2106,
+      "length": 2,
+      "value": "65"
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ParameterEncryptionConfig.swift",
+      "kind": "IntegerLiteral",
+      "offset": 2157,
+      "length": 4,
+      "value": "0x04"
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ParameterEncryptionConfig.swift",
+      "kind": "StringLiteral",
+      "offset": 3820,
+      "length": 66,
+      "value": "\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ParameterEncryptionConfig.swift",
+      "kind": "StringLiteral",
+      "offset": 3978,
+      "length": 67,
+      "value": "\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-\""
+    },
+    {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
       "offset": 1050,
@@ -3941,189 +4086,189 @@
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 47102,
+      "offset": 47215,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "IntegerLiteral",
-      "offset": 47148,
+      "offset": 47261,
       "length": 1,
       "value": "1"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 47506,
+      "offset": 47619,
       "length": 93,
       "value": "\"In-session attribution retry (attempt \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 47596,
+      "offset": 47709,
       "length": 1,
       "value": "\").\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 48112,
+      "offset": 48225,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 50349,
+      "offset": 50455,
       "length": 101,
       "value": "\"Appstack event '\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 50384,
+      "offset": 50490,
       "length": 67,
       "value": "\"' is tracked automatically and cannot be sent manually; ignoring.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 50549,
+      "offset": 50655,
       "length": 54,
       "value": "\"Custom event name is required when event is .CUSTOM.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 52058,
+      "offset": 52164,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52124,
+      "offset": 52230,
       "length": 53,
       "value": "\"Appstack event '\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52159,
+      "offset": 52265,
       "length": 19,
       "value": "\"' failed to send.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52220,
+      "offset": 52326,
       "length": 47,
       "value": "\"Event failed for \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52256,
+      "offset": 52362,
       "length": 1,
       "value": "\": \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52266,
+      "offset": 52372,
       "length": 2,
       "value": "\"\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52358,
+      "offset": 52464,
       "length": 68,
       "value": "\"Event '\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52384,
+      "offset": 52490,
       "length": 43,
       "value": "\"' buffered until configuration completes.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52476,
+      "offset": 52582,
       "length": 90,
       "value": "\"Appstack event '\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52511,
+      "offset": 52617,
       "length": 56,
       "value": "\"' dropped: buffer full before configuration completed.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 54383,
+      "offset": 54489,
       "length": 52,
       "value": "\"Dropping \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 54401,
+      "offset": 54507,
       "length": 8,
       "value": "\" buffered event(s): SDK disabled.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 54874,
+      "offset": 54980,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 54948,
+      "offset": 55054,
       "length": 53,
       "value": "\"Appstack event '\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 54983,
+      "offset": 55089,
       "length": 19,
       "value": "\"' failed to send.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 55048,
+      "offset": 55154,
       "length": 47,
       "value": "\"Event failed for \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 55084,
+      "offset": 55190,
       "length": 1,
       "value": "\": \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 55094,
+      "offset": 55200,
       "length": 2,
       "value": "\"\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 59627,
+      "offset": 59733,
       "length": 23,
       "value": "\"appstack_match_status\""
     },
@@ -4144,7 +4289,42 @@
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackASAAttribution.swift",
       "kind": "StringLiteral",
-      "offset": 1943,
+      "offset": 460,
+      "length": 17,
+      "value": "\"api_key_missing\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackASAAttribution.swift",
+      "kind": "StringLiteral",
+      "offset": 501,
+      "length": 14,
+      "value": "\"token_cached\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackASAAttribution.swift",
+      "kind": "StringLiteral",
+      "offset": 540,
+      "length": 15,
+      "value": "\"fetch_pending\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackASAAttribution.swift",
+      "kind": "StringLiteral",
+      "offset": 580,
+      "length": 15,
+      "value": "\"fetch_success\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackASAAttribution.swift",
+      "kind": "StringLiteral",
+      "offset": 619,
+      "length": 14,
+      "value": "\"fetch_failed\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackASAAttribution.swift",
+      "kind": "StringLiteral",
+      "offset": 2181,
       "length": 2,
       "value": "\"\""
     },
@@ -4242,63 +4422,70 @@
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ConfigResponse.swift",
       "kind": "StringLiteral",
-      "offset": 896,
+      "offset": 1091,
       "length": 8,
       "value": "\"app_id\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ConfigResponse.swift",
       "kind": "StringLiteral",
-      "offset": 931,
+      "offset": 1126,
       "length": 13,
       "value": "\"sdk_enabled\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ConfigResponse.swift",
       "kind": "StringLiteral",
-      "offset": 969,
+      "offset": 1164,
       "length": 11,
       "value": "\"match_url\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ConfigResponse.swift",
       "kind": "StringLiteral",
-      "offset": 1018,
+      "offset": 1213,
       "length": 26,
       "value": "\"use_install_detection_v2\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ConfigResponse.swift",
       "kind": "StringLiteral",
-      "offset": 1076,
+      "offset": 1271,
       "length": 18,
       "value": "\"decision_options\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ConfigResponse.swift",
       "kind": "StringLiteral",
-      "offset": 2550,
+      "offset": 1325,
+      "length": 22,
+      "value": "\"parameter_encryption\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ConfigResponse.swift",
+      "kind": "StringLiteral",
+      "offset": 2803,
       "length": 24,
       "value": "\"install_window_seconds\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ConfigResponse.swift",
       "kind": "StringLiteral",
-      "offset": 2624,
+      "offset": 2877,
       "length": 34,
       "value": "\"attribution_match_window_seconds\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ConfigResponse.swift",
       "kind": "StringLiteral",
-      "offset": 2708,
+      "offset": 2961,
       "length": 35,
       "value": "\"dir_vs_purchase_tolerance_seconds\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/ConfigResponse.swift",
       "kind": "StringLiteral",
-      "offset": 2792,
+      "offset": 3045,
       "length": 34,
       "value": "\"bundle_vs_data_tolerance_seconds\""
     },
@@ -4389,196 +4576,210 @@
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 1371,
+      "offset": 1547,
+      "length": 29,
+      "value": "\"AppstackParameterEncryption\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
+      "kind": "StringLiteral",
+      "offset": 1611,
       "length": 18,
       "value": "\"InstallEventSent\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 1593,
+      "offset": 1833,
       "length": 24,
       "value": "\"AppstackInstallEventId\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2014,
+      "offset": 2254,
       "length": 20,
       "value": "\"FirstOpenEventSent\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2078,
+      "offset": 2318,
       "length": 27,
       "value": "\"FirstOpenGuardedEventSent\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2143,
+      "offset": 2383,
       "length": 26,
       "value": "\"AppstackFirstOpenEventId\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2214,
+      "offset": 2454,
       "length": 33,
       "value": "\"AppstackFirstOpenGuardedEventId\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2277,
+      "offset": 2517,
       "length": 10,
       "value": "\"ASAToken\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2313,
+      "offset": 2734,
+      "length": 22,
+      "value": "\"ASAAttributionStatus\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
+      "kind": "StringLiteral",
+      "offset": 2782,
       "length": 6,
       "value": "\"IDFA\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2345,
+      "offset": 2814,
       "length": 6,
       "value": "\"IDFV\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2384,
+      "offset": 2853,
       "length": 13,
       "value": "\"DeviceModel\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2437,
+      "offset": 2906,
       "length": 23,
       "value": "\"MatchRequestAttempted\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2601,
+      "offset": 3070,
       "length": 32,
       "value": "\"AppstackAttributionMatchStatus\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2724,
+      "offset": 3193,
       "length": 28,
       "value": "\"AppstackOriginalAppVersion\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2794,
+      "offset": 3263,
       "length": 30,
       "value": "\"AppstackOriginalPurchaseDate\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2862,
+      "offset": 3331,
       "length": 26,
       "value": "\"AppstackAppTransactionId\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2928,
+      "offset": 3397,
       "length": 28,
       "value": "\"AppstackStoreKitAppVersion\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 2997,
+      "offset": 3466,
       "length": 29,
       "value": "\"AppstackStoreKitEnvironment\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 3062,
+      "offset": 3531,
       "length": 24,
       "value": "\"AppstackInstallVersion\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 3126,
+      "offset": 3595,
       "length": 28,
       "value": "\"AppstackLastSeenAppVersion\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 3197,
+      "offset": 3666,
       "length": 31,
       "value": "\"AppstackInstallClassification\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 3264,
+      "offset": 3733,
       "length": 24,
       "value": "\"AppstackInstallSignals\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 3332,
+      "offset": 3801,
       "length": 32,
       "value": "\"AppstackInstallStateComputedAt\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 3398,
+      "offset": 3867,
       "length": 22,
       "value": "\"AppstackPreviousIDFV\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 3486,
+      "offset": 3955,
       "length": 19,
       "value": "\"MatchedAppstackId\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 3548,
+      "offset": 4017,
       "length": 18,
       "value": "\"SyncedAppstackId\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 3957,
+      "offset": 4426,
       "length": 21,
       "value": "\"InstalledAppstackId\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "StringLiteral",
-      "offset": 4014,
+      "offset": 4483,
       "length": 7,
-      "value": "\"4.5.0\""
+      "value": "\"4.6.0\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",
       "kind": "BooleanLiteral",
-      "offset": 4848,
+      "offset": 5317,
       "length": 5,
       "value": "false"
     },
@@ -4606,63 +4807,63 @@
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/UserData.swift",
       "kind": "StringLiteral",
-      "offset": 3798,
+      "offset": 4816,
       "length": 13,
       "value": "\"deeplink_id\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/UserData.swift",
       "kind": "StringLiteral",
-      "offset": 3833,
+      "offset": 4851,
       "length": 8,
       "value": "\"app_id\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/UserData.swift",
       "kind": "StringLiteral",
-      "offset": 3872,
+      "offset": 4890,
       "length": 17,
       "value": "\"redirection_url\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/UserData.swift",
       "kind": "StringLiteral",
-      "offset": 3977,
+      "offset": 4995,
       "length": 14,
       "value": "\"query_params\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/UserData.swift",
       "kind": "StringLiteral",
-      "offset": 4018,
+      "offset": 5036,
       "length": 13,
       "value": "\"path_params\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/UserData.swift",
       "kind": "StringLiteral",
-      "offset": 4078,
+      "offset": 5096,
       "length": 12,
       "value": "\"install_id\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/UserData.swift",
       "kind": "StringLiteral",
-      "offset": 4116,
+      "offset": 5134,
       "length": 12,
       "value": "\"event_type\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/UserData.swift",
       "kind": "StringLiteral",
-      "offset": 4152,
+      "offset": 5170,
       "length": 10,
       "value": "\"date_day\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/Model\/UserData.swift",
       "kind": "StringLiteral",
-      "offset": 4188,
+      "offset": 5206,
       "length": 12,
       "value": "\"expires_at\""
     },
@@ -4683,133 +4884,140 @@
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1088,
+      "offset": 1427,
       "length": 10,
       "value": "\"event_id\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1124,
+      "offset": 1463,
       "length": 12,
       "value": "\"event_name\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1163,
+      "offset": 1502,
       "length": 13,
       "value": "\"appstack_id\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1198,
+      "offset": 1537,
       "length": 8,
       "value": "\"app_id\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1232,
+      "offset": 1571,
       "length": 12,
       "value": "\"event_type\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1272,
+      "offset": 1611,
       "length": 14,
       "value": "\"trigger_type\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1313,
+      "offset": 1652,
       "length": 13,
       "value": "\"sdk_version\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1359,
+      "offset": 1698,
       "length": 19,
       "value": "\"custom_parameters\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1413,
+      "offset": 1752,
       "length": 21,
       "value": "\"transaction_details\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1459,
+      "offset": 1798,
       "length": 11,
       "value": "\"asa_token\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1491,
+      "offset": 1846,
+      "length": 24,
+      "value": "\"asa_attribution_status\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
+      "kind": "StringLiteral",
+      "offset": 1891,
       "length": 6,
       "value": "\"idfa\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1522,
+      "offset": 1922,
       "length": 11,
       "value": "\"user_data\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1564,
+      "offset": 1964,
       "length": 18,
       "value": "\"customer_user_id\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1603,
+      "offset": 2003,
       "length": 6,
       "value": "\"idfv\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1637,
+      "offset": 2037,
       "length": 14,
       "value": "\"device_model\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1682,
+      "offset": 2082,
       "length": 17,
       "value": "\"wrapper_version\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1737,
+      "offset": 2137,
       "length": 24,
       "value": "\"install_classification\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "StringLiteral",
-      "offset": 1792,
+      "offset": 2192,
       "length": 17,
       "value": "\"install_signals\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Data\/ApiClients\/Model\/EventServerLogRequest.swift",
       "kind": "BooleanLiteral",
-      "offset": 2048,
+      "offset": 2448,
       "length": 5,
       "value": "false"
     },

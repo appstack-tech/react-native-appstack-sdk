@@ -24,7 +24,7 @@ let package = Package(
         // bridge uses AppstackSDK SPI, so an unreviewed native upgrade is unsafe.
         .package(
             url: "https://github.com/appstack-tech/ios-appstack-sdk.git",
-            exact: "4.5.0"
+            exact: "4.6.0"
         ),
         .package(name: "ReactNative", path: reactNativePackagePath),
         .package(
