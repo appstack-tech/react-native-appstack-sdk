@@ -43,6 +43,9 @@ let package = Package(
                 .product(name: "AppstackSDK", package: "ios-appstack-sdk"),
             ],
             path: ".",
+            // This is the separate CocoaPods artifact. SwiftPM resolves the
+            // native SDK from ios-appstack-sdk above instead.
+            exclude: ["AppstackSDK.xcframework"],
             sources: ["AppstackBridge.swift"]
         ),
         .target(
@@ -61,6 +64,7 @@ let package = Package(
                 ),
             ],
             path: ".",
+            exclude: ["AppstackSDK.xcframework"],
             sources: ["AppstackReactNative.mm"],
             publicHeadersPath: "include",
             cSettings: [

@@ -37,6 +37,10 @@ describe('iOS Swift Package Manager manifest', () => {
     expect(packageManifest).toContain('"AppstackBridgeSwift",');
   });
 
+  it('keeps the vendored CocoaPods framework out of both SwiftPM targets', () => {
+    expect(packageManifest.match(/exclude: \["AppstackSDK\.xcframework"\]/g)).toHaveLength(2);
+  });
+
   it('uses the React Native 0.87 self-managed package contract', () => {
     expect(packageManifest).toContain('let reactNativePackagePath = "../../../../xcframeworks"');
     expect(packageManifest).toContain('let reactGeneratedCodePackagePath = "../../../ios"');
