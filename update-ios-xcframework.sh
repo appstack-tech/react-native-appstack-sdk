@@ -4,13 +4,15 @@ set -euo pipefail
 # Updates the vendored ios/AppstackSDK.xcframework from the public native SDK
 # repo's GitHub Releases.
 #
-# To bump the version, edit VERSION below and re-run this script.
+# To bump the version, edit VERSION below and re-run this script. It updates the
+# vendored CocoaPods artifact and the exact SwiftPM dependency together.
 
 VERSION="4.5.0"
 
 REPO="appstack-tech/ios-appstack-sdk"
 ASSET_NAME="AppstackSDK.xcframework.zip"
 DEST_DIR="ios/AppstackSDK.xcframework"
+SPM_MANIFEST="ios/Package.swift"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
@@ -67,6 +69,37 @@ if [[ "$ACTUAL_CHECKSUM" != "$EXPECTED_CHECKSUM" ]]; then
 fi
 echo "Checksum OK (${ACTUAL_CHECKSUM})"
 
+echo "Preparing SwiftPM manifest for native SDK ${VERSION}..."
+if [[ ! -f "$SPM_MANIFEST" ]]; then
+  echo "Missing ${SPM_MANIFEST}; cannot keep CocoaPods and SwiftPM versions aligned" >&2
+  exit 1
+fi
+STAGED_SPM_MANIFEST="${TMP_DIR}/ReactNativeAppstackSdk.Package.swift"
+cp -p "$SPM_MANIFEST" "$STAGED_SPM_MANIFEST"
+python3 - "$STAGED_SPM_MANIFEST" "$VERSION" <<'PYEOF'
+import re
+import sys
+
+path, version = sys.argv[1:]
+with open(path, encoding="utf-8") as stream:
+    source = stream.read()
+
+pattern = re.compile(
+    r'(\.package\(\s*'
+    r'url:\s*"https://github\.com/appstack-tech/ios-appstack-sdk\.git",\s*'
+    r'exact:\s*")([^"]+)("\s*\))',
+    re.DOTALL,
+)
+updated, count = pattern.subn(rf'\g<1>{version}\g<3>', source)
+if count != 1:
+    raise SystemExit(
+        f"Expected exactly one public Appstack SwiftPM dependency in {path}; found {count}"
+    )
+
+with open(path, "w", encoding="utf-8") as stream:
+    stream.write(updated)
+PYEOF
+
 echo "Unzipping..."
 unzip -q "${TMP_DIR}/${ASSET_NAME}" -d "${TMP_DIR}/extracted"
 
@@ -121,6 +154,8 @@ PYEOF
 
 echo "Replacing ${DEST_DIR}..."
 BACKUP_DIR="${TMP_DIR}/backup"
+BACKUP_SPM_MANIFEST="${TMP_DIR}/Package.swift.backup"
+cp -p "$SPM_MANIFEST" "$BACKUP_SPM_MANIFEST"
 if [[ -e "$DEST_DIR" ]]; then
   mv "$DEST_DIR" "$BACKUP_DIR"
 fi
@@ -136,5 +171,18 @@ if ! mv "$NEW_XCFRAMEWORK" "$DEST_DIR"; then
   exit 1
 fi
 
+if ! mv "$STAGED_SPM_MANIFEST" "$SPM_MANIFEST"; then
+  echo "Failed to update ${SPM_MANIFEST}; restoring previous iOS artifacts" >&2
+  if [[ -e "$DEST_DIR" ]]; then
+    mv "$DEST_DIR" "$NEW_XCFRAMEWORK" || true
+  fi
+  if [[ -e "$BACKUP_DIR" ]]; then
+    mv "$BACKUP_DIR" "$DEST_DIR" || true
+  fi
+  cp -p "$BACKUP_SPM_MANIFEST" "$SPM_MANIFEST" || true
+  exit 1
+fi
+
 echo "Done. ios/AppstackSDK.xcframework is now at version ${VERSION}."
-echo "Remember to update CHANGELOG.md and test a pod install before committing."
+echo "Done. ${SPM_MANIFEST} now resolves ios-appstack-sdk ${VERSION}."
+echo "Remember to update CHANGELOG.md and run the CocoaPods and SwiftPM integration tests before committing."
