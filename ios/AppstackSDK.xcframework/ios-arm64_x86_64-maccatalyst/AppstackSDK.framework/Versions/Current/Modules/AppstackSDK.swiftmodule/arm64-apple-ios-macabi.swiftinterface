@@ -6,6 +6,7 @@ import AdServices
 import AdSupport
 import AppTrackingTransparency
 @_exported import AppstackSDK
+import CryptoKit
 import Darwin
 import Foundation
 import Network
@@ -46,6 +47,7 @@ public enum EventType : Swift.String, Swift.CaseIterable {
   case INSTALL
   case FIRST_OPEN
   case FIRST_OPEN_GUARDED
+  case ASA_ATTRIBUTION
   case LOGIN
   case SIGN_UP
   case REGISTER

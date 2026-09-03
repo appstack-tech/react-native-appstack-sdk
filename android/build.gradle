@@ -122,7 +122,7 @@ android {
 // candidate, point this at the RC's snapshot coordinate and everything below
 // adjusts itself. Stable releases must always ship a plain release version:
 // snapshots are mutable and expire.
-def appstackAndroidSdkVersion = '1.7.0'
+def appstackAndroidSdkVersion = '1.8.0'
 def appstackAndroidSdkIsSnapshot = appstackAndroidSdkVersion.endsWith('-SNAPSHOT')
 
 // Release candidates of the native SDK are published to the Central Portal
