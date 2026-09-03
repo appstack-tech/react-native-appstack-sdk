@@ -7,6 +7,10 @@ const path = require('path');
 
 const repositoryRoot = path.resolve(__dirname, '..');
 const packageManifest = fs.readFileSync(path.join(repositoryRoot, 'ios', 'Package.swift'), 'utf8');
+const podspec = fs.readFileSync(
+  path.join(repositoryRoot, 'react-native-appstack-sdk.podspec'),
+  'utf8'
+);
 const xcframeworkUpdater = fs.readFileSync(
   path.join(repositoryRoot, 'update-ios-xcframework.sh'),
   'utf8'
@@ -43,5 +47,9 @@ describe('iOS Swift Package Manager manifest', () => {
       /\.product\(\s*name: "ReactAppHeaders",\s*package: "React-GeneratedCode"\s*\)/
     );
     expect(packageManifest).toContain('.define("RCT_NEW_ARCH_ENABLED", to: "1")');
+  });
+
+  it('does not compile the SwiftPM manifest as CocoaPods source code', () => {
+    expect(podspec).toContain('s.exclude_files = "ios/Package.swift"');
   });
 });
