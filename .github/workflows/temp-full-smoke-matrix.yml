@@ -1,13 +1,11 @@
 # TEMPORARY — DELETE BEFORE MERGING THIS PR.
 #
-# One-off runtime validation of the SwiftPM packaging changes across the whole
-# Expo compatibility range and both supported React Native architectures. The
-# permanent workflow separately exercises React Native 0.87 through SwiftPM;
-# these jobs guard the existing CocoaPods/npm integration from regressions.
+# Follow-up for the sole failed cell from the completed full matrix. The first
+# two attempts exhausted the default Gradle JVM heap while Jetifying the large
+# React Native 0.74 Hermes AAR, before reaching this SDK's code.
 #
-# Coverage: new architecture on Expo SDK 51-57, legacy architecture on 51-54.
-# Legacy is absent above 54 because Expo removed it in SDK 55, and
-# integration-tests/run.sh refuses that combination outright.
+# Full-matrix evidence is preserved in Actions run 33834109644. This temporary
+# revision reruns only Android Expo SDK 51 legacy with an explicit heap budget.
 #
 # Triggered on push because this workflow is intentionally absent from main.
 name: TEMP full smoke matrix
@@ -27,21 +25,13 @@ jobs:
     name: TEMP smoke / Android (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.architecture }})
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs=-Xmx4g'
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { expo-sdk: '51', architecture: 'new' }
-          - { expo-sdk: '52', architecture: 'new' }
-          - { expo-sdk: '53', architecture: 'new' }
-          - { expo-sdk: '54', architecture: 'new' }
-          - { expo-sdk: '55', architecture: 'new' }
-          - { expo-sdk: '56', architecture: 'new' }
-          - { expo-sdk: '57', architecture: 'new' }
           - { expo-sdk: '51', architecture: 'legacy' }
-          - { expo-sdk: '52', architecture: 'legacy' }
-          - { expo-sdk: '53', architecture: 'legacy' }
-          - { expo-sdk: '54', architecture: 'legacy' }
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -75,6 +65,7 @@ jobs:
           script: ./integration-tests/run.sh ${{ matrix.expo-sdk }} --platform android --architecture ${{ matrix.architecture }} --smoke
 
   ios-smoke-matrix:
+    if: ${{ false }}
     name: TEMP smoke / iOS (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.architecture }}, Xcode ${{ matrix.xcode }})
     runs-on: macos-26
     timeout-minutes: 90
