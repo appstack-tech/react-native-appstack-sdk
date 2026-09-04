@@ -33,8 +33,20 @@ Here, you will find the [npmjs.org](http://npmjs.org)[ react-native-appstack-sdk
 
 ```
 npm install react-native-appstack-sdk
-cd ios && pod install  # Only needed for iOS
+cd ios && pod install  # CocoaPods apps only
 ```
+
+React Native 0.87 applications using its experimental Swift Package Manager
+integration do not run `pod install`. Instead, migrate the generated iOS project
+with:
+
+```sh
+npx react-native spm add --deintegrate
+```
+
+Appstack ships its own SwiftPM manifest, so React Native's generated fallback is
+not used for this SDK. The native Appstack iOS SDK is resolved from its public
+Swift package.
 
 **Android configuration**
 

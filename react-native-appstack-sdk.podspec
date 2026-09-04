@@ -32,6 +32,9 @@ Pod::Spec.new do |s|
   # Single-level glob on purpose: ios/ also holds the vendored xcframework, whose
   # headers must not be compiled as library sources.
   s.source_files = "ios/*.{h,m,mm,swift}"
+  # Package.swift lives beside the native sources for React Native's self-managed
+  # SwiftPM integration, but it is a manifest rather than CocoaPods source code.
+  s.exclude_files = "ios/Package.swift"
 
   # AppstackReactNative.h must stay PRIVATE. Under `use_frameworks!` CocoaPods puts
   # only public headers into the generated umbrella header, and that header imports
