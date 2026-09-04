@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-09-04
+
 ### Added
 
 - **iOS:** Added experimental React Native 0.87 Swift Package Manager support. The hand-written manifest splits the Swift bridge from the Objective-C++ TurboModule, wires React Native's generated code and header products, and resolves the exact native Appstack SDK version from its public Swift package. CocoaPods support is unchanged.
