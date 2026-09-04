@@ -212,6 +212,7 @@ if ! xcodebuild \
     -sdk iphonesimulator \
     -destination 'generic/platform=iOS Simulator' \
     -derivedDataPath "${WORK_DIR}/derived-data-debug" \
+    -packageAuthorizationProvider netrc \
     CODE_SIGNING_ALLOWED=NO \
     COMPILER_INDEX_STORE_ENABLE=NO \
     -quiet \
@@ -236,6 +237,7 @@ if ! xcodebuild \
     -sdk iphonesimulator \
     -destination 'generic/platform=iOS Simulator' \
     -derivedDataPath "${WORK_DIR}/derived-data-release" \
+    -packageAuthorizationProvider netrc \
     CODE_SIGNING_ALLOWED=NO \
     COMPILER_INDEX_STORE_ENABLE=NO \
     USE_HERMES=false \
