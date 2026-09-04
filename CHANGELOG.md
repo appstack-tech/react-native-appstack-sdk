@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Android:** pinned `tech.appstack.android-sdk:appstack-android-sdk` to `1.9.0-SNAPSHOT` (was `1.8.0`) for release-candidate testing. The snapshot plumbing in `android/build.gradle` activates automatically off the `-SNAPSHOT` suffix, so the Central Portal snapshot repository is registered on every root project and changing modules are no longer cached. A stable release must repin this to a plain `1.9.0`.
+
 ## [3.2.0] - 2026-09-04
 
 ### Added
