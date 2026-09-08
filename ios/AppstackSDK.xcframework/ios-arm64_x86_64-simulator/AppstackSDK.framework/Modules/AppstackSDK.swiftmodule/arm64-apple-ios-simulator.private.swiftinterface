@@ -33,6 +33,10 @@ import os
   public func sendEvent(event: AppstackSDK.EventType, name: Swift.String? = nil, parameters: [Swift.String : Any]? = nil)
   public func getAppstackId() -> Swift.String?
   public func isSdkDisabled() -> Swift.Bool
+  @discardableResult
+  public func handleUniversalLink(_ userActivity: Foundation.NSUserActivity, options: AppstackSDK.LinkOptions = LinkOptions()) -> AppstackSDK.UniversalLinkResult?
+  @discardableResult
+  public func handleUniversalLink(_ url: Foundation.URL, options: AppstackSDK.LinkOptions = LinkOptions()) -> AppstackSDK.UniversalLinkResult?
   public func getAttributionParams() async -> [Swift.String : Any]?
   public static let attributionMatchStatusKey: Swift.String
   public func deleteUserData() async throws
@@ -115,6 +119,15 @@ public enum LogLevel : Swift.Int {
   public var rawValue: Swift.Int {
     get
   }
+}
+public struct LinkOptions {
+  public let allowedHosts: Swift.Set<Swift.String>?
+  public init(allowedHosts: Swift.Set<Swift.String>? = nil)
+}
+public struct UniversalLinkResult {
+  public let deeplinkId: Swift.String?
+  public let queryParams: [Swift.String : Swift.String]
+  public let url: Foundation.URL
 }
 extension AppstackSDK.EventType : Swift.Equatable {}
 extension AppstackSDK.EventType : Swift.Hashable {}

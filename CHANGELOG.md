@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Android:** pinned `tech.appstack.android-sdk:appstack-android-sdk` to `1.9.0-rc0-SNAPSHOT` (was `1.8.0`). The snapshot plumbing in `android/build.gradle` activates automatically off the `-SNAPSHOT` suffix, so the Central Portal snapshot repository is registered on every root project and changing modules are no longer cached. A stable release must repin this to a plain release version.
+- **iOS:** updated the vendored `ios/AppstackSDK.xcframework` and the `ios/Package.swift` SwiftPM pin to `4.7.0-rc1` (was `4.6.0`), via `update-ios-xcframework.sh`. A stable release must repin this to a plain release version.
+
 ## [3.2.0] - 2026-09-04
 
 ### Added
