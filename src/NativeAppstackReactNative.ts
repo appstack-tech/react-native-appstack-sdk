@@ -53,6 +53,10 @@ export interface Spec extends TurboModule {
   getAppstackId(): Promise<string>;
   isSdkDisabled(): Promise<boolean>;
   getAttributionParams(): Promise<Object>;
+  handleUniversalLink(
+    url: string,
+    allowedHosts: ReadonlyArray<string> | null
+  ): Promise<Object | null>;
 }
 
 // `get`, not `getEnforcing`: `getEnforcing` throws at import time when the

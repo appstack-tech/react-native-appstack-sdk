@@ -91,6 +91,17 @@ export interface AppstackConfigureOptions {
   customerUserId?: string | null;
 }
 
+export interface AppstackLinkOptions {
+  /** Exact branded hostnames. When omitted, any non-shared branded host is accepted. */
+  allowedHosts?: readonly string[];
+}
+
+export interface AppstackLinkResult {
+  deeplinkId: string;
+  queryParams: Record<string, string>;
+  url: string;
+}
+
 export interface AppstackSDKInterface {
   /**
    * Configure Appstack SDK with your API key and optional parameters
@@ -145,6 +156,12 @@ export interface AppstackSDKInterface {
    * @returns Promise that resolves with the attribution parameters object
    */
   getAttributionParams(): Promise<Record<string, any>>;
+
+  /** Parse an Appstack standard Universal/App Link delivered by React Native Linking. */
+  handleUniversalLink(
+    url: string,
+    options?: AppstackLinkOptions | null
+  ): Promise<AppstackLinkResult | null>;
 }
 
 /**
@@ -440,6 +457,29 @@ class AppstackSDK implements AppstackSDKInterface {
       console.error('Failed to get attribution parameters:', error);
       throw error;
     }
+  }
+
+  async handleUniversalLink(
+    url: string,
+    options?: AppstackLinkOptions | null
+  ): Promise<AppstackLinkResult | null> {
+    if (typeof url !== 'string' || url.trim() === '') {
+      throw new Error('url must be a non-empty string');
+    }
+
+    const allowedHosts = options?.allowedHosts;
+    if (
+      allowedHosts !== undefined &&
+      (!Array.isArray(allowedHosts) ||
+        allowedHosts.some((host) => typeof host !== 'string' || host.trim() === ''))
+    ) {
+      throw new Error('allowedHosts must contain only non-empty hostnames');
+    }
+
+    return await AppstackReactNative.handleUniversalLink(
+      url.trim(),
+      allowedHosts?.map((host) => host.trim()) ?? null
+    );
   }
 }
 

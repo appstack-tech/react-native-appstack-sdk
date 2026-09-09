@@ -31,7 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)getAttributionParamsWithCompletion:(void (^)(NSDictionary * _Nullable params, NSError * _Nullable error))completion;
 
++ (NSDictionary * _Nullable)handleUniversalLink:(NSString *)url
+                                    allowedHosts:(NSArray<NSString *> * _Nullable)allowedHosts;
+
 @end
 
 NS_ASSUME_NONNULL_END
-

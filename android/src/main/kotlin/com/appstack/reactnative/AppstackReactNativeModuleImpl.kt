@@ -1,10 +1,12 @@
 package com.appstack.reactnative
 
+import android.net.Uri
 import android.content.pm.PackageManager
 import com.facebook.react.bridge.*
 // Import the SDK from the Maven dependency
 import com.appstack.attribution.AppstackAttributionSdk
 import com.appstack.attribution.EventType
+import com.appstack.attribution.LinkOptions
 
 /**
  * All Appstack bridge logic, shared by both architectures.
@@ -253,6 +255,30 @@ class AppstackReactNativeModuleImpl(
             promise.resolve(writableMap)
         } catch (exception: Exception) {
             promise.reject("ATTRIBUTION_PARAMS_ERROR", "Failed to get attribution parameters: ${exception.message}", exception)
+        }
+    }
+
+    fun handleUniversalLink(url: String, allowedHosts: ReadableArray?, promise: Promise) {
+        try {
+            val hosts = allowedHosts?.let { array ->
+                (0 until array.size()).mapNotNull { array.getString(it) }.toSet()
+            }
+            val result = AppstackAttributionSdk.handleAppLink(Uri.parse(url), LinkOptions(hosts))
+            if (result == null) {
+                promise.resolve(null)
+                return
+            }
+
+            val queryParams = Arguments.createMap()
+            result.queryParams.forEach { (key, value) -> queryParams.putString(key, value) }
+            val response = Arguments.createMap().apply {
+                putString("deeplinkId", result.deeplinkId ?: "")
+                putMap("queryParams", queryParams)
+                putString("url", result.uri.toString())
+            }
+            promise.resolve(response)
+        } catch (exception: Exception) {
+            promise.reject("UNIVERSAL_LINK_ERROR", "Failed to parse universal link: ${exception.message}", exception)
         }
     }
 }

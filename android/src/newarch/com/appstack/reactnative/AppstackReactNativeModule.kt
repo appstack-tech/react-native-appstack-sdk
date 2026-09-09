@@ -3,6 +3,7 @@ package com.appstack.reactnative
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.module.annotations.ReactModule
 
 /**
@@ -64,5 +65,9 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
 
     override fun getAttributionParams(promise: Promise) {
         impl.getAttributionParams(promise)
+    }
+
+    override fun handleUniversalLink(url: String, allowedHosts: ReadableArray?, promise: Promise) {
+        impl.handleUniversalLink(url, allowedHosts, promise)
     }
 }

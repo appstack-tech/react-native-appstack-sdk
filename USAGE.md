@@ -138,3 +138,57 @@ AppstackSDK.sendEvent(EventType.PURCHASE, { revenue: cents / 100, currency: 'USD
 ---
 
 Need help? Check the [GitHub repository](https://github.com/appstack-tech/react-native-appstack-sdk) or contact support.
+
+## Universal Links and Android App Links
+
+Appstack parses standard links on your branded domain. The shared
+`appstack.link` and `dev.appstack.link` hosts are intentionally ignored so one
+customer app cannot claim another customer's links. A supported link has exactly
+one path segment, for example `https://links.example.com/abc123?screen=offer`.
+
+Keep React Native in charge of link delivery. Forward both the cold-start URL
+and warm link events from [`Linking`](https://reactnative.dev/docs/linking):
+
+```tsx
+import { Linking } from 'react-native';
+import AppstackSDK from 'react-native-appstack-sdk';
+
+const handleUrl = async (url: string | null) => {
+  if (!url) return;
+  const link = await AppstackSDK.handleUniversalLink(url, {
+    allowedHosts: ['links.example.com'],
+  });
+  if (link) {
+    // Route using link.deeplinkId and link.queryParams.
+  }
+};
+
+Linking.getInitialURL().then(handleUrl);
+const subscription = Linking.addEventListener('url', ({ url }) => handleUrl(url));
+// Call subscription.remove() when the owning component unmounts.
+```
+
+The method is safe before `configure()` and performs no network request or
+tracking. `null` means the URL was not a supported Appstack standard link.
+
+The branded domain must also be associated with the app. For native iOS, add
+`applinks:links.example.com` to the target's Associated Domains capability. With
+Expo CNG, set `expo.ios.associatedDomains` and add an Android HTTPS
+`intentFilters` entry for the same host in `app.json`. The domain must serve the
+matching AASA and `assetlinks.json` files.
+
+```json
+{
+  "expo": {
+    "ios": { "associatedDomains": ["applinks:links.example.com"] },
+    "android": {
+      "intentFilters": [{
+        "action": "VIEW",
+        "autoVerify": true,
+        "data": [{ "scheme": "https", "host": "links.example.com" }],
+        "category": ["BROWSABLE", "DEFAULT"]
+      }]
+    }
+  }
+}
+```

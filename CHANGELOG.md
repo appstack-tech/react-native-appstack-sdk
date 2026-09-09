@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `handleUniversalLink(url, options?)` for parsing branded-domain Appstack standard links delivered by React Native `Linking`. It is safe before `configure()`, returns the deeplink id, query parameters, and original URL, and returns `null` for unsupported links.
+
+### Changed
+
+- Updated the native SDK dependencies that provide standard-link parsing: iOS `4.7.0` and Android `1.9.0`.
+
 ## [3.2.0] - 2026-09-04
 
 ### Added
