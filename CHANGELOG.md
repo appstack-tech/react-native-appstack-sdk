@@ -7,13 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-09-10
+
 ### Added
 
-- Added `handleUniversalLink(url, options?)` for parsing branded-domain Appstack standard links delivered by React Native `Linking`. It is safe before `configure()`, returns the deeplink id, query parameters, and original URL, and returns `null` for unsupported links.
+- `handleUniversalLink(url, options?)` — parses an Appstack standard link on your branded domain and resolves `{ deeplinkId, queryParams, url }`, or `null` when the URL is not a supported standard link. It is safe to call before `configure()` and performs no network request. React Native's `Linking` remains responsible for delivery: forward `Linking.getInitialURL()` for cold starts and `Linking.addEventListener('url', ...)` for links that arrive while the app runs.
+  - A supported link has exactly one path segment, as in `https://links.example.com/{deeplinkId}`. The shared `appstack.link` and `dev.appstack.link` hosts, resolver routes, extra path segments and non-HTTPS URLs return `null`, so one app cannot claim another customer's links.
+  - `options.allowedHosts` restricts parsing to exact branded hostnames. Omitting it accepts any branded host; passing an empty array throws, because it matches no host and would turn every link into `null`.
+  - `queryParams` values are strings, and a repeated key keeps its last value.
+  - The branded domain must also be associated with the app: `applinks:` in the target's Associated Domains on iOS, and an HTTPS `intentFilters` entry on Android, with the domain serving the matching AASA and `assetlinks.json` files. See [USAGE.md](USAGE.md#universal-links-and-android-app-links).
 
 ### Changed
 
-- Updated the native SDK dependencies that provide standard-link parsing: iOS `4.7.0` and Android `1.9.0`.
+- **iOS:** Updated `AppstackSDK.xcframework` to `4.7.0`, which brings the native standard-link parsing behind `handleUniversalLink`.
+- **Android:** Updated the native Appstack Android SDK dependency to `1.9.0`, which brings the native standard-link parsing behind `handleUniversalLink`.
 
 ## [3.2.0] - 2026-09-04
 
