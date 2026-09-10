@@ -126,4 +126,21 @@ public class AppstackBridge: NSObject {
             completion(params as NSDictionary? ?? [:], nil)
         }
     }
+
+    @objc public static func handleUniversalLink(
+        _ urlString: String,
+        allowedHosts: [String]?
+    ) -> NSDictionary? {
+        guard let url = URL(string: urlString),
+              let result = AppstackAttributionSdk.shared.handleUniversalLink(
+                url,
+                options: LinkOptions(allowedHosts: allowedHosts.map(Set.init))
+              ) else { return nil }
+
+        return [
+            "deeplinkId": result.deeplinkId ?? "",
+            "queryParams": result.queryParams,
+            "url": result.url.absoluteString,
+        ] as NSDictionary
+    }
 }

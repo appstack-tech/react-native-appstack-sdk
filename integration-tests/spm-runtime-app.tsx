@@ -35,6 +35,12 @@ export default function App() {
   useEffect(() => {
     (async () => {
       try {
+        // handleUniversalLink is documented as safe before configure() and as
+        // performing no network request.
+        const linkBeforeConfigure = await AppstackSDK.handleUniversalLink(
+          'https://links.example.com/AbC123?screen=offer'
+        );
+
         const configured = await AppstackSDK.configure('runtime-validation-local-key', {
           logLevel: 0,
           customerUserId: 'runtime-validation-user',
@@ -79,6 +85,40 @@ export default function App() {
 
         await AppstackSDK.sendEvent('runtime_validation_bare');
 
+        // Universal link marshalling across the bridge: a populated result, an
+        // unsupported link arriving as null rather than undefined, and a
+        // nullable host allowlist in both directions.
+        const linkParsed = await AppstackSDK.handleUniversalLink(
+          'https://links.example.com/AbC123?a=1&b=caf%C3%A9%20%F0%9F%9A%80'
+        );
+        const linkAllowed = await AppstackSDK.handleUniversalLink(
+          'https://links.example.com/AbC123',
+          { allowedHosts: ['links.example.com'] }
+        );
+        const linkAllowlistMiss = await AppstackSDK.handleUniversalLink(
+          'https://other.example.com/AbC123',
+          { allowedHosts: ['links.example.com'] }
+        );
+        const linkSharedHost = await AppstackSDK.handleUniversalLink(
+          'https://appstack.link/AbC123'
+        );
+
+        let linkValidationError = '';
+        try {
+          await AppstackSDK.handleUniversalLink(' ');
+        } catch (error) {
+          linkValidationError = error && error.message ? error.message : String(error);
+        }
+
+        let linkEmptyAllowlistError = '';
+        try {
+          await AppstackSDK.handleUniversalLink('https://links.example.com/AbC123', {
+            allowedHosts: [],
+          });
+        } catch (error) {
+          linkEmptyAllowlistError = error && error.message ? error.message : String(error);
+        }
+
         // Native event delivery is fire-and-forget.
         await delay(4000);
         const appstackId = await AppstackSDK.getAppstackId();
@@ -96,6 +136,17 @@ export default function App() {
             attribution.runtime_validation === 'attributed' && attribution.unicode === 'café 🚀',
           validationError,
           legacyCallRejected,
+          linkBeforeConfigure:
+            !!linkBeforeConfigure && linkBeforeConfigure.deeplinkId === 'AbC123',
+          linkDeeplinkId: linkParsed ? linkParsed.deeplinkId : null,
+          linkQueryParams: linkParsed ? linkParsed.queryParams : null,
+          linkUrl: linkParsed ? linkParsed.url : null,
+          linkAllowlistHit: !!linkAllowed && linkAllowed.deeplinkId === 'AbC123',
+          linkAllowlistMiss:
+            linkAllowlistMiss === null ? 'null' : typeof linkAllowlistMiss,
+          linkSharedHost: linkSharedHost === null ? 'null' : typeof linkSharedHost,
+          linkValidationError,
+          linkEmptyAllowlistError,
           errors: [],
         };
         await reportResult('success', result);

@@ -23,6 +23,7 @@ jest.mock('react-native', () => {
     getAppstackId: jest.fn().mockResolvedValue('test-appstack-id'),
     isSdkDisabled: jest.fn().mockResolvedValue(false),
     getAttributionParams: jest.fn().mockResolvedValue({ campaign: 'test' }),
+    handleUniversalLink: jest.fn().mockResolvedValue(null),
   };
   return {
     NativeModules: {
@@ -58,6 +59,7 @@ beforeEach(() => {
   mockNative.getAppstackId.mockResolvedValue('test-appstack-id');
   mockNative.isSdkDisabled.mockResolvedValue(false);
   mockNative.getAttributionParams.mockResolvedValue({});
+  mockNative.handleUniversalLink.mockResolvedValue(null);
 });
 
 describe('AppstackSDK', () => {
@@ -697,6 +699,64 @@ describe('integration-test runtime contract', () => {
       );
     }
     expect(legacyCallRejected).toBe(true);
+  });
+});
+
+describe('handleUniversalLink', () => {
+  it('forwards a URL without an allowlist', async () => {
+    mockNative.handleUniversalLink.mockResolvedValue({
+      deeplinkId: 'AbC123',
+      queryParams: { screen: 'offer' },
+      url: 'https://links.example.com/AbC123?screen=offer',
+    });
+
+    await expect(
+      appstackSDK.handleUniversalLink('https://links.example.com/AbC123?screen=offer')
+    ).resolves.toEqual(expect.objectContaining({ deeplinkId: 'AbC123' }));
+    expect(mockNative.handleUniversalLink).toHaveBeenCalledWith(
+      'https://links.example.com/AbC123?screen=offer',
+      null
+    );
+  });
+
+  it('trims and forwards an explicit host allowlist', async () => {
+    await appstackSDK.handleUniversalLink(' https://links.example.com/abc ', {
+      allowedHosts: [' links.example.com '],
+    });
+    expect(mockNative.handleUniversalLink).toHaveBeenCalledWith('https://links.example.com/abc', [
+      'links.example.com',
+    ]);
+  });
+
+  it('normalizes an unsupported link to null on both platforms', async () => {
+    // iOS resolves `nil`, which TurboModules convert to `undefined`; Android
+    // resolves a real `null`. The wrapper must report `null` either way.
+    mockNative.handleUniversalLink.mockResolvedValue(undefined);
+    await expect(
+      appstackSDK.handleUniversalLink('https://appstack.link/AbC123')
+    ).resolves.toBeNull();
+
+    mockNative.handleUniversalLink.mockResolvedValue(null);
+    await expect(
+      appstackSDK.handleUniversalLink('https://appstack.link/AbC123')
+    ).resolves.toBeNull();
+  });
+
+  it('rejects invalid wrapper arguments before native', async () => {
+    await expect(appstackSDK.handleUniversalLink(' ')).rejects.toThrow(
+      'url must be a non-empty string'
+    );
+    await expect(
+      appstackSDK.handleUniversalLink('https://links.example.com/abc', {
+        allowedHosts: [''],
+      })
+    ).rejects.toThrow('allowedHosts must contain only non-empty hostnames');
+    await expect(
+      appstackSDK.handleUniversalLink('https://links.example.com/abc', {
+        allowedHosts: [],
+      })
+    ).rejects.toThrow('allowedHosts must not be empty');
+    expect(mockNative.handleUniversalLink).not.toHaveBeenCalled();
   });
 });
 

@@ -5,6 +5,7 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.module.annotations.ReactModule
 
 /**
@@ -72,5 +73,10 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     fun getAttributionParams(promise: Promise) {
         impl.getAttributionParams(promise)
+    }
+
+    @ReactMethod
+    fun handleUniversalLink(url: String, allowedHosts: ReadableArray?, promise: Promise) {
+        impl.handleUniversalLink(url, allowedHosts, promise)
     }
 }

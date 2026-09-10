@@ -256,6 +256,18 @@ await AppstackSDK.setCustomerUserId(null);
 
 ## **Advanced usage**
 
+### **Universal Links and Android App Links**
+
+Use React Native's `Linking.getInitialURL()` for cold starts and
+`Linking.addEventListener('url', ...)` while the app is running, then forward the
+URL to `AppstackSDK.handleUniversalLink(url, { allowedHosts })`. See
+[USAGE.md](USAGE.md#universal-links-and-android-app-links) for the complete setup.
+
+Only branded-domain standard links shaped as
+`https://links.example.com/{deeplinkId}` are supported. Shared `appstack.link`
+hosts, resolver routes, extra path segments, non-HTTPS URLs, and unlisted hosts
+when `allowedHosts` is supplied return `null`.
+
 ### **Environment-based configuration**
 
 Set up different API keys for different environments:

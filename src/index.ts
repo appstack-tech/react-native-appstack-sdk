@@ -91,6 +91,21 @@ export interface AppstackConfigureOptions {
   customerUserId?: string | null;
 }
 
+export interface AppstackLinkOptions {
+  /**
+   * Exact branded hostnames. When omitted, any non-shared branded host is
+   * accepted. Passing an empty array throws, because it matches no host and
+   * would turn every link into `null`; omit the option instead.
+   */
+  allowedHosts?: readonly string[];
+}
+
+export interface AppstackLinkResult {
+  deeplinkId: string;
+  queryParams: Record<string, string>;
+  url: string;
+}
+
 export interface AppstackSDKInterface {
   /**
    * Configure Appstack SDK with your API key and optional parameters
@@ -145,6 +160,12 @@ export interface AppstackSDKInterface {
    * @returns Promise that resolves with the attribution parameters object
    */
   getAttributionParams(): Promise<Record<string, any>>;
+
+  /** Parse an Appstack standard Universal/App Link delivered by React Native Linking. */
+  handleUniversalLink(
+    url: string,
+    options?: AppstackLinkOptions | null
+  ): Promise<AppstackLinkResult | null>;
 }
 
 /**
@@ -440,6 +461,40 @@ class AppstackSDK implements AppstackSDKInterface {
       console.error('Failed to get attribution parameters:', error);
       throw error;
     }
+  }
+
+  async handleUniversalLink(
+    url: string,
+    options?: AppstackLinkOptions | null
+  ): Promise<AppstackLinkResult | null> {
+    if (typeof url !== 'string' || url.trim() === '') {
+      throw new Error('url must be a non-empty string');
+    }
+
+    const allowedHosts = options?.allowedHosts;
+    if (
+      allowedHosts !== undefined &&
+      (!Array.isArray(allowedHosts) ||
+        allowedHosts.some((host) => typeof host !== 'string' || host.trim() === ''))
+    ) {
+      throw new Error('allowedHosts must contain only non-empty hostnames');
+    }
+
+    // An empty allowlist matches no host, so every link would silently resolve
+    // `null`. That is almost never intended -- it usually means a remote config
+    // value arrived unset -- so reject it rather than swallowing every link.
+    if (Array.isArray(allowedHosts) && allowedHosts.length === 0) {
+      throw new Error('allowedHosts must not be empty; omit it to accept any branded host');
+    }
+
+    // An unsupported link resolves `nil` on iOS, which TurboModules convert to
+    // `undefined` rather than `null`. Android resolves a real `null`. Normalize
+    // so both platforms match the declared `AppstackLinkResult | null` contract.
+    const result = await AppstackReactNative.handleUniversalLink(
+      url.trim(),
+      allowedHosts?.map((host) => host.trim()) ?? null
+    );
+    return result ?? null;
   }
 }
 

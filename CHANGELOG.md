@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-09-10
+
+### Added
+
+- `handleUniversalLink(url, options?)` — parses a standard link delivered by React Native `Linking`, resolving `{ deeplinkId, queryParams, url }` or `null` for a URL it does not support. Safe before `configure()` and performs no network request. Works only with standard single-segment links on a custom HTTPS domain provisioned for the app; multi-segment and resolver paths return `null`. `options.allowedHosts` filters by exact hostname, and `queryParams` values are strings, with a repeated key keeping its last value.
+- Setup guidance for domain association and cold/warm-start handling. See [USAGE.md](USAGE.md#universal-links-and-android-app-links).
+
+### Changed
+
+- **iOS:** Updated `AppstackSDK.xcframework` to `4.7.0`, which brings the native standard-link parsing behind `handleUniversalLink`.
+- **Android:** Updated the native Appstack Android SDK dependency to `1.9.0`, which brings the native standard-link parsing behind `handleUniversalLink`.
+
 ## [3.2.0] - 2026-09-04
 
 ### Added

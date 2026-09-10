@@ -614,6 +614,94 @@
           },
           {
             "kind": "Function",
+            "name": "handleUniversalLink",
+            "printedName": "handleUniversalLink(_:options:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "AppstackSDK.UniversalLinkResult?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UniversalLinkResult",
+                    "printedName": "AppstackSDK.UniversalLinkResult",
+                    "usr": "s:11AppstackSDK19UniversalLinkResultV"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "NSUserActivity",
+                "printedName": "Foundation.NSUserActivity",
+                "usr": "c:objc(cs)NSUserActivity"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "LinkOptions",
+                "printedName": "AppstackSDK.LinkOptions",
+                "hasDefaultArg": true,
+                "usr": "s:11AppstackSDK11LinkOptionsV"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AppstackSDK0A14AttributionSdkC19handleUniversalLink_7optionsAA0fG6ResultVSgSo14NSUserActivityC_AA0G7OptionsVtF",
+            "mangledName": "$s11AppstackSDK0A14AttributionSdkC19handleUniversalLink_7optionsAA0fG6ResultVSgSo14NSUserActivityC_AA0G7OptionsVtF",
+            "moduleName": "AppstackSDK",
+            "declAttributes": [
+              "AccessControl",
+              "DiscardableResult",
+              "RawDocComment"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "handleUniversalLink",
+            "printedName": "handleUniversalLink(_:options:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "AppstackSDK.UniversalLinkResult?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UniversalLinkResult",
+                    "printedName": "AppstackSDK.UniversalLinkResult",
+                    "usr": "s:11AppstackSDK19UniversalLinkResultV"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "URL",
+                "printedName": "Foundation.URL",
+                "usr": "s:10Foundation3URLV"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "LinkOptions",
+                "printedName": "AppstackSDK.LinkOptions",
+                "hasDefaultArg": true,
+                "usr": "s:11AppstackSDK11LinkOptionsV"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AppstackSDK0A14AttributionSdkC19handleUniversalLink_7optionsAA0fG6ResultVSg10Foundation3URLV_AA0G7OptionsVtF",
+            "mangledName": "$s11AppstackSDK0A14AttributionSdkC19handleUniversalLink_7optionsAA0fG6ResultVSg10Foundation3URLV_AA0G7OptionsVtF",
+            "moduleName": "AppstackSDK",
+            "declAttributes": [
+              "AccessControl",
+              "DiscardableResult",
+              "RawDocComment"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
             "name": "getAttributionParams",
             "printedName": "getAttributionParams()",
             "children": [
@@ -3861,6 +3949,375 @@
         "printedName": "Foundation",
         "declKind": "Import",
         "moduleName": "AppstackSDK"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "AppstackSDK"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "LinkOptions",
+        "printedName": "LinkOptions",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "allowedHosts",
+            "printedName": "allowedHosts",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.Set<Swift.String>?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Set",
+                    "printedName": "Swift.Set<Swift.String>",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sh"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AppstackSDK11LinkOptionsV12allowedHostsShySSGSgvp",
+            "mangledName": "$s11AppstackSDK11LinkOptionsV12allowedHostsShySSGSgvp",
+            "moduleName": "AppstackSDK",
+            "declAttributes": [
+              "HasStorage",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.Set<Swift.String>?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Set",
+                        "printedName": "Swift.Set<Swift.String>",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "String",
+                            "printedName": "Swift.String",
+                            "usr": "s:SS"
+                          }
+                        ],
+                        "usr": "s:Sh"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AppstackSDK11LinkOptionsV12allowedHostsShySSGSgvg",
+                "mangledName": "$s11AppstackSDK11LinkOptionsV12allowedHostsShySSGSgvg",
+                "moduleName": "AppstackSDK",
+                "implicit": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(allowedHosts:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "LinkOptions",
+                "printedName": "AppstackSDK.LinkOptions",
+                "usr": "s:11AppstackSDK11LinkOptionsV"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.Set<Swift.String>?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Set",
+                    "printedName": "Swift.Set<Swift.String>",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sh"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11AppstackSDK11LinkOptionsV12allowedHostsACShySSGSg_tcfc",
+            "mangledName": "$s11AppstackSDK11LinkOptionsV12allowedHostsACShySSGSg_tcfc",
+            "moduleName": "AppstackSDK",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Struct",
+        "usr": "s:11AppstackSDK11LinkOptionsV",
+        "mangledName": "$s11AppstackSDK11LinkOptionsV",
+        "moduleName": "AppstackSDK",
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "UniversalLinkResult",
+        "printedName": "UniversalLinkResult",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "deeplinkId",
+            "printedName": "deeplinkId",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AppstackSDK19UniversalLinkResultV10deeplinkIdSSSgvp",
+            "mangledName": "$s11AppstackSDK19UniversalLinkResultV10deeplinkIdSSSgvp",
+            "moduleName": "AppstackSDK",
+            "declAttributes": [
+              "HasStorage",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AppstackSDK19UniversalLinkResultV10deeplinkIdSSSgvg",
+                "mangledName": "$s11AppstackSDK19UniversalLinkResultV10deeplinkIdSSSgvg",
+                "moduleName": "AppstackSDK",
+                "implicit": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "queryParams",
+            "printedName": "queryParams",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Dictionary",
+                "printedName": "[Swift.String : Swift.String]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:SD"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AppstackSDK19UniversalLinkResultV11queryParamsSDyS2SGvp",
+            "mangledName": "$s11AppstackSDK19UniversalLinkResultV11queryParamsSDyS2SGvp",
+            "moduleName": "AppstackSDK",
+            "declAttributes": [
+              "HasStorage",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Dictionary",
+                    "printedName": "[Swift.String : Swift.String]",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:SD"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AppstackSDK19UniversalLinkResultV11queryParamsSDyS2SGvg",
+                "mangledName": "$s11AppstackSDK19UniversalLinkResultV11queryParamsSDyS2SGvg",
+                "moduleName": "AppstackSDK",
+                "implicit": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "url",
+            "printedName": "url",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "URL",
+                "printedName": "Foundation.URL",
+                "usr": "s:10Foundation3URLV"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AppstackSDK19UniversalLinkResultV3url10Foundation3URLVvp",
+            "mangledName": "$s11AppstackSDK19UniversalLinkResultV3url10Foundation3URLVvp",
+            "moduleName": "AppstackSDK",
+            "declAttributes": [
+              "HasStorage",
+              "AccessControl",
+              "RawDocComment"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "URL",
+                    "printedName": "Foundation.URL",
+                    "usr": "s:10Foundation3URLV"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AppstackSDK19UniversalLinkResultV3url10Foundation3URLVvg",
+                "mangledName": "$s11AppstackSDK19UniversalLinkResultV3url10Foundation3URLVvg",
+                "moduleName": "AppstackSDK",
+                "implicit": true,
+                "accessorKind": "get"
+              }
+            ]
+          }
+        ],
+        "declKind": "Struct",
+        "usr": "s:11AppstackSDK19UniversalLinkResultV",
+        "mangledName": "$s11AppstackSDK19UniversalLinkResultV",
+        "moduleName": "AppstackSDK",
+        "declAttributes": [
+          "AccessControl",
+          "RawDocComment"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
       }
     ],
     "json_format_version": 8
@@ -4268,7 +4725,7 @@
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 59733,
+      "offset": 62078,
       "length": 23,
       "value": "\"appstack_match_status\""
     },
@@ -4327,6 +4784,13 @@
       "offset": 2181,
       "length": 2,
       "value": "\"\""
+    },
+    {
+      "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackASAAttribution.swift",
+      "kind": "IntegerLiteral",
+      "offset": 2718,
+      "length": 1,
+      "value": "0"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackPolicy.swift",
@@ -4774,7 +5238,7 @@
       "kind": "StringLiteral",
       "offset": 4483,
       "length": 7,
-      "value": "\"4.6.0\""
+      "value": "\"4.7.0\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",

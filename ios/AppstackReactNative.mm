@@ -203,6 +203,18 @@ RCT_EXPORT_METHOD(getAttributionParams:(RCTPromiseResolveBlock)resolve
     }
 }
 
+RCT_EXPORT_METHOD(handleUniversalLink:(NSString *)url
+                 allowedHosts:(NSArray<NSString *> * _Nullable)allowedHosts
+                 resolve:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        resolve([AppstackBridge handleUniversalLink:url allowedHosts:allowedHosts]);
+    } @catch (NSException *exception) {
+        reject(@"UNIVERSAL_LINK_ERROR", exception.reason, nil);
+    }
+}
+
 #pragma mark - TurboModule
 
 #ifdef RCT_NEW_ARCH_ENABLED

@@ -60,6 +60,45 @@ def main() -> None:
         result.get("legacyCallRejected") is True,
         "wrapper did not reject the removed 3-argument sendEvent call",
     )
+    require(
+        result.get("linkBeforeConfigure") is True,
+        "handleUniversalLink did not parse a supported link before configure()",
+    )
+    require(
+        result.get("linkDeeplinkId") == "AbC123",
+        f"universal link deeplinkId did not survive the bridge: {result.get('linkDeeplinkId')!r}",
+    )
+    require(
+        result.get("linkQueryParams") == {"a": "1", "b": "caf\u00e9 \U0001f680"},
+        f"universal link queryParams were corrupted across the bridge: {result.get('linkQueryParams')!r}",
+    )
+    require(
+        result.get("linkUrl") == "https://links.example.com/AbC123?a=1&b=caf%C3%A9%20%F0%9F%9A%80",
+        f"universal link url did not survive the bridge: {result.get('linkUrl')!r}",
+    )
+    require(
+        result.get("linkAllowlistHit") is True,
+        "an allowlisted host was not parsed, so allowedHosts did not marshal",
+    )
+    require(
+        result.get("linkAllowlistMiss") == "null",
+        f"a host outside the allowlist resolved {result.get('linkAllowlistMiss')}, expected null",
+    )
+    require(
+        result.get("linkSharedHost") == "null",
+        f"the shared appstack.link host resolved {result.get('linkSharedHost')}, expected null",
+    )
+    require(
+        result.get("linkValidationError", "").startswith("url must be a non-empty string"),
+        "wrapper did not reject a blank universal link URL before reaching native",
+    )
+    require(
+        result.get("linkEmptyAllowlistError", "").startswith(
+            "allowedHosts must not be empty"
+        ),
+        "wrapper did not reject an empty allowedHosts array",
+    )
+
     require(not result.get("errors"), f"runtime errors: {result.get('errors')}")
 
     require(
