@@ -11,11 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `handleUniversalLink(url, options?)` — parses an Appstack standard link on your branded domain and resolves `{ deeplinkId, queryParams, url }`, or `null` when the URL is not a supported standard link. It is safe to call before `configure()` and performs no network request. React Native's `Linking` remains responsible for delivery: forward `Linking.getInitialURL()` for cold starts and `Linking.addEventListener('url', ...)` for links that arrive while the app runs.
-  - A supported link has exactly one path segment, as in `https://links.example.com/{deeplinkId}`. The shared `appstack.link` and `dev.appstack.link` hosts, resolver routes, extra path segments and non-HTTPS URLs return `null`, so one app cannot claim another customer's links.
-  - `options.allowedHosts` restricts parsing to exact branded hostnames. Omitting it accepts any branded host; passing an empty array throws, because it matches no host and would turn every link into `null`.
-  - `queryParams` values are strings, and a repeated key keeps its last value.
-  - The branded domain must also be associated with the app: `applinks:` in the target's Associated Domains on iOS, and an HTTPS `intentFilters` entry on Android, with the domain serving the matching AASA and `assetlinks.json` files. See [USAGE.md](USAGE.md#universal-links-and-android-app-links).
+- `handleUniversalLink(url, options?)` — parses a standard link delivered by React Native `Linking`, resolving `{ deeplinkId, queryParams, url }` or `null` for a URL it does not support. Safe before `configure()` and performs no network request. Works only with standard single-segment links on a custom HTTPS domain provisioned for the app; multi-segment and resolver paths return `null`. `options.allowedHosts` filters by exact hostname, and `queryParams` values are strings, with a repeated key keeping its last value.
+- Setup guidance for domain association and cold/warm-start handling. See [USAGE.md](USAGE.md#universal-links-and-android-app-links).
 
 ### Changed
 
