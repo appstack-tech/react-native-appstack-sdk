@@ -94,8 +94,8 @@ export interface AppstackConfigureOptions {
 export interface AppstackLinkOptions {
   /**
    * Exact branded hostnames. When omitted, any non-shared branded host is
-   * accepted. An empty array is rejected, because it would match no host and
-   * silently discard every link; omit the option instead.
+   * accepted. Passing an empty array throws, because it matches no host and
+   * would turn every link into `null`; omit the option instead.
    */
   allowedHosts?: readonly string[];
 }
