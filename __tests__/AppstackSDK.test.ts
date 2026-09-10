@@ -728,6 +728,20 @@ describe('handleUniversalLink', () => {
     ]);
   });
 
+  it('normalizes an unsupported link to null on both platforms', async () => {
+    // iOS resolves `nil`, which TurboModules convert to `undefined`; Android
+    // resolves a real `null`. The wrapper must report `null` either way.
+    mockNative.handleUniversalLink.mockResolvedValue(undefined);
+    await expect(
+      appstackSDK.handleUniversalLink('https://appstack.link/AbC123')
+    ).resolves.toBeNull();
+
+    mockNative.handleUniversalLink.mockResolvedValue(null);
+    await expect(
+      appstackSDK.handleUniversalLink('https://appstack.link/AbC123')
+    ).resolves.toBeNull();
+  });
+
   it('rejects invalid wrapper arguments before native', async () => {
     await expect(appstackSDK.handleUniversalLink(' ')).rejects.toThrow(
       'url must be a non-empty string'
@@ -737,6 +751,11 @@ describe('handleUniversalLink', () => {
         allowedHosts: [''],
       })
     ).rejects.toThrow('allowedHosts must contain only non-empty hostnames');
+    await expect(
+      appstackSDK.handleUniversalLink('https://links.example.com/abc', {
+        allowedHosts: [],
+      })
+    ).rejects.toThrow('allowedHosts must not be empty');
     expect(mockNative.handleUniversalLink).not.toHaveBeenCalled();
   });
 });

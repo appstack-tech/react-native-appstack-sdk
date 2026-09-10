@@ -362,6 +362,13 @@ export default function App() {
   useEffect(() => {
     (async () => {
       try {
+        // handleUniversalLink is documented as safe before configure() and as
+        // performing no network request. Probing it first is the only coverage
+        // of that ordering guarantee on a real device.
+        const linkBeforeConfigure = await AppstackSDK.handleUniversalLink(
+          'https://links.example.com/AbC123?screen=offer'
+        );
+
         const configured = await AppstackSDK.configure(
           'runtime-validation-local-key',
           { logLevel: 0, customerUserId: 'runtime-validation-user' }
@@ -419,6 +426,46 @@ export default function App() {
         // to match across platforms.
         await AppstackSDK.sendEvent('runtime_validation_bare');
 
+        // Universal link marshalling across the bridge. The parser itself belongs
+        // to the native SDK; what has to hold here is that a populated result
+        // survives the bridge intact, that an unsupported link arrives as null
+        // rather than undefined, and that a nullable host allowlist marshals in
+        // both directions.
+        const linkParsed = await AppstackSDK.handleUniversalLink(
+          'https://links.example.com/AbC123?a=1&b=caf%C3%A9%20%F0%9F%9A%80'
+        );
+        const linkAllowed = await AppstackSDK.handleUniversalLink(
+          'https://links.example.com/AbC123',
+          { allowedHosts: ['links.example.com'] }
+        );
+        const linkAllowlistMiss = await AppstackSDK.handleUniversalLink(
+          'https://other.example.com/AbC123',
+          { allowedHosts: ['links.example.com'] }
+        );
+        const linkSharedHost = await AppstackSDK.handleUniversalLink(
+          'https://appstack.link/AbC123'
+        );
+
+        let linkValidationError = '';
+        try {
+          await AppstackSDK.handleUniversalLink(' ');
+        } catch (error) {
+          linkValidationError =
+            error && error.message ? error.message : String(error);
+        }
+
+        // An empty allowlist matches no host and must be rejected outright
+        // rather than quietly turning every link into null.
+        let linkEmptyAllowlistError = '';
+        try {
+          await AppstackSDK.handleUniversalLink('https://links.example.com/AbC123', {
+            allowedHosts: [],
+          });
+        } catch (error) {
+          linkEmptyAllowlistError =
+            error && error.message ? error.message : String(error);
+        }
+
         // Native event delivery is fire-and-forget.
         await delay(4000);
         const appstackId = await AppstackSDK.getAppstackId();
@@ -436,6 +483,19 @@ export default function App() {
             attribution.unicode === 'café 🚀',
           validationError,
           legacyCallRejected,
+          linkBeforeConfigure:
+            !!linkBeforeConfigure && linkBeforeConfigure.deeplinkId === 'AbC123',
+          linkDeeplinkId: linkParsed ? linkParsed.deeplinkId : null,
+          linkQueryParams: linkParsed ? linkParsed.queryParams : null,
+          linkUrl: linkParsed ? linkParsed.url : null,
+          linkAllowlistHit: !!linkAllowed && linkAllowed.deeplinkId === 'AbC123',
+          // Reported as a type name, not a boolean, so a bridge that resolves
+          // undefined instead of null names itself in the failure.
+          linkAllowlistMiss:
+            linkAllowlistMiss === null ? 'null' : typeof linkAllowlistMiss,
+          linkSharedHost: linkSharedHost === null ? 'null' : typeof linkSharedHost,
+          linkValidationError,
+          linkEmptyAllowlistError,
           errors: [],
         };
         await reportResult('success', result);

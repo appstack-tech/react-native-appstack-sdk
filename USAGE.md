@@ -171,6 +171,11 @@ const subscription = Linking.addEventListener('url', ({ url }) => handleUrl(url)
 The method is safe before `configure()` and performs no network request or
 tracking. `null` means the URL was not a supported Appstack standard link.
 
+`allowedHosts` takes exact hostnames. Omit it to accept any branded host. An
+empty array is rejected rather than silently discarding every link, which
+matters when the list comes from remote config and an unset value arrives
+as `[]`.
+
 The branded domain must also be associated with the app. For native iOS, add
 `applinks:links.example.com` to the target's Associated Domains capability. With
 Expo CNG, set `expo.ios.associatedDomains` and add an Android HTTPS
