@@ -1,5 +1,5 @@
 import Foundation
-@_spi(AppstackInternal) @preconcurrency import AppstackSDK
+@_spi(AppstackInternal) import AppstackSDK
 
 @objc(AppstackBridge)
 public class AppstackBridge: NSObject {

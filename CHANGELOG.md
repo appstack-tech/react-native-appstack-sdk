@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Android:** Updated the native Appstack Android SDK dependency to `1.10.0`.
 - Removed the obsolete Android-only native `clearData` bridge in favor of the cross-platform `deleteUserData()` API shared with iOS.
+- **iOS:** Updated `AppstackSDK.xcframework` to `4.7.1`, which fixes Swift 6 build errors when
+  referencing `AppstackAttributionSdk.shared` or `AppstackASAAttribution.shared`.
 
 ## [3.3.0] - 2026-09-10
 
