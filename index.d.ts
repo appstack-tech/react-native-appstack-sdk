@@ -24,6 +24,7 @@ declare module 'react-native-appstack-sdk' {
   export interface AppstackSDKInterface {
     configure(apiKey: string, options?: AppstackConfigureOptions | null): Promise<boolean>;
     setCustomerUserId(customerUserId?: string | null): Promise<void>;
+    deleteUserData(): Promise<void>;
     sendEvent(
       event: EventType | string,
       parameters?: AppstackEventParameters | null
@@ -84,6 +85,7 @@ declare module 'react-native-appstack-sdk' {
     static getInstance(): AppstackSDK;
     configure(apiKey: string, options?: AppstackConfigureOptions | null): Promise<boolean>;
     setCustomerUserId(customerUserId?: string | null): Promise<void>;
+    deleteUserData(): Promise<void>;
     sendEvent(
       event: EventType | string,
       parameters?: AppstackEventParameters | null

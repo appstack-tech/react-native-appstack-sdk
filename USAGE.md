@@ -77,6 +77,12 @@ await AppstackSDK.setCustomerUserId('user-123'); // on login
 await AppstackSDK.setCustomerUserId(null);       // on logout
 ```
 
+For a GDPR or other privacy deletion request, permanently delete the current user's Appstack data on either platform:
+
+```typescript
+await AppstackSDK.deleteUserData();
+```
+
 `null`, `undefined`, `''`, and whitespace-only strings all clear the stored ID — the value is trimmed first. Safe to call at any time — last write wins. The call sends nothing by itself; the mapping is formed by the next event that carries the ID.
 
 ## EAC recommendations

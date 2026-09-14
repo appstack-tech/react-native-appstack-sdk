@@ -248,6 +248,14 @@ await AppstackSDK.setCustomerUserId('user-123');
 await AppstackSDK.setCustomerUserId(null);
 ```
 
+### Deleting user data
+
+Use `deleteUserData()` when fulfilling a GDPR or other privacy deletion request. It is available on both iOS and Android and completes only after the native request finishes.
+
+```typescript
+await AppstackSDK.deleteUserData();
+```
+
 - `null`, `undefined`, and an empty or whitespace-only string all clear the stored ID — the value is trimmed first. (In `configure`, a blank string is rejected instead: `configure` never clears.)
 - Callable at any time, before or after `configure`, as often as you like — the last call wins.
 - Applies to every event sent from here on, including ones already buffered natively. Events already sent are not backfilled and do not need to be: Appstack maps the ID to the install using any event that carries it.

@@ -19,7 +19,7 @@ import { TurboModuleRegistry } from 'react-native';
  *   is not in the codegen type map and fails to parse.
  * - Exactly one `TurboModuleRegistry` call is allowed per spec file.
  *
- * `clearData`, `isEnabled` and `disableASAAttributionTracking` are intentionally
+ * `isEnabled` and `disableASAAttributionTracking` are intentionally
  * part of the spec but not part of the documented `AppstackSDK` API. They exist
  * natively on one platform each and are declared here so they stay reachable on
  * both the legacy and the new architecture (new-architecture dispatch is built
@@ -47,8 +47,7 @@ export interface Spec extends TurboModule {
   enableAppleAdsAttribution(): Promise<boolean>;
   /** iOS only; resolves `false` on Android. */
   disableASAAttributionTracking(): Promise<boolean>;
-  /** Android only; resolves `false` on iOS. */
-  clearData(): Promise<boolean>;
+  deleteUserData(): Promise<void>;
   isEnabled(): Promise<boolean>;
   getAppstackId(): Promise<string>;
   isSdkDisabled(): Promise<boolean>;

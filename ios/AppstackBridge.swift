@@ -116,6 +116,20 @@ public class AppstackBridge: NSObject {
     @objc public static func isSdkDisabled() -> Bool {
         return AppstackAttributionSdk.shared.isSdkDisabled()
     }
+
+    @objc(deleteUserDataWithCompletion:)
+    public static func deleteUserData(
+        completion: @escaping @Sendable (NSError?) -> Void
+    ) {
+        Task {
+            do {
+                try await AppstackAttributionSdk.shared.deleteUserData()
+                completion(nil)
+            } catch {
+                completion(error as NSError)
+            }
+        }
+    }
     
     @objc(getAttributionParamsWithCompletion:)
     public static func getAttributionParams(

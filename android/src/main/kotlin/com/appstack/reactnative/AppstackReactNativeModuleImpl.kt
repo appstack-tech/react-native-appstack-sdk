@@ -7,6 +7,9 @@ import com.facebook.react.bridge.*
 import com.appstack.attribution.AppstackAttributionSdk
 import com.appstack.attribution.EventType
 import com.appstack.attribution.LinkOptions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * All Appstack bridge logic, shared by both architectures.
@@ -205,12 +208,18 @@ class AppstackReactNativeModuleImpl(
         promise.resolve(false)
     }
 
-    fun clearData(promise: Promise) {
-        try {
-            AppstackAttributionSdk.clearData()
-            promise.resolve(true)
-        } catch (exception: Exception) {
-            promise.reject("CLEAR_DATA_ERROR", "Failed to clear data: ${exception.message}", exception)
+    fun deleteUserData(promise: Promise) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                AppstackAttributionSdk.deleteUserData()
+                promise.resolve(null)
+            } catch (exception: Exception) {
+                promise.reject(
+                    "DELETE_USER_DATA_ERROR",
+                    "Failed to delete user data: ${exception.message}",
+                    exception
+                )
+            }
         }
     }
 

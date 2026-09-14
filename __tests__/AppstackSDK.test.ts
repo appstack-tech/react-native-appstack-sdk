@@ -18,6 +18,7 @@ jest.mock('react-native', () => {
   const mockNative = {
     configure: jest.fn().mockResolvedValue(true),
     setCustomerUserId: jest.fn().mockResolvedValue(undefined),
+    deleteUserData: jest.fn().mockResolvedValue(undefined),
     sendEvent: jest.fn().mockResolvedValue(true),
     enableAppleAdsAttribution: jest.fn().mockResolvedValue(true),
     getAppstackId: jest.fn().mockResolvedValue('test-appstack-id'),
@@ -54,6 +55,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockNative.configure.mockResolvedValue(true);
   mockNative.setCustomerUserId.mockResolvedValue(undefined);
+  mockNative.deleteUserData.mockResolvedValue(undefined);
   mockNative.sendEvent.mockResolvedValue(true);
   mockNative.enableAppleAdsAttribution.mockResolvedValue(true);
   mockNative.getAppstackId.mockResolvedValue('test-appstack-id');
@@ -332,6 +334,21 @@ describe('AppstackSDK', () => {
       );
       await appstackSDK.setCustomerUserId('');
       expect(mockNative.setCustomerUserId).toHaveBeenCalledWith(null);
+    });
+  });
+
+  describe('deleteUserData', () => {
+    it('waits for native deletion to complete', async () => {
+      const result = await appstackSDK.deleteUserData();
+
+      expect(result).toBeUndefined();
+      expect(mockNative.deleteUserData).toHaveBeenCalledTimes(1);
+    });
+
+    it('rethrows native deletion errors', async () => {
+      mockNative.deleteUserData.mockRejectedValue(new Error('Deletion failed'));
+
+      await expect(appstackSDK.deleteUserData()).rejects.toThrow('Deletion failed');
     });
   });
 
