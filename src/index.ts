@@ -124,6 +124,12 @@ export interface AppstackSDKInterface {
   setCustomerUserId(customerUserId?: string | null): Promise<void>;
 
   /**
+   * Permanently delete the current user's Appstack data for GDPR/privacy requests.
+   * @returns Promise that resolves when deletion completes
+   */
+  deleteUserData(): Promise<void>;
+
+  /**
    * Send a standard or custom event, optionally with parameters.
    * @param event - A standard `EventType` (recommended; its string name also works,
    * case-insensitively), or any other string to send a custom event by that name
@@ -187,6 +193,9 @@ export interface AppstackSDKInterface {
  * // Set the customer user ID later (e.g. on login), or clear it on logout
  * await AppstackSDK.setCustomerUserId('user-123');
  * await AppstackSDK.setCustomerUserId(null);
+ *
+ * // Permanently delete this user's Appstack data for a privacy request
+ * await AppstackSDK.deleteUserData();
  *
  * // Send events
  * await AppstackSDK.sendEvent(EventType.PURCHASE); // Without parameters
@@ -307,6 +316,16 @@ class AppstackSDK implements AppstackSDKInterface {
       await AppstackReactNative.setCustomerUserId(normalized);
     } catch (error) {
       console.error('Failed to set Appstack customer user ID:', error);
+      throw error;
+    }
+  }
+
+  /** Permanently delete the current user's Appstack data. */
+  async deleteUserData(): Promise<void> {
+    try {
+      await AppstackReactNative.deleteUserData();
+    } catch (error) {
+      console.error('Failed to delete Appstack user data:', error);
       throw error;
     }
   }

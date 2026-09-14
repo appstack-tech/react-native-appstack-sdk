@@ -51,8 +51,8 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun clearData(promise: Promise) {
-        impl.clearData(promise)
+    fun deleteUserData(promise: Promise) {
+        impl.deleteUserData(promise)
     }
 
     @ReactMethod

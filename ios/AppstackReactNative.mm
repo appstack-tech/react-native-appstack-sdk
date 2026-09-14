@@ -134,14 +134,22 @@ RCT_EXPORT_METHOD(disableASAAttributionTracking:(RCTPromiseResolveBlock)resolve
     }
 }
 
-RCT_EXPORT_METHOD(clearData:(RCTPromiseResolveBlock)resolve
+RCT_EXPORT_METHOD(deleteUserData:(RCTPromiseResolveBlock)resolve
                  reject:(RCTPromiseRejectBlock)reject)
 {
-    // Not wired on iOS: the native framework exposes an async `deleteUserData()`,
-    // which needs a completion-handler shim in AppstackBridge. Resolves false to
-    // signal "unsupported on this platform", the same convention Android uses for
-    // enableAppleAdsAttribution.
-    resolve(@(NO));
+    @try {
+        [AppstackBridge deleteUserDataWithCompletion:^(NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (error != nil) {
+                    reject(@"DELETE_USER_DATA_ERROR", error.localizedDescription, error);
+                    return;
+                }
+                resolve(nil);
+            });
+        }];
+    } @catch (NSException *exception) {
+        reject(@"DELETE_USER_DATA_ERROR", exception.reason, nil);
+    }
 }
 
 RCT_EXPORT_METHOD(isEnabled:(RCTPromiseResolveBlock)resolve

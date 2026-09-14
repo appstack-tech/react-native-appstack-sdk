@@ -47,8 +47,8 @@ class AppstackReactNativeModule(reactContext: ReactApplicationContext) :
         impl.disableASAAttributionTracking(promise)
     }
 
-    override fun clearData(promise: Promise) {
-        impl.clearData(promise)
+    override fun deleteUserData(promise: Promise) {
+        impl.deleteUserData(promise)
     }
 
     override fun isEnabled(promise: Promise) {

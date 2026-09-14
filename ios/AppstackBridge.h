@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)isSdkDisabled;
 
++ (void)deleteUserDataWithCompletion:(void (^)(NSError * _Nullable error))completion;
+
 + (void)getAttributionParamsWithCompletion:(void (^)(NSDictionary * _Nullable params, NSError * _Nullable error))completion;
 
 + (NSDictionary * _Nullable)handleUniversalLink:(NSString *)url

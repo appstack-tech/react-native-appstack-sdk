@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `deleteUserData()` on iOS and Android for GDPR/privacy deletion requests. The promise resolves only after the native deletion request completes and rejects when native deletion fails.
+
 ### Changed
 
+- **Android:** Updated the native Appstack Android SDK dependency to `1.10.0`.
+- Removed the obsolete Android-only native `clearData` bridge in favor of the cross-platform `deleteUserData()` API shared with iOS.
 - **iOS:** Updated `AppstackSDK.xcframework` to `4.7.1`, which fixes Swift 6 build errors when
   referencing `AppstackAttributionSdk.shared` or `AppstackASAAttribution.shared`.
 
