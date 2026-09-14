@@ -93,8 +93,10 @@
               "HasInitialValue",
               "Final",
               "HasStorage",
-              "AccessControl"
+              "AccessControl",
+              "RawDocComment"
             ],
+            "isLet": true,
             "hasStorage": true,
             "accessors": [
               {
@@ -119,56 +121,6 @@
                   "Final"
                 ],
                 "accessorKind": "get"
-              },
-              {
-                "kind": "Accessor",
-                "name": "Set",
-                "printedName": "Set()",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "Void",
-                    "printedName": "()"
-                  },
-                  {
-                    "kind": "TypeNominal",
-                    "name": "AppstackAttributionSdk",
-                    "printedName": "AppstackSDK.AppstackAttributionSdk",
-                    "usr": "s:11AppstackSDK0A14AttributionSdkC"
-                  }
-                ],
-                "declKind": "Accessor",
-                "usr": "s:11AppstackSDK0A14AttributionSdkC6sharedACvsZ",
-                "mangledName": "$s11AppstackSDK0A14AttributionSdkC6sharedACvsZ",
-                "moduleName": "AppstackSDK",
-                "static": true,
-                "implicit": true,
-                "declAttributes": [
-                  "Final"
-                ],
-                "accessorKind": "set"
-              },
-              {
-                "kind": "Accessor",
-                "name": "Modify",
-                "printedName": "Modify()",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "Void",
-                    "printedName": "()"
-                  }
-                ],
-                "declKind": "Accessor",
-                "usr": "s:11AppstackSDK0A14AttributionSdkC6sharedACvMZ",
-                "mangledName": "$s11AppstackSDK0A14AttributionSdkC6sharedACvMZ",
-                "moduleName": "AppstackSDK",
-                "static": true,
-                "implicit": true,
-                "declAttributes": [
-                  "Final"
-                ],
-                "accessorKind": "_modify"
               }
             ]
           },
@@ -940,8 +892,10 @@
               "HasInitialValue",
               "Final",
               "HasStorage",
-              "AccessControl"
+              "AccessControl",
+              "RawDocComment"
             ],
+            "isLet": true,
             "hasStorage": true,
             "accessors": [
               {
@@ -966,61 +920,6 @@
                   "Final"
                 ],
                 "accessorKind": "get"
-              },
-              {
-                "kind": "Accessor",
-                "name": "Set",
-                "printedName": "Set()",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "Void",
-                    "printedName": "()"
-                  },
-                  {
-                    "kind": "TypeNominal",
-                    "name": "AppstackASAAttribution",
-                    "printedName": "AppstackSDK.AppstackASAAttribution",
-                    "usr": "s:11AppstackSDK0A14ASAAttributionC"
-                  }
-                ],
-                "declKind": "Accessor",
-                "usr": "s:11AppstackSDK0A14ASAAttributionC6sharedACvsZ",
-                "mangledName": "$s11AppstackSDK0A14ASAAttributionC6sharedACvsZ",
-                "moduleName": "AppstackSDK",
-                "static": true,
-                "implicit": true,
-                "declAttributes": [
-                  "Final"
-                ],
-                "accessorKind": "set"
-              },
-              {
-                "kind": "Accessor",
-                "name": "Modify",
-                "printedName": "Modify()",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "Void",
-                    "printedName": "()"
-                  }
-                ],
-                "declKind": "Accessor",
-                "usr": "s:11AppstackSDK0A14ASAAttributionC6sharedACvMZ",
-                "mangledName": "$s11AppstackSDK0A14ASAAttributionC6sharedACvMZ",
-                "moduleName": "AppstackSDK",
-                "static": true,
-                "implicit": true,
-                "intro_Macosx": "12.0",
-                "intro_iOS": "15.0",
-                "declAttributes": [
-                  "Final",
-                  "Available",
-                  "Available",
-                  "Available"
-                ],
-                "accessorKind": "_modify"
               }
             ]
           },
@@ -1095,6 +994,13 @@
             "printedName": "Escapable",
             "usr": "s:s9EscapableP",
             "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
           }
         ]
       },
@@ -4403,329 +4309,329 @@
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 1050,
+      "offset": 1202,
       "length": 2,
       "value": "\"\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 1259,
+      "offset": 1411,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 1463,
+      "offset": 1615,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 3084,
+      "offset": 3236,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "Array",
-      "offset": 3184,
+      "offset": 3336,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 3740,
+      "offset": 3892,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "Array",
-      "offset": 4470,
+      "offset": 4622,
       "length": 2,
       "value": "[]"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "IntegerLiteral",
-      "offset": 4577,
+      "offset": 4729,
       "length": 3,
       "value": "100"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 5368,
+      "offset": 5520,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 6106,
+      "offset": 6258,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 6780,
+      "offset": 6932,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 6963,
+      "offset": 7115,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 7014,
+      "offset": 7166,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "IntegerLiteral",
-      "offset": 7064,
+      "offset": 7216,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "IntegerLiteral",
-      "offset": 7109,
+      "offset": 7261,
       "length": 1,
       "value": "0"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 7445,
+      "offset": 7597,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 7765,
+      "offset": 7917,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 7978,
+      "offset": 8130,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 8032,
+      "offset": 8184,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 8157,
+      "offset": 8309,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 47215,
+      "offset": 47367,
       "length": 4,
       "value": "true"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "IntegerLiteral",
-      "offset": 47261,
+      "offset": 47413,
       "length": 1,
       "value": "1"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 47619,
+      "offset": 47771,
       "length": 93,
       "value": "\"In-session attribution retry (attempt \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 47709,
+      "offset": 47861,
       "length": 1,
       "value": "\").\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 48225,
+      "offset": 48377,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 50455,
+      "offset": 50607,
       "length": 101,
       "value": "\"Appstack event '\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 50490,
+      "offset": 50642,
       "length": 67,
       "value": "\"' is tracked automatically and cannot be sent manually; ignoring.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 50655,
+      "offset": 50807,
       "length": 54,
       "value": "\"Custom event name is required when event is .CUSTOM.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 52164,
+      "offset": 52316,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52230,
+      "offset": 52382,
       "length": 53,
       "value": "\"Appstack event '\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52265,
+      "offset": 52417,
       "length": 19,
       "value": "\"' failed to send.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52326,
+      "offset": 52478,
       "length": 47,
       "value": "\"Event failed for \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52362,
+      "offset": 52514,
       "length": 1,
       "value": "\": \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52372,
+      "offset": 52524,
       "length": 2,
       "value": "\"\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52464,
+      "offset": 52616,
       "length": 68,
       "value": "\"Event '\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52490,
+      "offset": 52642,
       "length": 43,
       "value": "\"' buffered until configuration completes.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52582,
+      "offset": 52734,
       "length": 90,
       "value": "\"Appstack event '\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 52617,
+      "offset": 52769,
       "length": 56,
       "value": "\"' dropped: buffer full before configuration completed.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 54489,
+      "offset": 54641,
       "length": 52,
       "value": "\"Dropping \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 54507,
+      "offset": 54659,
       "length": 8,
       "value": "\" buffered event(s): SDK disabled.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "BooleanLiteral",
-      "offset": 54980,
+      "offset": 55132,
       "length": 5,
       "value": "false"
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 55054,
+      "offset": 55206,
       "length": 53,
       "value": "\"Appstack event '\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 55089,
+      "offset": 55241,
       "length": 19,
       "value": "\"' failed to send.\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 55154,
+      "offset": 55306,
       "length": 47,
       "value": "\"Event failed for \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 55190,
+      "offset": 55342,
       "length": 1,
       "value": "\": \""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 55200,
+      "offset": 55352,
       "length": 2,
       "value": "\"\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackAttributionSdk.swift",
       "kind": "StringLiteral",
-      "offset": 62078,
+      "offset": 62230,
       "length": 23,
       "value": "\"appstack_match_status\""
     },
@@ -4781,14 +4687,14 @@
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackASAAttribution.swift",
       "kind": "StringLiteral",
-      "offset": 2181,
+      "offset": 2277,
       "length": 2,
       "value": "\"\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/AppstackMain\/AppstackASAAttribution.swift",
       "kind": "IntegerLiteral",
-      "offset": 2718,
+      "offset": 2814,
       "length": 1,
       "value": "0"
     },
@@ -5238,7 +5144,7 @@
       "kind": "StringLiteral",
       "offset": 4483,
       "length": 7,
-      "value": "\"4.7.0\""
+      "value": "\"4.7.1\""
     },
     {
       "filePath": "\/Users\/runner\/work\/appstack-ios-sdk\/appstack-ios-sdk\/source-repo\/AppstackSDK\/Sources\/Config.swift",

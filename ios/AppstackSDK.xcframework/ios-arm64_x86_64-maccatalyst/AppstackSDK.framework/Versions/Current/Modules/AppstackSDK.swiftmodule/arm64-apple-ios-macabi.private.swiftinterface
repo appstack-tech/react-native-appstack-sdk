@@ -21,7 +21,7 @@ import _SwiftConcurrencyShims
 import os.log
 import os
 @_hasMissingDesignatedInitializers public class AppstackAttributionSdk : @unchecked Swift.Sendable {
-  public static var shared: AppstackSDK.AppstackAttributionSdk
+  public static let shared: AppstackSDK.AppstackAttributionSdk
   @available(*, deprecated, renamed: "configure(apiKey:logLevel:customerUserId:)", message: "isDebug is no longer used; drop it from your configure() call. This overload will be removed in the next major version.")
   public func configure(apiKey appstackApiKey: Swift.String, isDebug: Swift.Bool, endpointBaseUrl: Swift.String? = nil, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil)
   @available(*, deprecated, renamed: "configure(apiKey:logLevel:customerUserId:)", message: "endpointBaseUrl is no longer used; drop it from your configure() call. This overload will be removed in the next major version.")
@@ -43,8 +43,8 @@ import os
   @objc deinit
 }
 @_hasMissingDesignatedInitializers @available(iOS 15.0, macOS 12.0, macCatalyst 15.0, *)
-final public class AppstackASAAttribution {
-  public static var shared: AppstackSDK.AppstackASAAttribution
+final public class AppstackASAAttribution : @unchecked Swift.Sendable {
+  public static let shared: AppstackSDK.AppstackASAAttribution
   final public func enableAppleAdsAttribution()
   final public func disableASAAttributionTracking()
   @objc deinit

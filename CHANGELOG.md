@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **iOS:** Updated `AppstackSDK.xcframework` to `4.7.1`, which fixes Swift 6 build errors when
+  referencing `AppstackAttributionSdk.shared` or `AppstackASAAttribution.shared`.
+
 ## [3.3.0] - 2026-09-10
 
 ### Added
