@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-09-14
+
 ### Added
 
 - Added `deleteUserData()` on iOS and Android for GDPR/privacy deletion requests. The promise resolves only after the native deletion request completes and rejects when native deletion fails.
