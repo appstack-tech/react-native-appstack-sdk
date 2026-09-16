@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2026-09-16
+
+### Changed
+
+- **Android:** Updated the native Appstack Android SDK dependency to `1.11.0`. No JavaScript API or integration change is required.
+  - Events include the Google Play App Set ID and its scope for partner analytics integrations when available.
+  - Backend requests identify the host app and version, Appstack SDK version, and Android OS/API level in their User-Agent.
+  - Attribution matching sends broader best-effort device and network context. Individual signals are SDK implementation details and may change between releases; unavailable values are omitted. No new permission or runtime prompt is introduced.
+
+### Fixed
+
+- **Android:** A native `configure()` call made from an `Activity` no longer retains that `Activity` for the life of the process. The supplied `Context` is normalised to the application context before use.
+
 ## [3.4.0] - 2026-09-14
 
 ### Added
