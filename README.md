@@ -330,8 +330,9 @@ temporarily pin the SwiftPM dependency to the native SDK's rolling `rc` channel:
 
 This vendors the current `rc` binary and rewrites `ios/Package.swift` from
 `exact: "X.Y.Z"` to `branch: "rc"`. The channel is mutable and is republished on
-every candidate, so re-run the script (or `swift package update`) to move to a
-newer one. Restore the stable pin before committing anything for release:
+every candidate, so re-run the same script to move to a newer one — it keeps the
+vendored CocoaPods binary and the SwiftPM pin in step. Restore the stable pin
+before committing anything for release:
 
 ```bash
 ./update-ios-xcframework.sh 4.7.1   # or the version being prepared
