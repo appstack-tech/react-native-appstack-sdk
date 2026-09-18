@@ -73,17 +73,20 @@ jobs:
         set -euo pipefail
         if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
           VERSION="$INPUT_VERSION"
-          # Canonical RC form is X.Y.Z-rc.N; accept the legacy -rcN too. Validate
-          # before the value flows into any script or downstream job, so a crafted
-          # input cannot inject shell syntax.
-          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+-rc[.-]?[0-9]+$'; then
+          # Canonical RC form is X.Y.Z-rc.N; accept the legacy -rcN too.
+          #
+          # Match the whole string, not line by line: `grep -q` would accept a
+          # newline-bearing input like "3.6.0-rc.1\nother=1" on its first line,
+          # and that value is later echoed into $GITHUB_OUTPUT. [.] keeps the dots
+          # literal regardless of how the shell processes backslashes in =~.
+          if [[ ! "$VERSION" =~ ^[0-9]+[.][0-9]+[.][0-9]+-rc[.]?[0-9]+$ ]]; then
             echo "::error::Dispatch version '$VERSION' is not a release candidate (expected e.g. 3.6.0-rc.1)."
             exit 1
           fi
           CHANNEL=rc
         else
           VERSION="$REF_NAME"
-          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+          if [[ ! "$VERSION" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
             echo "::error::Tag '$VERSION' is not a stable SemVer version."
             exit 1
           fi
