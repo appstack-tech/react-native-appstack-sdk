@@ -1,10 +1,18 @@
 name: Build
 
 on:
+  # Stable releases are pushed as X.Y.Z tags. Release candidates are triggered
+  # manually with workflow_dispatch (typically on a release/x.y branch) so they
+  # never mint a git tag: the npm version and the `rc` dist-tag are the identity.
   push:
     tags:
-      - '[0-9]*.[0-9]*.[0-9]*'
-      - '[0-9]*.[0-9]*.[0-9]*-rc[0-9]*'
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release candidate version to publish, e.g. 3.6.0-rc.1'
+        required: true
+        type: string
 
 permissions:
   id-token: write
@@ -21,17 +29,23 @@ jobs:
   # RC releases run the package and latest-SDK runtime checks. Stable releases
   # additionally run the complete compatibility build matrix.
   release-checks:
-    name: ${{ contains(github.ref_name, '-rc') && 'RC checks' || 'Stable checks' }}
+    name: ${{ github.event_name == 'workflow_dispatch' && 'RC checks' || 'Stable checks' }}
     uses: ./.github/workflows/integration-tests.yml
     with:
-      run-compatibility-matrix: ${{ !contains(github.ref_name, '-rc') }}
+      run-compatibility-matrix: ${{ github.event_name != 'workflow_dispatch' }}
 
-  # Build and publish on version tags
+  # Build and publish. Stable comes from a tag, an RC from workflow_dispatch.
   publish:
     runs-on: ubuntu-latest
     needs: [release-checks]
+    # Serialize publishes: the `rc` dist-tag is a single moving pointer, so two
+    # candidates publishing at once would race it. Queue rather than cancel.
+    concurrency:
+      group: publish-npm
+      cancel-in-progress: false
     outputs:
-      version: ${{ steps.get_version.outputs.version }}
+      version: ${{ steps.meta.outputs.version }}
+      channel: ${{ steps.meta.outputs.channel }}
     steps:
     - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       with:
@@ -49,22 +63,41 @@ jobs:
         # auto-detect fallback, which an explicit `cache` input would otherwise
         # take precedence over (actions/setup-node src/main.ts).
         package-manager-cache: false
-    - name: Extract and validate version from tag
-      id: get_version
+    - name: Resolve version and channel
+      id: meta
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        REF_NAME: ${{ github.ref_name }}
+        INPUT_VERSION: ${{ inputs.version }}
       run: |
         set -euo pipefail
-        VERSION="${GITHUB_REF#refs/tags/}"
-        # Validate the tag is a simple SemVer before it flows into any script or
-        # downstream job — guards against script injection via crafted tags.
-        if ! printf '%s' "$VERSION" | grep -Eq "$SEMVER_REGEX"; then
-          echo "::error::Tag '$VERSION' is not a valid SemVer version"
-          exit 1
+        if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+          VERSION="$INPUT_VERSION"
+          # Canonical RC form is X.Y.Z-rc.N; accept the legacy -rcN too.
+          #
+          # Match the whole string, not line by line: `grep -q` would accept a
+          # newline-bearing input like "3.6.0-rc.1\nother=1" on its first line,
+          # and that value is later echoed into $GITHUB_OUTPUT. [.] keeps the dots
+          # literal regardless of how the shell processes backslashes in =~.
+          if [[ ! "$VERSION" =~ ^[0-9]+[.][0-9]+[.][0-9]+-rc[.]?[0-9]+$ ]]; then
+            echo "::error::Dispatch version '$VERSION' is not a release candidate (expected e.g. 3.6.0-rc.1)."
+            exit 1
+          fi
+          CHANNEL=rc
+        else
+          VERSION="$REF_NAME"
+          if [[ ! "$VERSION" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
+            echo "::error::Tag '$VERSION' is not a stable SemVer version."
+            exit 1
+          fi
+          CHANNEL=stable
         fi
         echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-        echo "Extracted version: $VERSION"
+        echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
+        echo "Resolved version=$VERSION channel=$CHANNEL"
     - name: Update package.json version
       env:
-        VERSION: ${{ steps.get_version.outputs.version }}
+        VERSION: ${{ steps.meta.outputs.version }}
       run: |
         set -euo pipefail
         npm version "$VERSION" --no-git-tag-version
@@ -94,7 +127,8 @@ jobs:
     # attestations are generated automatically, so no --provenance flag is needed.
     - name: Publish to npm
       env:
-        VERSION: ${{ steps.get_version.outputs.version }}
+        VERSION: ${{ steps.meta.outputs.version }}
+        CHANNEL: ${{ steps.meta.outputs.channel }}
       run: |
         set -euo pipefail
         # Trusted publishing needs npm >= 11.5.1. Fail loudly rather than silently
@@ -113,7 +147,7 @@ jobs:
         if [[ -f "$NPMRC" ]]; then
           sed -i '/_authToken/d' "$NPMRC"
         fi
-        if [[ "$VERSION" == *-* ]]; then
+        if [[ "$CHANNEL" == "rc" ]]; then
           npm publish --access public --tag rc
           echo "✅ Published $VERSION under the 'rc' dist-tag"
         else
@@ -126,13 +160,13 @@ jobs:
   # after publish succeeds (needs: publish), and is the only job granted
   # contents: write.
   #
-  # Skipped for pre-release tags (anything with a "-", e.g. 2.4.0-rc1): those
-  # still publish to npm but do not get a GitHub Release.
+  # Skipped for release candidates (channel == rc): those still publish to npm
+  # but do not get a GitHub Release.
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
     needs: publish
-    if: ${{ !contains(needs.publish.outputs.version, '-') }}
+    if: ${{ needs.publish.outputs.channel == 'stable' }}
     permissions:
       contents: write   # needed to create the GitHub Release
     steps:
