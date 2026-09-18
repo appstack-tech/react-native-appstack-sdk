@@ -319,6 +319,25 @@ if (Platform.OS === 'ios' && Platform.Version >= '14.3') {
 }
 ```
 
+**Testing a native iOS release candidate:**
+
+To exercise an unreleased native iOS SDK build, vendor the current candidate and
+temporarily pin the SwiftPM dependency to the native SDK's rolling `rc` channel:
+
+```bash
+./update-ios-xcframework.sh --rc
+```
+
+This vendors the current `rc` binary and rewrites `ios/Package.swift` from
+`exact: "X.Y.Z"` to `branch: "rc"`. The channel is mutable and is republished on
+every candidate, so re-run the same script to move to a newer one — it keeps the
+vendored CocoaPods binary and the SwiftPM pin in step. Restore the stable pin
+before committing anything for release:
+
+```bash
+./update-ios-xcframework.sh 4.7.1   # or the version being prepared
+```
+
 ### **Android**
 
 **Play Store attribution:**
