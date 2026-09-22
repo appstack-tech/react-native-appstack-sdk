@@ -19,7 +19,7 @@ set -euo pipefail
 # The stable VERSION below is the default and is what the determinism check
 # (__tests__/SwiftPackage.test.js) reads; --rc does not change it.
 
-VERSION="4.7.1"
+VERSION="4.7.2"
 MODE="stable"
 
 REPO="appstack-tech/ios-appstack-sdk"
