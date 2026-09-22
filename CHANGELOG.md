@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.1] - 2026-09-22
+
+### Changed
+
+- **iOS:** Updated the vendored `AppstackSDK.xcframework` and exact Swift Package Manager pin to `4.7.2`. No JavaScript API change is required.
+
+### Fixed
+
+- **iOS:** The automatic Apple Ads attribution event is sent only once after confirmed delivery. A failed send can be retried on a later `enableAppleAdsAttribution()` call with the same event ID.
+
 ## [3.5.0] - 2026-09-16
 
 ### Changed
