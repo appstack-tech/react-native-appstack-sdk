@@ -1,8 +1,8 @@
 <p align="center">
   <a href="https://www.appstack.tech">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/appstack-tech/react-native-appstack-sdk/main/.github/assets/appstack_logo_white_wordmark.png">
-      <img alt="Appstack" src="https://raw.githubusercontent.com/appstack-tech/react-native-appstack-sdk/main/.github/assets/appstack_logo_black_wordmark.png" width="280">
+      <source media="(prefers-color-scheme: dark)" srcset="https://docs.appstack.tech/images/appstack_logo_white_wordmark.png">
+      <img alt="Appstack" src="https://docs.appstack.tech/images/appstack_logo_black_wordmark.png" width="280">
     </picture>
   </a>
 </p>
