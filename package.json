@@ -31,6 +31,8 @@
     "test": "jest",
     "test:integration": "./integration-tests/run.sh",
     "typecheck": "tsc --noEmit",
+    "api:check": "bob build && api-extractor run && tsc -p tsconfig.api.json",
+    "api:update": "bob build && api-extractor run --local && tsc -p tsconfig.api.json",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "prepack": "bob build",
     "build": "./build.sh",
@@ -60,6 +62,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.59.2",
     "@react-native-community/cli": "latest",
     "@react-native-community/eslint-config": "^3.0.0",
     "@types/jest": "^28.1.2",

@@ -1,0 +1,66 @@
+name: API change gate
+
+# A change to the committed API report means the package's public TypeScript
+# API changed, and apps compile against it. Require the author to say so with a
+# label. integration-tests.yml's API check keeps the report honest; this keeps
+# it visible.
+#
+# Separate from tests.yml because it must re-run when labels change, and label
+# events shouldn't re-run (or cancel) the build and integration tests.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+concurrency:
+  group: api-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+# Read-only: the diff goes to the job summary instead of a PR comment, which
+# would need pull-requests: write.
+permissions:
+  contents: read
+
+jobs:
+  api-label:
+    name: API change label
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The PR merge commit plus its first parent (the base tip) is enough
+          # to diff the PR's net change.
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Require label when the API report changes
+        env:
+          API_FILE: api/react-native-appstack-sdk.api.md
+          # Passed through env, never interpolated into the script.
+          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: |
+          if git diff --quiet HEAD^1 HEAD -- "$API_FILE"; then
+            echo "$API_FILE unchanged."
+            exit 0
+          fi
+
+          {
+            echo "## Public API changed"
+            echo
+            echo "This PR changes \`$API_FILE\`:"
+            echo
+            echo '```diff'
+            git diff HEAD^1 HEAD -- "$API_FILE"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if echo "$LABELS" | jq -e 'any(.[]; . == "breaking" or . == "api-change")' > /dev/null; then
+            echo "Public API change acknowledged by label. Diff is in the job summary."
+            exit 0
+          fi
+
+          echo "::error file=$API_FILE::This PR changes the SDK's public API. Add the 'api-change' label (additive change) or 'breaking' (removed/renamed/changed signature) to acknowledge it. See RELEASING.md."
+          exit 1

@@ -1,0 +1,13 @@
+{
+  // Type-checks api/api-surface.ts against the built declarations in
+  // lib/typescript, the same files npm consumers resolve. See RELEASING.md.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": ".",
+    "paths": {
+      "react-native-appstack-sdk": ["./lib/typescript/index.d.ts"]
+    }
+  },
+  "include": ["api/api-surface.ts"]
+}
