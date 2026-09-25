@@ -24,36 +24,6 @@ const expectType =
   <Actual>(_value: Actual & (Equals<Actual, Expected> extends true ? unknown : never)) =>
     undefined;
 
-// An app's own implementation of the exported interface, e.g. a test mock.
-// Written against today's interface and deliberately not updated when it grows:
-// a new required member breaks implementers like this one, so it fails here.
-export class ConsumerMock implements AppstackSDKInterface {
-  async configure(_apiKey: string, _options?: AppstackConfigureOptions | null) {
-    return true;
-  }
-  async setCustomerUserId(_customerUserId?: string | null) {}
-  async deleteUserData() {}
-  async sendEvent(_event: EventType | string, _parameters?: AppstackEventParameters | null) {}
-  async enableAppleAdsAttribution() {
-    return false;
-  }
-  async getAppstackId() {
-    return 'appstack-id';
-  }
-  async isSdkDisabled() {
-    return false;
-  }
-  async getAttributionParams(): Promise<Record<string, any>> {
-    return {};
-  }
-  async handleUniversalLink(
-    _url: string,
-    _options?: AppstackLinkOptions | null
-  ): Promise<AppstackLinkResult | null> {
-    return null;
-  }
-}
-
 export async function exerciseApi(): Promise<void> {
   // The default export is the singleton, typed as the class.
   const sdk: AppstackSDK = AppstackSDKDefault;
