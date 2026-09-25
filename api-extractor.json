@@ -6,7 +6,7 @@
   "apiReport": {
     "enabled": true,
     "reportFolder": "<projectFolder>/api/",
-    "reportTempFolder": "<projectFolder>/lib/api-extractor/"
+    "reportTempFolder": "<projectFolder>/node_modules/.cache/api-extractor/"
   },
   "docModel": { "enabled": false },
   "dtsRollup": { "enabled": false },
