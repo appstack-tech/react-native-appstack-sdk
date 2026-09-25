@@ -18,12 +18,14 @@ reviewed on purpose.
 - **API change gate (`api-change-gate.yml`)** fails any PR that changes the
   report unless the PR has one of these labels:
 
-  - `api-change`: additive only (new export, method, optional parameter or
-    optional field). Existing apps keep compiling. A new `EventType` member also
-    goes here.
+  - `api-change`: additive only (new export, a method on an exported class,
+    optional parameter or optional field). Existing apps keep compiling. A new
+    `EventType` member also goes here.
   - `breaking`: something was removed or renamed, a parameter became required,
-    a type was narrowed, or a return type changed. Plan a major version and call
-    it out in `CHANGELOG.md`.
+    a type was narrowed, a return type changed, or a required member was added
+    to an exported interface such as `AppstackSDKInterface` (apps that
+    implement it, e.g. a test mock, stop compiling). Plan a major version and
+    call it out in `CHANGELOG.md`.
 
   The diff is in the gate job's summary. Adding or removing a label re-runs the
   gate by itself, without the build and integration tests.
