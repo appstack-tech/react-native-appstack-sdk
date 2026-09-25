@@ -33,6 +33,13 @@ jobs:
       - name: Lint, typecheck, test, and build package
         run: ./build.sh --ci --clean
 
+      # Fails when the built declarations no longer match the committed
+      # api/react-native-appstack-sdk.api.md, or when api/api-surface.ts stops
+      # compiling against them. api-change-gate.yml requires a label when the
+      # report itself changes. See RELEASING.md.
+      - name: Check public API against baseline
+        run: npm run api:check
+
   android:
     name: Build checks / Android (Expo SDK ${{ matrix.expo-sdk }}, ${{ matrix.architecture }} architecture)
     needs: package

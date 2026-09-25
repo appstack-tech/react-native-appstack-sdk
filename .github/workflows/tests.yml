@@ -21,6 +21,8 @@ on:
       - 'babel.config.js'
       - 'jest.config.js'
       - 'tsconfig*.json'
+      - 'api/**'
+      - 'api-extractor.json'
       - 'integration-tests/**'
       - '.github/workflows/build.yml'
       - '.github/workflows/integration-tests.yml'

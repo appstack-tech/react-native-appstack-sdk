@@ -1,0 +1,25 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+  // The declarations npm actually ships ("types" in package.json), emitted from
+  // src/ by bob. Build first: npm run api:check and api:update both do.
+  "mainEntryPointFilePath": "<projectFolder>/lib/typescript/index.d.ts",
+  "apiReport": {
+    "enabled": true,
+    "reportFolder": "<projectFolder>/api/",
+    "reportTempFolder": "<projectFolder>/lib/api-extractor/"
+  },
+  "docModel": { "enabled": false },
+  "dtsRollup": { "enabled": false },
+  "tsdocMetadata": { "enabled": false },
+  "messages": {
+    "extractorMessageReporting": {
+      "default": { "logLevel": "warning" },
+      // The SDK doesn't use @public/@beta release tags; everything exported is public.
+      "ae-missing-release-tag": { "logLevel": "none" }
+    },
+    "tsdocMessageReporting": {
+      // TSDoc syntax nits in doc comments aren't API changes.
+      "default": { "logLevel": "none" }
+    }
+  }
+}
