@@ -49,6 +49,10 @@ def main() -> None:
     require(result.get("callbackCount") == 3, "not all attribution calls completed")
     require(result.get("successCount") == 3, "attribution calls did not all succeed")
     require(
+        result.get("firstCallValidated") is True,
+        "getAttributionParams() right after configure() did not wait for the attribution match",
+    )
+    require(
         result.get("attributionValidated") is True,
         "attribution payload was corrupted across the bridge",
     )

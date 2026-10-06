@@ -7,12 +7,17 @@ import signal
 import socketserver
 import ssl
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 
 MAX_REQUEST_BODY_BYTES = 1024 * 1024
+# The match response arrives late on purpose: a getAttributionParams() call made right
+# after configure() only sees it if the bridge waits for the native match, instead of
+# reading a still-empty cache.
+MATCH_RESPONSE_DELAY_SECONDS = 1.5
 SENSITIVE_NAMES = {
     "authorization",
     "cookie",
@@ -97,6 +102,7 @@ def main() -> None:
                 )
                 return
             if "/attribution/match" in path:
+                time.sleep(MATCH_RESPONSE_DELAY_SECONDS)
                 self.respond(
                     200,
                     {

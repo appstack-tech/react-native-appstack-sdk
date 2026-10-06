@@ -45,6 +45,9 @@ export default function App() {
           logLevel: 0,
           customerUserId: 'runtime-validation-user',
         });
+        // Called once, immediately, with no polling: the bridge itself has to wait
+        // for the (deliberately delayed) match response.
+        const firstCall = await AppstackSDK.getAttributionParams();
         const attribution = await waitForAttribution();
         const callbackResults = await Promise.all([
           AppstackSDK.getAttributionParams(),
@@ -132,6 +135,10 @@ export default function App() {
           sdkDisabled,
           callbackCount: callbackResults.length,
           successCount: validCallbacks,
+          firstCallValidated:
+            !!firstCall &&
+            firstCall.runtime_validation === 'attributed' &&
+            firstCall.unicode === 'café 🚀',
           attributionValidated:
             attribution.runtime_validation === 'attributed' && attribution.unicode === 'café 🚀',
           validationError,
