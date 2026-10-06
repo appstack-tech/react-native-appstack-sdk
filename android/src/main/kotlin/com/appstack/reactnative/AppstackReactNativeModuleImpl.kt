@@ -251,19 +251,24 @@ class AppstackReactNativeModuleImpl(
     }
 
     fun getAttributionParams(promise: Promise) {
-        try {
-            val params = AppstackAttributionSdk.getAttributionParams(rawReferrer = null)
+        // awaitAttributionParams waits for the native match phase, like the iOS bridge's async
+        // getAttributionParams. The non-suspending getAttributionParams returns an empty map when
+        // called before the /match response is cached, which is the case right after configure().
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val params = AppstackAttributionSdk.awaitAttributionParams(rawReferrer = null)
 
-            // Convert Map<String, Any> to WritableMap using Arguments factory
-            val writableMap = Arguments.createMap()
+                // Convert Map<String, Any> to WritableMap using Arguments factory
+                val writableMap = Arguments.createMap()
 
-            params.forEach { (key, value) ->
-                writableMap.putString(key, value)
+                params.forEach { (key, value) ->
+                    writableMap.putString(key, value)
+                }
+
+                promise.resolve(writableMap)
+            } catch (exception: Exception) {
+                promise.reject("ATTRIBUTION_PARAMS_ERROR", "Failed to get attribution parameters: ${exception.message}", exception)
             }
-
-            promise.resolve(writableMap)
-        } catch (exception: Exception) {
-            promise.reject("ATTRIBUTION_PARAMS_ERROR", "Failed to get attribution parameters: ${exception.message}", exception)
         }
     }
 
