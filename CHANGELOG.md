@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.2] - 2026-10-13
+
 ### Fixed
 
 - **Android:** `getAttributionParams()` now waits for the attribution match to finish, as it already does on iOS. It previously returned an empty object when called shortly after `configure()`, before the match response was cached, so `appstack_adnetwork` and `appstack_campaign` were missing on Android (and never reached integrations such as RevenueCat). No JavaScript API change.
