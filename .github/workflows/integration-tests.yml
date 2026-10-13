@@ -6,6 +6,11 @@ name: Integration Tests
 on:
   workflow_call:
     inputs:
+      run-tests:
+        description: Run the checks. When false, every job is skipped and the aggregate "Integration tests" check still reports success
+        required: false
+        default: true
+        type: boolean
       run-compatibility-matrix:
         description: Run the older-SDK, legacy-architecture, and static-framework build matrix
         required: false
@@ -18,6 +23,8 @@ permissions:
 jobs:
   package:
     name: Build checks / JavaScript package
+    # Every other check needs this job, so skipping it skips the whole suite.
+    if: ${{ inputs.run-tests }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -235,6 +242,15 @@ jobs:
       - name: Check required results
         run: |
           set -euo pipefail
+
+          if [[ "${{ inputs.run-tests }}" != "true" ]]; then
+            if [[ "${{ needs.package.result }}" != "skipped" ]]; then
+              echo "❌ Checks should be skipped when there are no relevant changes: Package=${{ needs.package.result }}"
+              exit 1
+            fi
+            echo "✅ No relevant changes, checks skipped"
+            exit 0
+          fi
 
           if [[ "${{ needs.package.result }}" != "success" || "${{ needs['ios-spm'].result }}" != "success" || "${{ needs['android-smoke'].result }}" != "success" || "${{ needs['ios-smoke'].result }}" != "success" ]]; then
             echo "❌ Package: ${{ needs.package.result }}, iOS SwiftPM: ${{ needs['ios-spm'].result }}, Android runtime: ${{ needs['android-smoke'].result }}, iOS runtime: ${{ needs['ios-smoke'].result }}"
