@@ -3,30 +3,16 @@ name: Tests
 # Thin wrapper so focused PR checks display namespaced under a single "tests /"
 # group. Manual runs default to the full compatibility matrix. The actual jobs
 # live in integration-tests.yml (also called before RC and stable publishes).
+#
+# This workflow runs on every PR on purpose. Branch protection requires
+# "tests / Integration tests", and a required check whose workflow is filtered
+# out by `paths` never reports, which leaves the PR waiting forever. The
+# `changes` job decides whether the suite is needed; when it is not, the
+# aggregate check still reports success without running anything.
 
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'android/**'
-      - 'ios/**'
-      - 'src/**'
-      - '__tests__/**'
-      - 'react-native.config.js'
-      - '*.podspec'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'build.sh'
-      - '.eslintrc.js'
-      - 'babel.config.js'
-      - 'jest.config.js'
-      - 'tsconfig*.json'
-      - 'api/**'
-      - 'api-extractor.json'
-      - 'integration-tests/**'
-      - '.github/workflows/build.yml'
-      - '.github/workflows/integration-tests.yml'
-      - '.github/workflows/tests.yml'
   workflow_dispatch:
     inputs:
       run-compatibility-matrix:
@@ -44,9 +30,55 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect relevant changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      relevant: ${{ steps.detect.outputs.relevant }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          # The PR merge commit plus its first parent (the base tip) is enough
+          # to diff the PR's net change.
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Check changed files
+        id: detect
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          # Files that can affect the package, the native bridges or the
+          # integration test harness.
+          RELEVANT_PATTERN: >-
+            ^(android/|ios/|src/|__tests__/|api/|integration-tests/|react-native\.config\.js$|[^/]*\.podspec$|package\.json$|package-lock\.json$|build\.sh$|\.eslintrc\.js$|babel\.config\.js$|jest\.config\.js$|tsconfig[^/]*\.json$|api-extractor\.json$|\.github/workflows/(build|integration-tests|tests)\.yml$)
+        run: |
+          set -euo pipefail
+
+          if [[ "$EVENT_NAME" != "pull_request" ]]; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+            echo "Manual run: tests always run."
+            exit 0
+          fi
+
+          CHANGED="$(git diff --name-only HEAD^1 HEAD)"
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          if grep -Eq "$RELEVANT_PATTERN" <<< "$CHANGED"; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+            echo "Relevant changes found: tests will run."
+          else
+            echo "relevant=false" >> "$GITHUB_OUTPUT"
+            echo "No relevant changes: tests will be skipped."
+          fi
+
   tests:
+    needs: changes
     uses: ./.github/workflows/integration-tests.yml
     with:
+      run-tests: ${{ needs.changes.outputs.relevant == 'true' }}
       # Pull requests use focused checks. A manual run can opt into or out of
       # the full compatibility matrix and defaults to running it.
       run-compatibility-matrix: ${{ github.event_name == 'workflow_dispatch' && inputs.run-compatibility-matrix }}
