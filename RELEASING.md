@@ -1,5 +1,61 @@
 # Releasing
 
+## Branches and how a release happens
+
+- **`develop`** is where work lands. Open PRs against it and squash-merge
+  them. Nothing on `develop` is published by merging.
+- **`main`** only changes through release PRs. Merging one publishes to npm.
+
+To cut a stable release:
+
+1. On a branch off `develop`, run:
+
+   ```bash
+   npm run version:set -- X.Y.Z
+   ```
+
+   It writes the version into every place it lives (`package.json`,
+   `package-lock.json`, `wrapperVersion` in `ios/AppstackBridge.swift`,
+   `WRAPPER_VERSION` in the Android module) and promotes `## [Unreleased]` in
+   `CHANGELOG.md` to `## [X.Y.Z] - <today>`. Commit the result and merge it
+   into `develop`.
+2. Open a PR from `develop` into `main`. The **Release version** check
+   (`release-pr.yml`) names the version that merging will publish. It fails if
+   the changelog has no new version, or if any copy of the version disagrees
+   (`npm run version:check` runs the same check locally).
+3. Get it approved by someone other than you, then merge it with **Create a
+   merge commit**. Don't squash: a squash leaves `develop` and `main` with
+   different commits for the same changes, and every later release PR then
+   conflicts. That merge commit is the one record of each release on `main`.
+4. `build.yml` runs on the push to `main`: it reads the version from the
+   changelog, checks every copy agrees again, runs the full release checks,
+   publishes that commit to npm unchanged, then creates the `X.Y.Z` tag and
+   GitHub Release on the merge commit.
+
+A merge to `main` whose changelog has no new version publishes nothing. Such
+a PR needs the `no-release` label to pass the Release version check. Version
+tags are created by the workflow; pushing one by hand doesn't publish, and
+there is no local release command.
+
+### Release candidates
+
+Run `build.yml` manually on `develop` with an RC version:
+
+```bash
+gh workflow run build.yml --ref develop -f version=3.6.0-rc.1
+```
+
+It publishes under the `rc` npm dist-tag and creates no git tag or GitHub
+Release. Runs on any other branch are rejected. The RC version is stamped
+into the package at publish time only; nothing is committed.
+
+### Hotfixes
+
+Branch `hotfix/<name>` off `main`, run `npm run version:set -- X.Y.Z` for
+the patch version, and open the PR into `main` (merge commit, as above). After it publishes,
+open a PR from `main` into `develop` and squash it, so the fix is on
+`develop` too.
+
 ## Public API baseline
 
 `api/react-native-appstack-sdk.api.md` is the committed report of the package's
