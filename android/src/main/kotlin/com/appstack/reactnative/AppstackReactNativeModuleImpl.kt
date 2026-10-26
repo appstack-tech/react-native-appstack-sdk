@@ -30,7 +30,7 @@ class AppstackReactNativeModuleImpl(
 
     companion object {
         const val NAME = "AppstackReactNative"
-        private const val WRAPPER_VERSION = "react-native-1.0.0"
+        private const val WRAPPER_VERSION = "react-native-3.5.2"
     }
 
     // setProxyUrl + configureWrapper are gated behind @RequiresOptIn(InternalAppstackApi).

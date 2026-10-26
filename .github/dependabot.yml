@@ -3,6 +3,8 @@ updates:
   # Keep SHA-pinned GitHub Actions up to date
   - package-ecosystem: github-actions
     directory: /
+    # Day-to-day changes land on develop; main only takes release PRs.
+    target-branch: develop
     schedule:
       interval: monthly
     groups:

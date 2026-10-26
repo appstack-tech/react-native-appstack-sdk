@@ -1,0 +1,75 @@
+name: Release PR
+
+# Every PR into main is a release PR: merging it runs build.yml, which publishes
+# the version in CHANGELOG.md. This check states that version up front so the
+# approval is an approval of a specific release, and fails early when merging
+# would publish nothing or the wrong thing:
+#
+#   * The head branch must be develop (a release) or hotfix/* (a fix cut from
+#     main). Feature work goes to develop.
+#   * The changelog must add a new "## [X.Y.Z] - YYYY-MM-DD" section, newer than
+#     the latest release. A PR that should merge without releasing (say, a
+#     workflow-only fix on main) needs the `no-release` label.
+#   * package.json, package-lock.json and both native wrapper constants must
+#     carry that same version (scripts/set-version.mjs --check), so what is
+#     approved is exactly what gets published.
+#
+# Make "Release version" a required check on main.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  version:
+    name: Release version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Tags are needed to tell a new version from one already released.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check head branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [[ "$HEAD_REF" != "develop" && "$HEAD_REF" != hotfix/* ]]; then
+            echo "::error::PRs into main come from develop or hotfix/*, not '$HEAD_REF'. Target develop instead."
+            exit 1
+          fi
+
+      - name: Resolve release version
+        id: meta
+        run: .github/scripts/resolve-release-version.sh CHANGELOG.md
+
+      - name: Require a new version
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          RELEASE: ${{ steps.meta.outputs.release }}
+          NO_RELEASE: ${{ contains(github.event.pull_request.labels.*.name, 'no-release') }}
+        run: |
+          if [[ "$RELEASE" == "true" ]]; then
+            echo "Merging this PR publishes **$VERSION** to npm as \`latest\`." >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$NO_RELEASE" == "true" ]]; then
+            echo "Labeled \`no-release\`: merging this PR publishes nothing." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error::CHANGELOG.md has no new version ($VERSION is already released). Run 'node scripts/set-version.mjs X.Y.Z' on develop, or label the PR no-release."
+            exit 1
+          fi
+
+      # Runs for no-release PRs too: main must never hold disagreeing copies.
+      - name: Check version copies agree
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: node scripts/set-version.mjs --check "$VERSION"

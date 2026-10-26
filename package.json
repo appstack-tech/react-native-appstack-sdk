@@ -1,6 +1,6 @@
 {
   "name": "react-native-appstack-sdk",
-  "version": "1.0.0",
+  "version": "3.5.2",
   "description": "React Native bridge for Appstack iOS SDK - Track events and revenue",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -37,7 +37,8 @@
     "prepack": "bob build",
     "build": "./build.sh",
     "build:clean": "./build.sh --clean",
-    "release": "release-it"
+    "version:set": "node scripts/set-version.mjs",
+    "version:check": "node scripts/set-version.mjs --check"
   },
   "keywords": [
     "react-native",

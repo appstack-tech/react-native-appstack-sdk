@@ -8,7 +8,7 @@ public class AppstackBridge: NSObject {
         return EventType.allCases.first { $0.rawValue == string.uppercased() }
     }
 
-    private static let wrapperVersion = "react-native-1.0.0"
+    private static let wrapperVersion = "react-native-3.5.2"
 
     @objc public static func configure(apiKey: String, logLevel: Int, customerUserId: String?) {
         // Translate the JS-side logLevel contract (0=DEBUG, 1=INFO, 2=WARN, 3=ERROR;
