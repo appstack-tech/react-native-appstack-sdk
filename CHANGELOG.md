@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **iOS:** Swift Package Manager builds now work on React Native 0.88 and 0.89, including Expo's SwiftPM preview. CocoaPods builds are unaffected.
+
 ## [3.5.2] - 2026-10-13
 
 ### Fixed

@@ -75,6 +75,12 @@ let package = Package(
                 .define("FOLLY_NO_CONFIG"),
                 .define("FOLLY_MOBILE", to: "1"),
                 .define("FOLLY_USE_LIBCPP", to: "1"),
+                // FOLLY_NO_CONFIG skips folly-config.h, which is where React Native
+                // turns coroutines off. Without this, C++20 makes folly/Expected.h
+                // include folly/coro headers that React Native does not ship
+                // (reached through Bridging.h since 0.89). Mirrors the flag React
+                // Native's CocoaPods helpers pass to every new-architecture pod.
+                .define("FOLLY_CFG_NO_COROUTINES", to: "1"),
                 .define("DEBUG", .when(configuration: .debug)),
                 .define("NDEBUG", .when(configuration: .release)),
             ]

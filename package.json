@@ -93,6 +93,9 @@
       "javaPackageName": "com.appstack.reactnative"
     }
   },
+  "swiftpmConfig": {
+    "name": "ReactNativeAppstackSdk"
+  },
   "engines": {
     "node": ">= 16.0.0"
   },
