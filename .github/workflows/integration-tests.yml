@@ -146,10 +146,21 @@ jobs:
           ${{ matrix.frameworks == 'static' && '--static-frameworks' || '' }}
 
   ios-spm:
-    name: Build checks / iOS (React Native 0.87, SwiftPM)
+    name: Build checks / iOS (React Native ${{ matrix.react-native }}, SwiftPM)
     needs: package
     runs-on: macos-26
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # 0.88 changed how a library's SwiftPM package name is resolved, and 0.89
+        # makes SwiftPM the default for bare apps. Each has broken our manifest
+        # in a way the others did not catch.
+        react-native: ['0.87.0', '0.88.1', '0.89.0-rc.1']
+    env:
+      REACT_NATIVE_VERSION: ${{ matrix.react-native }}
+      # npm does not let a prerelease satisfy our `>=0.72.0` peer range.
+      npm_config_legacy_peer_deps: ${{ contains(matrix.react-native, '-rc.') && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
