@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.0] - 2026-11-17
+
+### Added
+
+- `getAttributionParams()` now returns `confidence_tier` (`high`, `medium` or `low`), the confidence of the attribution match. It isn't returned for an organic install. **iOS:** it now also returns `deeplink_id`, the ID of the matched link, as Android already did.
+- **Android:** `getAttributionParams()` now always includes `appstack_match_status`, as on iOS: `matched`, `matched_no_params`, `organic`, `skipped` and `not_configured` are settled answers, and `failed` is worth re-reading later.
+
+### Changed
+
+- **iOS:** Updated `AppstackSDK.xcframework` to `4.8.0`, which brings `deeplink_id` and `confidence_tier`. **Android:** Updated the native Android SDK to `1.12.0`, which brings `confidence_tier` and `appstack_match_status`.
+- **Android:** An organic install now returns `appstack_match_status: organic` and no `deeplink_id`, and `getAttributionParams()` called before `configure()` returns `appstack_match_status: not_configured` instead of an empty object. Check the status key instead of checking the result for content.
+
+### Fixed
+
+- **iOS:** Swift Package Manager builds now work on React Native 0.88 and 0.89, including Expo's SwiftPM preview. CocoaPods builds are unaffected.
+- **Android:** Fixed a rare crash (`IllegalArgumentException: Service not registered`) when closing the Play Store install referrer connection.
+
 ## [3.5.2] - 2026-10-13
 
 ### Fixed

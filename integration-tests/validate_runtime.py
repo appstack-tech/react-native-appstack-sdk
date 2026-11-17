@@ -56,6 +56,16 @@ def main() -> None:
         result.get("attributionValidated") is True,
         "attribution payload was corrupted across the bridge",
     )
+    metadata = result.get("attributionMetadata") or {}
+    expected_metadata = {
+        "deeplink_id": "runtime-validation-deeplink",
+        "confidence_tier": "high",
+        "appstack_match_status": "matched",
+    }
+    require(
+        metadata == expected_metadata,
+        f"attribution metadata did not cross the bridge: expected {expected_metadata}, got {metadata}",
+    )
     require(
         result.get("validationError", "").startswith("event must be a non-empty string"),
         "wrapper did not return the expected meaningful validation error",

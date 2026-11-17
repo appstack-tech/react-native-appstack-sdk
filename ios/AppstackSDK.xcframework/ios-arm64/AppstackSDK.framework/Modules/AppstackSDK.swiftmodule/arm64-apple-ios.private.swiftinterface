@@ -20,26 +20,26 @@ import _StringProcessing
 import _SwiftConcurrencyShims
 import os.log
 import os
-@_hasMissingDesignatedInitializers public class AppstackAttributionSdk : @unchecked Swift.Sendable {
+@_hasMissingDesignatedInitializers final public class AppstackAttributionSdk : @unchecked Swift.Sendable {
   public static let shared: AppstackSDK.AppstackAttributionSdk
   @available(*, deprecated, renamed: "configure(apiKey:logLevel:customerUserId:)", message: "isDebug is no longer used; drop it from your configure() call. This overload will be removed in the next major version.")
-  public func configure(apiKey appstackApiKey: Swift.String, isDebug: Swift.Bool, endpointBaseUrl: Swift.String? = nil, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil)
+  final public func configure(apiKey appstackApiKey: Swift.String, isDebug: Swift.Bool, endpointBaseUrl: Swift.String? = nil, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil)
   @available(*, deprecated, renamed: "configure(apiKey:logLevel:customerUserId:)", message: "endpointBaseUrl is no longer used; drop it from your configure() call. This overload will be removed in the next major version.")
-  public func configure(apiKey appstackApiKey: Swift.String, endpointBaseUrl: Swift.String?, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil)
-  public func configure(apiKey appstackApiKey: Swift.String, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil)
-  @_spi(AppstackInternal) public func configure(apiKey appstackApiKey: Swift.String, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil, wrapperVersion: Swift.String?)
-  public func setCustomerUserId(_ customerUserId: Swift.String?)
-  @_spi(AppstackInternal) public func setProxyUrl(_ url: Swift.String)
-  public func sendEvent(event: AppstackSDK.EventType, name: Swift.String? = nil, parameters: [Swift.String : Any]? = nil)
-  public func getAppstackId() -> Swift.String?
-  public func isSdkDisabled() -> Swift.Bool
+  final public func configure(apiKey appstackApiKey: Swift.String, endpointBaseUrl: Swift.String?, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil)
+  final public func configure(apiKey appstackApiKey: Swift.String, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil)
+  @_spi(AppstackInternal) final public func configure(apiKey appstackApiKey: Swift.String, logLevel: AppstackSDK.LogLevel = .info, customerUserId: Swift.String? = nil, wrapperVersion: Swift.String?)
+  final public func setCustomerUserId(_ customerUserId: Swift.String?)
+  @_spi(AppstackInternal) final public func setProxyUrl(_ url: Swift.String)
+  final public func sendEvent(event: AppstackSDK.EventType, name: Swift.String? = nil, parameters: [Swift.String : Any]? = nil)
+  final public func getAppstackId() -> Swift.String?
+  final public func isSdkDisabled() -> Swift.Bool
   @discardableResult
-  public func handleUniversalLink(_ userActivity: Foundation.NSUserActivity, options: AppstackSDK.LinkOptions = LinkOptions()) -> AppstackSDK.UniversalLinkResult?
+  final public func handleUniversalLink(_ userActivity: Foundation.NSUserActivity, options: AppstackSDK.LinkOptions = LinkOptions()) -> AppstackSDK.UniversalLinkResult?
   @discardableResult
-  public func handleUniversalLink(_ url: Foundation.URL, options: AppstackSDK.LinkOptions = LinkOptions()) -> AppstackSDK.UniversalLinkResult?
-  public func getAttributionParams() async -> [Swift.String : Any]?
+  final public func handleUniversalLink(_ url: Foundation.URL, options: AppstackSDK.LinkOptions = LinkOptions()) -> AppstackSDK.UniversalLinkResult?
+  final public func getAttributionParams() async -> [Swift.String : Any]?
   public static let attributionMatchStatusKey: Swift.String
-  public func deleteUserData() async throws
+  final public func deleteUserData() async throws
   @objc deinit
 }
 @_hasMissingDesignatedInitializers @available(iOS 15.0, macOS 12.0, macCatalyst 15.0, *)
@@ -49,7 +49,7 @@ final public class AppstackASAAttribution : @unchecked Swift.Sendable {
   final public func disableASAAttributionTracking()
   @objc deinit
 }
-public enum EventType : Swift.String, Swift.CaseIterable {
+public enum EventType : Swift.String, Swift.CaseIterable, Swift.Sendable {
   case INSTALL
   case FIRST_OPEN
   case FIRST_OPEN_GUARDED
@@ -109,7 +109,7 @@ public struct UserData : Swift.Decodable, Swift.Encodable {
   public init(from decoder: any Swift.Decoder) throws
   public func encode(to encoder: any Swift.Encoder) throws
 }
-public enum LogLevel : Swift.Int {
+public enum LogLevel : Swift.Int, Swift.Sendable {
   case off
   case error
   case info
@@ -120,11 +120,11 @@ public enum LogLevel : Swift.Int {
     get
   }
 }
-public struct LinkOptions {
+public struct LinkOptions : Swift.Sendable {
   public let allowedHosts: Swift.Set<Swift.String>?
   public init(allowedHosts: Swift.Set<Swift.String>? = nil)
 }
-public struct UniversalLinkResult {
+public struct UniversalLinkResult : Swift.Sendable {
   public let deeplinkId: Swift.String?
   public let queryParams: [Swift.String : Swift.String]
   public let url: Foundation.URL

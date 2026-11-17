@@ -21,7 +21,6 @@ module.exports = {
     'lib/',
     'node_modules/',
     'homepage-app/',
-    'plugin/build/',
     '*.podspec',
     'android/',
     'ios/',
