@@ -8,6 +8,47 @@ import { ThemedText } from '../../components/ThemedText';
 import { ThemedView } from '../../components/ThemedView';
 import AppstackSDK, { EventType } from 'react-native-appstack-sdk';
 
+async function initializeAppstackSDK(): Promise<{ initialized: boolean; error: string | null }> {
+  let configured = false;
+  try {
+    console.log('Initializing Appstack SDK...');
+
+    // This demo reads its API key from local environment configuration. Never
+    // commit a real key to the sample application.
+    const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY?.trim();
+
+    if (!apiKey) {
+      const msg = 'Missing EXPO_PUBLIC_APPSTACK_API_KEY. Set it in your env (e.g. eas.json env or .env) to initialize the SDK.';
+      console.warn(msg);
+      return { initialized: false, error: msg };
+    }
+
+    // The dev endpoint is applied natively via the APPSTACK_DEV_PROXY_URL manifest key
+    // (ios/homepageapp/Info.plist + android/app/src/main/AndroidManifest.xml), not through
+    // configure() — the isDebug/endpointBaseUrl arguments were never forwarded to
+    // native and were removed in 3.0.
+    await AppstackSDK.configure(apiKey, {
+      logLevel: 0, // 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
+    });
+    configured = true;
+    console.log('Appstack SDK configured successfully');
+
+    // Send a basic event to test
+    await AppstackSDK.sendEvent('APP_OPENED');
+    console.log('APP_OPENED event sent successfully');
+    return { initialized: true, error: null };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Failed to initialize Appstack SDK:', error);
+
+    // Only show alert if it's not the common linking error
+    if (!errorMessage.includes("doesn't seem to be linked")) {
+      Alert.alert('SDK Error', `Failed to initialize Appstack SDK: ${errorMessage}`);
+    }
+    return { initialized: configured, error: errorMessage };
+  }
+}
+
 export default function HomeScreen() {
   const [isSDKInitialized, setIsSDKInitialized] = useState(false);
   const [sdkError, setSdkError] = useState<string | null>(null);
@@ -16,60 +57,16 @@ export default function HomeScreen() {
 
   // Initialize SDK when component mounts
   useEffect(() => {
-    initializeAppstackSDK();
+    let cancelled = false;
+    initializeAppstackSDK().then(({ initialized, error }) => {
+      if (cancelled) return;
+      setIsSDKInitialized(initialized);
+      setSdkError(error);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
-
-  const initializeAppstackSDK = async () => {
-    try {
-      console.log('Initializing Appstack SDK...');
-      
-      // Debug: check the native module resolved. The SDK is a TurboModule, so look it
-      // up through TurboModuleRegistry rather than NativeModules — the latter is the
-      // legacy-architecture path and is not the SDK's own lookup mechanism.
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { TurboModuleRegistry } = require('react-native');
-      const nativeModule = TurboModuleRegistry.get('AppstackReactNative');
-      console.log('AppstackReactNative module:', nativeModule);
-      console.log('Is AppstackReactNative available:', !!nativeModule);
-
-      // This demo reads its API key from local environment configuration. Never
-      // commit a real key to the sample application.
-      const apiKey = process.env.EXPO_PUBLIC_APPSTACK_API_KEY?.trim();
-
-      if (!apiKey) {
-        const msg = 'Missing EXPO_PUBLIC_APPSTACK_API_KEY. Set it in your env (e.g. eas.json env or .env) to initialize the SDK.';
-        console.warn(msg);
-        setSdkError(msg);
-        setIsSDKInitialized(false);
-        return;
-      }
-
-      // The dev endpoint is applied natively via the APPSTACK_DEV_PROXY_URL manifest key
-      // (ios/homepageapp/Info.plist + android/app/src/main/AndroidManifest.xml), not through
-      // configure() — the isDebug/endpointBaseUrl arguments were never forwarded to
-      // native and were removed in 3.0.
-      await AppstackSDK.configure(apiKey, {
-        logLevel: 0, // 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR
-      });
-      setIsSDKInitialized(true);
-      setSdkError(null);
-
-      console.log('Appstack SDK configured successfully');
-
-      // Send a basic event to test
-      await AppstackSDK.sendEvent('APP_OPENED');
-      console.log('APP_OPENED event sent successfully');
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Failed to initialize Appstack SDK:', error);
-      setSdkError(errorMessage);
-
-      // Only show alert if it's not the common linking error
-      if (!errorMessage.includes("doesn't seem to be linked")) {
-        Alert.alert('SDK Error', `Failed to initialize Appstack SDK: ${errorMessage}`);
-      }
-    }
-  };
 
   const handleTestEvent = async () => {
     if (!isSDKInitialized) {

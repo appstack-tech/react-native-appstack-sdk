@@ -16,7 +16,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.example.homepageapp"
     },
     "web": {
@@ -35,7 +34,6 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "../plugin/build",
       "./plugins/withAppstackDevProxy",
       "expo-web-browser",
       "expo-font"
