@@ -12,15 +12,6 @@ async function initializeAppstackSDK(): Promise<{ initialized: boolean; error: s
   let configured = false;
   try {
     console.log('Initializing Appstack SDK...');
-    
-    // Debug: check the native module resolved. The SDK is a TurboModule, so look it
-    // up through TurboModuleRegistry rather than NativeModules — the latter is the
-    // legacy-architecture path and is not the SDK's own lookup mechanism.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { TurboModuleRegistry } = require('react-native');
-    const nativeModule = TurboModuleRegistry.get('AppstackReactNative');
-    console.log('AppstackReactNative module:', nativeModule);
-    console.log('Is AppstackReactNative available:', !!nativeModule);
 
     // This demo reads its API key from local environment configuration. Never
     // commit a real key to the sample application.
