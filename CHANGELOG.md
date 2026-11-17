@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.0] - 2026-11-17
+
 ### Added
 
 - `getAttributionParams()` now returns `confidence_tier` (`high`, `medium` or `low`), the confidence of the attribution match. It isn't returned for an organic install. **iOS:** it now also returns `deeplink_id`, the ID of the matched link, as Android already did.
