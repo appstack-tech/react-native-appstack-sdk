@@ -148,14 +148,12 @@ export default function App() {
           },
           validationError,
           legacyCallRejected,
-          linkBeforeConfigure:
-            !!linkBeforeConfigure && linkBeforeConfigure.deeplinkId === 'AbC123',
+          linkBeforeConfigure: !!linkBeforeConfigure && linkBeforeConfigure.deeplinkId === 'AbC123',
           linkDeeplinkId: linkParsed ? linkParsed.deeplinkId : null,
           linkQueryParams: linkParsed ? linkParsed.queryParams : null,
           linkUrl: linkParsed ? linkParsed.url : null,
           linkAllowlistHit: !!linkAllowed && linkAllowed.deeplinkId === 'AbC123',
-          linkAllowlistMiss:
-            linkAllowlistMiss === null ? 'null' : typeof linkAllowlistMiss,
+          linkAllowlistMiss: linkAllowlistMiss === null ? 'null' : typeof linkAllowlistMiss,
           linkSharedHost: linkSharedHost === null ? 'null' : typeof linkSharedHost,
           linkValidationError,
           linkEmptyAllowlistError,
