@@ -141,16 +141,19 @@ export default function App() {
             firstCall.unicode === 'café 🚀',
           attributionValidated:
             attribution.runtime_validation === 'attributed' && attribution.unicode === 'café 🚀',
+          attributionMetadata: {
+            deeplink_id: attribution.deeplink_id ?? null,
+            confidence_tier: attribution.confidence_tier ?? null,
+            appstack_match_status: attribution.appstack_match_status ?? null,
+          },
           validationError,
           legacyCallRejected,
-          linkBeforeConfigure:
-            !!linkBeforeConfigure && linkBeforeConfigure.deeplinkId === 'AbC123',
+          linkBeforeConfigure: !!linkBeforeConfigure && linkBeforeConfigure.deeplinkId === 'AbC123',
           linkDeeplinkId: linkParsed ? linkParsed.deeplinkId : null,
           linkQueryParams: linkParsed ? linkParsed.queryParams : null,
           linkUrl: linkParsed ? linkParsed.url : null,
           linkAllowlistHit: !!linkAllowed && linkAllowed.deeplinkId === 'AbC123',
-          linkAllowlistMiss:
-            linkAllowlistMiss === null ? 'null' : typeof linkAllowlistMiss,
+          linkAllowlistMiss: linkAllowlistMiss === null ? 'null' : typeof linkAllowlistMiss,
           linkSharedHost: linkSharedHost === null ? 'null' : typeof linkSharedHost,
           linkValidationError,
           linkEmptyAllowlistError,

@@ -107,6 +107,7 @@ def main() -> None:
                     200,
                     {
                         "deeplink_id": "runtime-validation-deeplink",
+                        "confidence_tier": "high",
                         "app_id": "runtime_validation_app",
                         "redirection_url": "https://example.invalid/app",
                         "timestamp": "2026-07-13T00:00:00Z",

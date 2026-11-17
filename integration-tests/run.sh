@@ -489,6 +489,11 @@ export default function App() {
           attributionValidated:
             attribution.runtime_validation === 'attributed' &&
             attribution.unicode === 'café 🚀',
+          attributionMetadata: {
+            deeplink_id: attribution.deeplink_id ?? null,
+            confidence_tier: attribution.confidence_tier ?? null,
+            appstack_match_status: attribution.appstack_match_status ?? null,
+          },
           validationError,
           legacyCallRejected,
           linkBeforeConfigure:
