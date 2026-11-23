@@ -2,7 +2,7 @@ const {
   withInfoPlist,
   withAndroidManifest,
   AndroidConfig,
-} = require('@expo/config-plugins');
+} = require('expo/config-plugins');
 
 // Repo-only Expo config plugin. Injects the Appstack dev proxy URL as a native
 // manifest key on both platforms so THIS test app targets the dev environment via
